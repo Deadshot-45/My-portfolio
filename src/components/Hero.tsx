@@ -62,7 +62,7 @@ export default function Hero() {
             <span className="text-accent underline decoration-accent/20 underline-offset-8">
               Full Stack Engineer
             </span>
-            .
+            <span>.</span>
           </motion.p>
         </div>
 

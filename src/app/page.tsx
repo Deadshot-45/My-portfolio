@@ -21,7 +21,7 @@ const projects = [
       "Online therapy and assessments designed for India's pace of life. Psych-up delivers therapist-guided sessions, clinically validated assessments, and personalised care journeys on one secure platform.",
     image: "/psychup.png",
     link: "https://dev.psychup.health/",
-    tags: ["Next.js", "TypeScript", "Tailwind"],
+    tags: ["React.js", "TypeScript", "Tailwind"],
   },
   {
     title: "Vogue-Vault E-commerce",

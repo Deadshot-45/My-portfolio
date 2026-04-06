@@ -5,7 +5,7 @@ import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 export default function MotionProvider({
   children,
 }: {
-  children: React.ReactNode;
+  readonly children: React.ReactNode;
 }) {
   return (
     <MotionConfig

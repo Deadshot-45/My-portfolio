@@ -79,8 +79,9 @@ export default function About() {
               into Digital Reality.&quot;
             </h3>
             <p className="text-lg text-slate-400 leading-relaxed">
-              I&apos;m <span className="text-white font-bold">Mayank Sahu</span>
-              , a Front-End Web Developer and graduate. I specialize in building
+              I<span>&apos;m</span>{" "}
+              <span className="text-white font-bold">Mayank Sahu</span>, a
+              Front-End Web Developer and graduate. I specialize in building
               high-performance, interactive web applications using modern
               technologies.
             </p>
