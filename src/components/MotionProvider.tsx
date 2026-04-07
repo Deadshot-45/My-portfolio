@@ -14,12 +14,13 @@ export default function MotionProvider({
     >
       <AnimatePresence mode="wait">
         <motion.div
-          key="page-mount"
-          initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ duration: 0.8, delay: 0, ease: [0.22, 1, 0.36, 1] }}
-          className="flex-1 flex flex-col"
-        >
+           key="page-mount"
+           initial={{ opacity: 0, y: 8 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.5, delay: 0, ease: [0.22, 1, 0.36, 1] }}
+           className="flex-1 flex flex-col"
+         >
+
           {children}
         </motion.div>
       </AnimatePresence>

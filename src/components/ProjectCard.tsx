@@ -32,19 +32,21 @@ export default function ProjectCard({
     <motion.div
       variants={fadeUpVariants}
       initial="hidden"
-      animate="show"
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      whileInView="show"
+      viewport={{ once: true, margin: "-50px" }}
       className="group relative cursor-pointer"
       onClick={handleClick}
     >
       <div className="relative aspect-video rounded-[3rem] overflow-hidden border border-slate-800/50 glass p-2">
-        <div className="w-full h-full rounded-[2.5rem] overflow-hidden relative">
+        <div className="w-full h-full rounded-[2.5rem] overflow-hidden relative transform-gpu">
           <Image
             src={image}
             alt={title}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
+
           <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
         </div>
 

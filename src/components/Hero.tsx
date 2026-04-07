@@ -14,8 +14,8 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.8, ease: "easeOut" }}
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-accent/10 blur-[160px] rounded-full"
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/15 blur-[120px] rounded-full"
         />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.8)_100%)]" />
       </div>
@@ -107,9 +107,10 @@ export default function Hero() {
               src="/hero-developer.png"
               alt="Digital Product Showcase"
               fill
-              sizes="(max-width: 1280px) 100vw, 1280px"
-              className="object-cover group-hover:scale-105 transition-transform duration-1000 opacity-80"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 1280px"
+              className="object-cover group-hover:scale-105 transition-transform duration-1000 opacity-90"
               priority
+              quality={90}
             />
             <div className="absolute inset-0 bg-linear-to-t from-slate-950/40 via-transparent to-transparent" />
           </div>

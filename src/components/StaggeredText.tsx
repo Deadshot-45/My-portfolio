@@ -1,10 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
-const container = {
-  hidden: {},
+const container: Variants = {
+  hidden: { opacity: 0 },
   show: {
+    opacity: 1,
     transition: {
       staggerChildren: 0.035,
       delayChildren: 0.06,
@@ -12,21 +13,24 @@ const container = {
   },
 };
 
-const letter = {
+const letter: Variants = {
+
   hidden: {
-    y: 18,
-    filter: "blur(10px)",
+    y: 10,
+    opacity: 0,
     scale: 0.98,
   },
   show: {
     y: 0,
-    filter: "blur(0px)",
+    opacity: 1,
     scale: 1,
     transition: {
-      duration: 0.55,
+      duration: 0.45,
+      ease: "easeOut",
     },
   },
 };
+
 
 export default function StaggeredText({
   text,

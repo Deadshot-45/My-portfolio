@@ -37,12 +37,13 @@ export default function Navbar() {
           ease: [0.22, 1, 0.36, 1],
           delay: 0,
         }}
-        className={`fixed top-4 left-1/2 z-50 px-6 py-2.5 rounded-full transition-all duration-500 ${
+        className={`fixed top-4 left-1/2 z-50 px-6 py-2.5 rounded-full transition-all duration-500 transform-gpu ${
           scrolled
             ? "glass shadow-2xl w-[95%] lg:w-[85%] max-w-5xl"
             : "w-[98%] max-w-6xl"
         }`}
       >
+
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"

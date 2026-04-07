@@ -1,8 +1,9 @@
 import type { Variants } from "framer-motion";
 
 export const containerVariants: Variants = {
-  hidden: {},
+  hidden: { opacity: 0 },
   show: {
+    opacity: 1,
     transition: {
       staggerChildren: 0.12,
       delayChildren: 0.1,
@@ -11,25 +12,26 @@ export const containerVariants: Variants = {
 };
 
 export const fadeUpVariants: Variants = {
-  hidden: { y: 40, filter: "blur(10px)" },
+  hidden: { y: 20, opacity: 0 },
   show: {
     y: 0,
-    filter: "blur(0px)",
+    opacity: 1,
     transition: {
       duration: 0.6,
-      ease: "easeOut",
+      ease: [0.22, 1, 0.36, 1],
     },
   },
 };
 
 export const scaleInVariants: Variants = {
-  hidden: { scale: 0.94, filter: "blur(8px)" },
+  hidden: { scale: 0.96, opacity: 0 },
   show: {
     scale: 1,
-    filter: "blur(0px)",
+    opacity: 1,
     transition: {
       duration: 0.6,
-      ease: "easeOut",
+      ease: [0.22, 1, 0.36, 1],
     },
   },
 };
+
