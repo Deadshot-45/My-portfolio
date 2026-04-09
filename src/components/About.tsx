@@ -5,7 +5,7 @@ import Image from "next/image";
 import { containerVariants, fadeUpVariants, scaleInVariants } from "./motion";
 import SectionHeading from "./SectionHeading";
 import { Award, Info, Target, Trophy } from "lucide-react";
-import { aboutBlurb } from "@/data/site";
+import { aboutBlurb, getAssetUrl } from "@/data/site";
 
 export default function About() {
   return (
@@ -37,7 +37,7 @@ export default function About() {
           <div className="absolute -inset-4 bg-linear-to-r from-emerald-500/20 to-blue-500/20 rounded-[2.5rem] blur-2xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
           <div className="relative aspect-square rounded-4xl overflow-hidden border border-slate-800/50 shadow-2xl glass">
             <Image
-              src="/profile.png"
+              src={getAssetUrl("profile.png")}
               alt="Mayank Sahu"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
