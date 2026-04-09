@@ -9,13 +9,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const [activeSection, setActiveSection] = useState("home");
 
   const navLinks = [
     { name: "About", href: "#about" },
@@ -26,6 +20,86 @@ export default function Navbar() {
     { name: "Skills", href: "#skills" },
     { name: "Contact", href: "#contact" },
   ];
+
+  useEffect(() => {
+    const sectionIds = navLinks.map((item) => item.href.replace("#", ""));
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => section !== null);
+
+    const updateActiveSection = () => {
+      setScrolled(window.scrollY > 12);
+
+      if (window.scrollY < 80) {
+        setActiveSection("home");
+        return;
+      }
+
+      const viewportAnchor = window.innerHeight * 0.35;
+      const active = sections.reduce<{
+        id: string;
+        distance: number;
+        inView: boolean;
+      } | null>((closest, section) => {
+        const rect = section.getBoundingClientRect();
+        const isInView =
+          rect.top <= viewportAnchor && rect.bottom >= viewportAnchor;
+        const distance = Math.abs(rect.top - viewportAnchor);
+        const next = { id: section.id, distance, inView: isInView };
+
+        if (!closest) {
+          return next;
+        }
+
+        if (next.inView && !closest.inView) {
+          return next;
+        }
+
+        if (
+          next.inView === closest.inView &&
+          next.distance < closest.distance
+        ) {
+          return next;
+        }
+
+        return closest;
+      }, null);
+
+      if (active?.id) {
+        setActiveSection(active.id);
+      }
+    };
+
+    const syncWithHash = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && sectionIds.includes(hash)) {
+        setActiveSection(hash);
+        return;
+      }
+
+      updateActiveSection();
+    };
+
+    updateActiveSection();
+    syncWithHash();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("hashchange", syncWithHash);
+    window.addEventListener("resize", updateActiveSection);
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("hashchange", syncWithHash);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
@@ -43,7 +117,6 @@ export default function Navbar() {
             : "w-[98%] max-w-6xl"
         }`}
       >
-
         <div className="flex items-center justify-between gap-4">
           <Link
             href="/"
@@ -58,7 +131,11 @@ export default function Navbar() {
               <a
                 key={link.name}
                 href={link.href}
-                className="hover:text-white transition-colors px-2 py-1"
+                className={`hover:text-white transition-colors px-2 py-1 ${
+                  activeSection === link.href.replace("#", "")
+                    ? "text-white"
+                    : ""
+                }`}
               >
                 {link.name}
               </a>
