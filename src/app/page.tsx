@@ -10,29 +10,30 @@ import Navbar from "@/components/Navbar";
 import ProjectCard from "@/components/ProjectCard";
 import SectionHeading from "@/components/SectionHeading";
 import Skills from "@/components/Skills";
+import { projects } from "@/data/site";
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Download, Github, Linkedin, Mail } from "lucide-react";
 
-const projects = [
-  {
-    title: "Psych-up - Digital Healthcare",
-    category: "Mental Healthcare",
-    description:
-      "Online therapy and assessments designed for India's pace of life. Psych-up delivers therapist-guided sessions, clinically validated assessments, and personalised care journeys on one secure platform.",
-    image: "/psychup.png",
-    link: "https://dev.psychup.health/",
-    tags: ["React.js", "TypeScript", "Tailwind"],
-  },
-  {
-    title: "Vogue-Vault E-commerce",
-    category: "E-commerce",
-    description:
-      "A feature-rich, high-performance E-Commerce platform built with React and Tailwind CSS, offering a premium shopping experience with collections for all ages.",
-    image: "/e-com.png",
-    link: "https://vault-vogue-lite.vercel.app/",
-    tags: ["Next.js", "Tailwind", "Express.js"],
-  },
-];
+// const projects = [
+//   {
+//     title: "Psych-up - Digital Healthcare",
+//     category: "Mental Healthcare",
+//     description:
+//       "Online therapy and assessments designed for India's pace of life. Psych-up delivers therapist-guided sessions, clinically validated assessments, and personalised care journeys on one secure platform.",
+//     image: getAssetUrl("/psychup.png"),
+//     link: "https://dev.psychup.health/",
+//     tags: ["React.js", "TypeScript", "Tailwind"],
+//   },
+//   {
+//     title: "Vogue-Vault E-commerce",
+//     category: "E-commerce",
+//     description:
+//       "A feature-rich, high-performance E-Commerce platform built with React and Tailwind CSS, offering a premium shopping experience with collections for all ages.",
+//     image: getAssetUrl("/e-com.png"),
+//     link: "https://vault-vogue-lite.vercel.app/",
+//     tags: ["Next.js", "Tailwind", "Express.js"],
+//   },
+// ];
 
 export default function Home() {
   return (
@@ -122,6 +123,16 @@ export default function Home() {
                 <Github className="w-6 h-6 md:w-8 md:h-8" />
               </div>
               <span>GitHub</span>
+            </a>
+            <a
+              href="/react_mayank_sahu.pdf"
+              download="resume_mayank_sahu.pdf"
+              className="group flex items-center gap-3 text-2xl md:text-4xl font-display font-medium hover:text-accent transition-all duration-300"
+            >
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center group-hover:border-accent/50 group-hover:bg-accent/5 transition-all">
+                <Download className="w-6 h-6 md:w-8 md:h-8" />
+              </div>
+              <span>Resume</span>
             </a>
           </div>
         </div>

@@ -8,16 +8,16 @@ import { fadeUpVariants } from "./motion";
 interface ProjectCardProps {
   readonly title: string;
   readonly category: string;
-  readonly description: string;
+  readonly longDescription: string;
   readonly image: string;
-  readonly tags: string[];
+  readonly tags: readonly string[];
   readonly link?: string;
 }
 
 export default function ProjectCard({
   title,
   category,
-  description,
+  longDescription,
   image,
   tags,
   link,
@@ -68,7 +68,7 @@ export default function ProjectCard({
         </h3>
 
         <p className="text-slate-400 text-sm leading-relaxed max-w-md">
-          {description}
+          {longDescription}
         </p>
 
         <div className="flex flex-wrap gap-2 pt-2">

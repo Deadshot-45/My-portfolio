@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { containerVariants, fadeUpVariants, scaleInVariants } from "./motion";
 import StaggeredText from "./StaggeredText";
+import { getAssetUrl } from "@/data/site";
 
 export default function Hero() {
   return (
@@ -104,7 +105,7 @@ export default function Hero() {
         <div className="relative aspect-video rounded-[3rem] overflow-hidden border border-slate-800 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] glass p-3 group transform-gpu will-change-transform">
           <div className="w-full h-full rounded-[2.5rem] flex items-center justify-center overflow-hidden bg-slate-900/50">
             <Image
-              src="/hero-developer.png"
+              src={getAssetUrl("/hero-developer.png")}
               alt="Digital Product Showcase"
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 1280px"

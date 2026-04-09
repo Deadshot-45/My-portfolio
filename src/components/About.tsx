@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { containerVariants, fadeUpVariants, scaleInVariants } from "./motion";
 import SectionHeading from "./SectionHeading";
-import { Award, Target, Trophy } from "lucide-react";
+import { Award, Info, Target, Trophy } from "lucide-react";
+import { aboutBlurb } from "@/data/site";
 
 export default function About() {
   return (
@@ -43,6 +44,15 @@ export default function About() {
               className="object-cover group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-transparent to-transparent opacity-60" />
+
+            <div className="absolute top-6 right-6 flex flex-col items-end gap-2">
+              <div className="group inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-950/80 border border-slate-700/70 text-slate-100 shadow-xl shadow-slate-950/20 transition duration-300 hover:bg-accent/90 hover:text-slate-950">
+                <Info className="w-5 h-5" />
+              </div>
+              <span className="pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-[11px] leading-snug text-slate-200 bg-slate-950/90 border border-slate-700/70 rounded-2xl px-3 py-2 max-w-[200px] text-right">
+                Image is real — AI effect added
+              </span>
+            </div>
 
             <div className="absolute bottom-6 left-6 right-6 flex justify-between gap-4">
               <div className="glass px-4 py-2 rounded-xl backdrop-blur-3xl border-slate-700/50">
@@ -84,6 +94,10 @@ export default function About() {
               Front-End Web Developer and graduate. I specialize in building
               high-performance, interactive web applications using modern
               technologies.
+            </p>
+
+            <p className="text-lg text-slate-400 leading-relaxed">
+              {aboutBlurb[1]}
             </p>
           </div>
 
