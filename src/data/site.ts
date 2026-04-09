@@ -165,21 +165,26 @@ export const projects = [
     title: "Procurelinc e-Procurement Solution",
     category: "B2B SaaS / Fintech",
     tagline:
-      "A comprehensive, Cert-In certified 360-degree e-procurement and auction platform.",
+      "A secure and scalable e-procurement platform for government and enterprise tendering workflows.",
     description:
-      "Developed a highly secure, zero-cost procurement platform for Government, Semi-Government, and PSU departments to manage end-to-end tendering processes.",
+      "Contributed to UI enhancements, bug resolution, and feature improvements for a large-scale procurement platform used by Government and PSU departments.",
     longDescription:
-      "Engineered a robust e-procurement ecosystem featuring live auction capabilities, real-time bid tracking, and automated comparison sheets. The platform prioritizes security through PKI Digital Signature integration and adherence to Cert-In standards. It simplifies complex procurement workflows with an envelope-based tendering system, automated bidder management, and a seamless payment gateway integration, all while maintaining a 'Zero Cost' model for buyer departments.",
-    image: getAssetUrl("/procurelinc-preview.png"), // Placeholder based on your pattern
-    tags: ["e-Tendering", "Digital Signatures", "Live Auction", "Cert-In Certified"],
+      "Worked on improving the frontend experience of a complex e-procurement system by refining UI components, fixing critical bugs, and implementing new features. Focused on enhancing usability across tendering workflows, ensuring consistency in design, and improving overall interaction quality. Collaborated within an existing codebase to deliver stable updates while maintaining platform reliability and performance.",
+    image: getAssetUrl("/procurelinc-preview.png"),
+    tags: [
+      "Frontend Development",
+      "UI Enhancements",
+      "Bug Fixing",
+      "Feature Implementation",
+    ],
     metrics: [
-      "Zero-cost buyer model",
-      "Real-time bid synchronization",
-      "PKI-based security integrity",
+      "Improved UI consistency",
+      "Resolved production issues",
+      "Enhanced user workflows",
     ],
     link: "https://dev.procurelinc.in/",
     featured: true,
-}
+  },
   // {
   //   slug: "crypto-flow",
   //   title: "Crypto Flow",
