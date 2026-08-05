@@ -192,7 +192,11 @@ export default function Home() {
               <div className="hud-notch-bottom-right" />
               <div className="relative aspect-square rounded-[calc(1.5rem-0.25rem)] overflow-hidden bg-slate-950 border border-rose-900/30">
                 <Image
-                  src={getAssetUrl("/profile-avatar.webp")}
+                  src={
+                    siteData.profile.avatarUrl?.startsWith("data:")
+                      ? siteData.profile.avatarUrl
+                      : getAssetUrl(`${siteData.profile.avatarUrl || "/profile-avatar.webp"}?t=${siteData.profile.lastUpdated || ""}`)
+                  }
                   alt="Mayank Sahu Avatar"
                   fill
                   sizes="260px"
@@ -274,7 +278,11 @@ export default function Home() {
                       <div className="p-2 rounded-[2rem] bg-white/5 border border-rose-900/20 shadow-2xl backdrop-blur-2xl w-[260px] transform-gpu transition-all duration-700 hover:rotate-2">
                         <div className="relative aspect-square rounded-[calc(2rem-0.5rem)] overflow-hidden bg-slate-950 border border-rose-900/20">
                           <Image
-                            src={getAssetUrl("/hero-banner.webp")}
+                            src={
+                              siteData.profile.bannerUrl?.startsWith("data:")
+                                ? siteData.profile.bannerUrl
+                                : getAssetUrl(`${siteData.profile.bannerUrl || "/hero-banner.webp"}?t=${siteData.profile.lastUpdated || ""}`)
+                            }
                             alt="Hologram concepts"
                             fill
                             sizes="260px"
@@ -659,7 +667,11 @@ export default function Home() {
                         </a>
 
                         <a
-                          href="/Mayank_Sahu_MERN_Stack.pdf"
+                          href={
+                            siteData.profile.resumeUrl?.startsWith("data:")
+                              ? siteData.profile.resumeUrl
+                              : `${siteData.profile.resumeUrl || "/Mayank_Sahu_MERN_Stack.pdf"}?t=${siteData.profile.lastUpdated || ""}`
+                          }
                           download="Mayank_Sahu_MERN_Stack.pdf"
                           className="p-1 rounded-2xl bg-white/5 border border-rose-900/10 hover:border-rose-500/40 transition-colors shadow-md group"
                         >

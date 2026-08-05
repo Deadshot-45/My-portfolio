@@ -141,6 +141,18 @@ export default function AdminCMS() {
       if (data && data.success) {
         setUploadStatus("success");
         playBeep(1400, 0.15);
+        setSiteData((prev) => {
+          const profile = { ...prev.profile };
+          if (type === "avatar") {
+            profile.avatarUrl = data.path;
+          } else if (type === "banner") {
+            profile.bannerUrl = data.path;
+          } else {
+            profile.resumeUrl = data.path;
+          }
+          profile.lastUpdated = Date.now();
+          return { ...prev, profile };
+        });
         setTimeout(() => setUploadStatus("idle"), 3000);
       } else {
         setUploadStatus("error");

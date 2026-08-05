@@ -6,7 +6,11 @@
     "level": 48,
     "coins": 1428,
     "availability": "OPEN FOR HIRE",
-    "motto": "BUILDING HIGH-PERFORMANCE WEB ARTIFACTS WITH SPATIAL PRECISION."
+    "motto": "BUILDING HIGH-PERFORMANCE WEB ARTIFACTS WITH SPATIAL PRECISION.",
+    "avatarUrl": "/profile-avatar.webp",
+    "bannerUrl": "/hero-banner.webp",
+    "resumeUrl": "/Mayank_Sahu_MERN_Stack.pdf",
+    "lastUpdated": 1722467890123
   },
   "quest": {
     "questName": "REACT WEBSITE",
