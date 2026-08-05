@@ -10,6 +10,7 @@ import { Award, BookOpen, GraduationCap } from "lucide-react";
 
 export default function Home() {
   const [siteData, setSiteData] = useState(initialSiteData);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"beginning" | "logs" | "achievements" | "creations" | "socials">("beginning");
   const [localTime, setLocalTime] = useState("");
   const [soundOn, setSoundOn] = useState(true);
@@ -29,9 +30,10 @@ export default function Home() {
         if (data && !data.error) {
           setSiteData(data);
         }
+        setIsLoading(false);
       })
       .catch(() => {
-        // Fallback to imported JSON
+        setIsLoading(false);
       });
   }, []);
 
@@ -191,18 +193,27 @@ export default function Home() {
               <div className="hud-notch-bottom-left" />
               <div className="hud-notch-bottom-right" />
               <div className="relative aspect-square rounded-[calc(1.5rem-0.25rem)] overflow-hidden bg-slate-950 border border-rose-900/30">
-                <Image
-                  src={
-                    siteData.profile.avatarUrl?.startsWith("data:")
-                      ? siteData.profile.avatarUrl
-                      : getAssetUrl(`${siteData.profile.avatarUrl || "/profile-avatar.webp"}?t=${siteData.profile.lastUpdated || ""}`)
-                  }
-                  alt="Mayank Sahu Avatar"
-                  fill
-                  sizes="260px"
-                  className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-700 filter saturate-75 contrast-125"
-                />
-                <div className="absolute inset-0 bg-rose-950/10 pointer-events-none mix-blend-overlay" />
+                {isLoading ? (
+                  <div className="absolute inset-0 bg-black flex flex-col items-center justify-center border border-rose-500/20">
+                    <div className="w-8 h-8 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin mb-2" />
+                    <span className="text-[7px] tracking-widest text-rose-500/60 font-bold uppercase animate-pulse">UPLINKING AVATAR...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Image
+                      src={
+                        siteData.profile.avatarUrl?.startsWith("data:")
+                          ? siteData.profile.avatarUrl
+                          : getAssetUrl(`${siteData.profile.avatarUrl || "/profile-avatar.webp"}?t=${siteData.profile.lastUpdated || ""}`)
+                      }
+                      alt="Mayank Sahu Avatar"
+                      fill
+                      sizes="260px"
+                      className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-700 filter saturate-75 contrast-125"
+                    />
+                    <div className="absolute inset-0 bg-rose-950/10 pointer-events-none mix-blend-overlay" />
+                  </>
+                )}
               </div>
             </div>
 
@@ -277,18 +288,27 @@ export default function Home() {
                       <div className="absolute -inset-4 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
                       <div className="p-2 rounded-[2rem] bg-white/5 border border-rose-900/20 shadow-2xl backdrop-blur-2xl w-[260px] transform-gpu transition-all duration-700 hover:rotate-2">
                         <div className="relative aspect-square rounded-[calc(2rem-0.5rem)] overflow-hidden bg-slate-950 border border-rose-900/20">
-                          <Image
-                            src={
-                              siteData.profile.bannerUrl?.startsWith("data:")
-                                ? siteData.profile.bannerUrl
-                                : getAssetUrl(`${siteData.profile.bannerUrl || "/hero-banner.webp"}?t=${siteData.profile.lastUpdated || ""}`)
-                            }
-                            alt="Hologram concepts"
-                            fill
-                            sizes="260px"
-                            className="object-cover saturate-50 brightness-90"
-                          />
-                          <div className="absolute inset-0 bg-radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.8)_100%)" />
+                          {isLoading ? (
+                            <div className="absolute inset-0 bg-black flex flex-col items-center justify-center border border-rose-500/20">
+                              <div className="w-8 h-8 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin mb-2" />
+                              <span className="text-[7px] tracking-widest text-rose-500/60 font-bold uppercase animate-pulse">ESTABLISHING LINK...</span>
+                            </div>
+                          ) : (
+                            <>
+                              <Image
+                                src={
+                                  siteData.profile.bannerUrl?.startsWith("data:")
+                                    ? siteData.profile.bannerUrl
+                                    : getAssetUrl(`${siteData.profile.bannerUrl || "/hero-banner.webp"}?t=${siteData.profile.lastUpdated || ""}`)
+                                }
+                                alt="Hologram concepts"
+                                fill
+                                sizes="260px"
+                                className="object-cover saturate-50 brightness-90"
+                              />
+                              <div className="absolute inset-0 bg-radial-gradient(circle_at_center,transparent_30%,rgba(0,0,0,0.8)_100%)" />
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
