@@ -71,3 +71,5 @@ jobs:
         env:
           NEXT_PUBLIC_ADMIN_PASSCODE: ${{ secrets.NEXT_PUBLIC_ADMIN_PASSCODE }}
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          
