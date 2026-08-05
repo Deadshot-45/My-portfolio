@@ -11,6 +11,8 @@ import { Award, BookOpen, GraduationCap } from "lucide-react";
 export default function Home() {
   const [siteData, setSiteData] = useState(initialSiteData);
   const [isLoading, setIsLoading] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isQuestOpen, setIsQuestOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"beginning" | "logs" | "achievements" | "creations" | "socials">("beginning");
   const [localTime, setLocalTime] = useState("");
   const [soundOn, setSoundOn] = useState(true);
@@ -145,6 +147,140 @@ export default function Home() {
     }
   };
 
+  const renderProfileContent = () => (
+    <div className="flex flex-col justify-between h-full gap-6">
+      <div className="space-y-6">
+        {/* Profile Avatar Frame */}
+        <div className="p-1 rounded-[1.5rem] bg-rose-950/20 border border-rose-900/25 relative group">
+          <div className="hud-notch-top-left" />
+          <div className="hud-notch-top-right" />
+          <div className="hud-notch-bottom-left" />
+          <div className="hud-notch-bottom-right" />
+          <div className="relative aspect-square rounded-[calc(1.5rem-0.25rem)] overflow-hidden bg-slate-950 border border-rose-900/30">
+            {isLoading ? (
+              <div className="absolute inset-0 bg-black flex flex-col items-center justify-center border border-rose-500/20">
+                <div className="w-8 h-8 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin mb-2" />
+                <span className="text-[7px] tracking-widest text-rose-500/60 font-bold uppercase animate-pulse">UPLINKING AVATAR...</span>
+              </div>
+            ) : (
+              <>
+                <Image
+                  src={
+                    siteData.profile.avatarUrl?.startsWith("data:")
+                      ? siteData.profile.avatarUrl
+                      : getAssetUrl(`${siteData.profile.avatarUrl || "/profile-avatar.webp"}?t=${siteData.profile.lastUpdated || ""}`)
+                  }
+                  alt="Mayank Sahu Avatar"
+                  fill
+                  sizes="260px"
+                  className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-700 filter saturate-75 contrast-125"
+                />
+                <div className="absolute inset-0 bg-rose-950/10 pointer-events-none mix-blend-overlay" />
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Profile Info labels */}
+        <div className="space-y-4 text-[10px] tracking-widest font-semibold uppercase text-rose-500/80">
+          <div className="space-y-1">
+            <p className="text-[9px] text-slate-500 font-bold">NAME</p>
+            <p className="text-white text-sm font-display font-black tracking-wider glow-text-red">{siteData.profile.name}</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-[9px] text-slate-500 font-bold">OCCUPATION</p>
+            <p className="text-white font-black tracking-wide">{siteData.profile.occupation}</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-[9px] text-slate-500 font-bold">CORPORATION</p>
+            <p className="text-rose-400">{siteData.profile.corporation}</p>
+          </div>
+          <div className="space-y-1 pt-2">
+            <p className="text-[9px] text-slate-500 font-bold">AVAILABILITY</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/20 border border-rose-500/30 text-rose-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+              <span>{siteData.profile.availability}</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <p className="text-[9px] text-slate-500 font-bold">SOCIAL</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/10 border border-rose-950/30 text-rose-500/60">
+              <span>📶 CONNECTION OPEN</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Motto */}
+      <div className="border-t border-rose-950/20 pt-4 text-[10px] text-slate-500 uppercase tracking-widest font-bold leading-relaxed">
+        <p className="text-[8px] text-rose-500/40 mb-1">MOTTO:</p>
+        {siteData.profile.motto}
+      </div>
+    </div>
+  );
+
+  const renderQuestContent = () => (
+    <div className="flex flex-col justify-between h-full gap-6 text-rose-500/80 uppercase">
+      <div className="space-y-6">
+        {/* Quest Details Panel */}
+        <div className="p-4 rounded-2xl bg-rose-950/10 border border-rose-950/20 space-y-4">
+          <span className="text-[8px] font-display font-black tracking-widest text-rose-400 bg-rose-950/30 border border-rose-900/30 px-2 py-0.5 rounded-sm">ACTIVE QUEST</span>
+          <div className="space-y-1">
+            <p className="text-[8px] text-slate-500 font-bold">QUEST NAME</p>
+            <p className="text-white text-xs font-bold leading-tight">{siteData.quest.questName}</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-[8px] text-slate-500 font-bold">GOAL</p>
+            <p className="text-[9px] text-slate-400 font-medium normal-case leading-relaxed">
+              {siteData.quest.goal}
+            </p>
+          </div>
+          <div className="space-y-1 pt-1">
+            <p className="text-[8px] text-slate-500 font-bold">REWARDS</p>
+            <div className="flex gap-2">
+              <span className="text-[9px] bg-rose-950/30 border border-rose-900/30 px-2 py-0.5 rounded-md text-white font-bold">XP +{siteData.quest.xpReward}</span>
+              <span className="text-[9px] bg-rose-950/30 border border-rose-900/30 px-2 py-0.5 rounded-md text-white font-bold">COINS +{siteData.quest.coinsReward}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Audio Controls */}
+      <div className="space-y-3 text-[10px] font-bold tracking-widest text-slate-500">
+        <div className="flex items-center justify-between">
+          <label htmlFor="sound-toggle-drawer" className="cursor-pointer hover:text-slate-300">SOUND EFFECTS</label>
+          <input
+            id="sound-toggle-drawer"
+            type="checkbox"
+            checked={soundOn}
+            onChange={(e) => {
+              playBeep(600, 0.05);
+              setSoundOn(e.target.checked);
+            }}
+            className="w-3.5 h-3.5 border border-rose-950 rounded-sm bg-black accent-rose-500 cursor-pointer"
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <label htmlFor="music-toggle-drawer" className="cursor-pointer hover:text-slate-300">AMBIENT DRONE</label>
+          <input
+            id="music-toggle-drawer"
+            type="checkbox"
+            checked={musicOn}
+            onChange={(e) => {
+              playBeep(700, 0.05);
+              setMusicOn(e.target.checked);
+            }}
+            className="w-3.5 h-3.5 border border-rose-950 rounded-sm bg-black accent-rose-500 cursor-pointer"
+          />
+        </div>
+        <div className="flex items-center justify-between pt-2 border-t border-rose-950/20">
+          <span>VISUAL SETTINGS</span>
+          <span className="text-[14px] text-rose-500 cursor-pointer hover:rotate-45 transition-transform duration-300">⚙</span>
+        </div>
+      </div>
+    </div>
+  );
+
   // Calculations for achievements completed vs total
   const completedAchievements = siteData.achievements.filter(a => a.status === "COMPLETED").length;
   const totalAchievements = siteData.achievements.length;
@@ -158,100 +294,66 @@ export default function Home() {
       <div className="absolute inset-0 bg-radial-gradient(circle_at_center,transparent_40%,rgba(3,1,2,0.95)_100%) pointer-events-none -z-10" />
 
       {/* Top HUD Telemetry Bar */}
-      <header className="w-full border-b border-rose-950/40 bg-black/60 px-6 py-3 flex items-center justify-between text-[10px] tracking-[0.2em] font-semibold text-rose-500/80 z-20 shrink-0">
-        <div className="flex items-center gap-6">
-          <span className="flex items-center gap-2 glow-text-red">
+      <header className="w-full border-b border-rose-950/40 bg-black/60 px-4 sm:px-6 py-3 flex items-center justify-between text-[10px] tracking-[0.2em] font-semibold text-rose-500/80 z-20 shrink-0">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setIsProfileOpen(true)}
+            className="lg:hidden flex items-center gap-2 hover:text-white transition-colors bg-rose-950/15 border border-rose-900/35 px-2.5 py-1 rounded-xl active:scale-95 cursor-pointer"
+          >
+            <div className="w-4.5 h-4.5 rounded-full overflow-hidden relative border border-rose-500/30">
+              <Image 
+                src={
+                  siteData.profile.avatarUrl?.startsWith("data:")
+                    ? siteData.profile.avatarUrl
+                    : getAssetUrl(`${siteData.profile.avatarUrl || "/profile-avatar.webp"}?t=${siteData.profile.lastUpdated || ""}`)
+                }
+                alt="Profile thumbnail"
+                fill
+                sizes="20px"
+                className="object-cover"
+              />
+            </div>
+            <span>PROFILE</span>
+          </button>
+
+          <span className="hidden lg:flex items-center gap-2 glow-text-red">
             <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
             {siteData.profile.level} LEVEL
           </span>
-          <span className="hidden sm:inline text-rose-600/60">|</span>
-          <span className="hidden sm:inline">
+          <span className="hidden lg:inline text-rose-600/60">|</span>
+          <span className="hidden lg:inline">
             + {siteData.profile.coins} COINS AWARDED
           </span>
         </div>
         
-        <div className="flex items-center gap-6">
-          <span className="hidden md:inline text-rose-600/40">SYSTEM: ONLINE</span>
-          <span className="hidden md:inline text-rose-600/60">|</span>
-          <Link href="/admin" className="hover:text-white transition-colors glow-text-red">✏ CMS COGNITIVE LINK</Link>
-          <span className="text-rose-600/60">|</span>
-          <span className="text-white glow-text-red">LOCAL TIME: {localTime || "21:16:05"}</span>
+        <div className="lg:hidden flex items-center text-center">
+          <span className="text-white glow-text-red font-black">LVL {siteData.profile.level}</span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setIsQuestOpen(true)}
+            className="lg:hidden flex items-center gap-2 hover:text-white transition-colors bg-rose-950/15 border border-rose-900/35 px-2.5 py-1 rounded-xl active:scale-95 cursor-pointer"
+          >
+            <span>📜 QUEST</span>
+          </button>
+
+          <div className="hidden lg:flex items-center gap-6">
+            <span className="text-rose-600/40">SYSTEM: ONLINE</span>
+            <span className="text-rose-600/60">|</span>
+            <Link href="/admin" className="hover:text-white transition-colors glow-text-red">✏ CMS COGNITIVE LINK</Link>
+            <span className="text-rose-600/60">|</span>
+            <span className="text-white glow-text-red">LOCAL TIME: {localTime || "21:16:05"}</span>
+          </div>
         </div>
       </header>
 
       {/* Main Grid Viewport */}
-      <div className="flex-1 w-full flex flex-col md:flex-row overflow-hidden relative z-10">
+      <div className="flex-1 w-full flex flex-col lg:flex-row overflow-hidden relative z-10">
         
-        {/* Left Side: Profile Panel */}
-        <aside className="w-full md:w-[280px] border-r border-rose-950/30 bg-black/40 p-6 flex flex-col justify-between shrink-0 gap-6">
-          <div className="space-y-6">
-            
-            {/* Profile Avatar Frame */}
-            <div className="p-1 rounded-[1.5rem] bg-rose-950/20 border border-rose-900/25 relative group">
-              <div className="hud-notch-top-left" />
-              <div className="hud-notch-top-right" />
-              <div className="hud-notch-bottom-left" />
-              <div className="hud-notch-bottom-right" />
-              <div className="relative aspect-square rounded-[calc(1.5rem-0.25rem)] overflow-hidden bg-slate-950 border border-rose-900/30">
-                {isLoading ? (
-                  <div className="absolute inset-0 bg-black flex flex-col items-center justify-center border border-rose-500/20">
-                    <div className="w-8 h-8 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin mb-2" />
-                    <span className="text-[7px] tracking-widest text-rose-500/60 font-bold uppercase animate-pulse">UPLINKING AVATAR...</span>
-                  </div>
-                ) : (
-                  <>
-                    <Image
-                      src={
-                        siteData.profile.avatarUrl?.startsWith("data:")
-                          ? siteData.profile.avatarUrl
-                          : getAssetUrl(`${siteData.profile.avatarUrl || "/profile-avatar.webp"}?t=${siteData.profile.lastUpdated || ""}`)
-                      }
-                      alt="Mayank Sahu Avatar"
-                      fill
-                      sizes="260px"
-                      className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-700 filter saturate-75 contrast-125"
-                    />
-                    <div className="absolute inset-0 bg-rose-950/10 pointer-events-none mix-blend-overlay" />
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Profile Info labels */}
-            <div className="space-y-4 text-[10px] tracking-widest font-semibold uppercase text-rose-500/80">
-              <div className="space-y-1">
-                <p className="text-[9px] text-slate-500 font-bold">NAME</p>
-                <p className="text-white text-sm font-display font-black tracking-wider glow-text-red">{siteData.profile.name}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-[9px] text-slate-500 font-bold">OCCUPATION</p>
-                <p className="text-white font-black tracking-wide">{siteData.profile.occupation}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-[9px] text-slate-500 font-bold">CORPORATION</p>
-                <p className="text-rose-400">{siteData.profile.corporation}</p>
-              </div>
-              <div className="space-y-1 pt-2">
-                <p className="text-[9px] text-slate-500 font-bold">AVAILABILITY</p>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/20 border border-rose-500/30 text-rose-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
-                  <span>{siteData.profile.availability}</span>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <p className="text-[9px] text-slate-500 font-bold">SOCIAL</p>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/10 border border-rose-950/30 text-rose-500/60">
-                  <span>📶 CONNECTION OPEN</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Motto */}
-          <div className="border-t border-rose-950/20 pt-4 text-[10px] text-slate-500 uppercase tracking-widest font-bold leading-relaxed">
-            <p className="text-[8px] text-rose-500/40 mb-1">MOTTO:</p>
-            {siteData.profile.motto}
-          </div>
+        {/* Left Side: Profile Panel (Desktop) */}
+        <aside className="hidden lg:flex w-[280px] border-r border-rose-950/30 bg-black/40 p-6 flex-col justify-between shrink-0 gap-6">
+          {renderProfileContent()}
         </aside>
 
         {/* Center: Dynamic Console Viewport */}
@@ -733,69 +835,59 @@ export default function Home() {
           </footer>
         </section>
 
-        {/* Right Side: Quest Details & Controls */}
-        <aside className="w-full md:w-[280px] border-l border-rose-950/30 bg-black/40 p-6 flex flex-col justify-between shrink-0 gap-6 text-rose-500/80 uppercase">
-          <div className="space-y-6">
-            
-            {/* Quest Details Panel */}
-            <div className="p-4 rounded-2xl bg-rose-950/10 border border-rose-950/20 space-y-4">
-              <span className="text-[8px] font-display font-black tracking-widest text-rose-400 bg-rose-950/30 border border-rose-900/30 px-2 py-0.5 rounded-sm">ACTIVE QUEST</span>
-              <div className="space-y-1">
-                <p className="text-[8px] text-slate-500 font-bold">QUEST NAME</p>
-                <p className="text-white text-xs font-bold leading-tight">{siteData.quest.questName}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-[8px] text-slate-500 font-bold">GOAL</p>
-                <p className="text-[9px] text-slate-400 font-medium normal-case leading-relaxed">
-                  {siteData.quest.goal}
-                </p>
-              </div>
-              <div className="space-y-1 pt-1">
-                <p className="text-[8px] text-slate-500 font-bold">REWARDS</p>
-                <div className="flex gap-2">
-                  <span className="text-[9px] bg-rose-950/30 border border-rose-900/30 px-2 py-0.5 rounded-md text-white font-bold">XP +{siteData.quest.xpReward}</span>
-                  <span className="text-[9px] bg-rose-950/30 border border-rose-900/30 px-2 py-0.5 rounded-md text-white font-bold">COINS +{siteData.quest.coinsReward}</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Audio Controls */}
-          <div className="space-y-3 text-[10px] font-bold tracking-widest text-slate-500">
-            <div className="flex items-center justify-between">
-              <label htmlFor="sound-toggle" className="cursor-pointer hover:text-slate-300">SOUND EFFECTS</label>
-              <input
-                id="sound-toggle"
-                type="checkbox"
-                checked={soundOn}
-                onChange={(e) => {
-                  playBeep(600, 0.05);
-                  setSoundOn(e.target.checked);
-                }}
-                className="w-3.5 h-3.5 border border-rose-950 rounded-sm bg-black accent-rose-500 cursor-pointer"
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="music-toggle" className="cursor-pointer hover:text-slate-300">AMBIENT DRONE</label>
-              <input
-                id="music-toggle"
-                type="checkbox"
-                checked={musicOn}
-                onChange={(e) => {
-                  playBeep(700, 0.05);
-                  setMusicOn(e.target.checked);
-                }}
-                className="w-3.5 h-3.5 border border-rose-950 rounded-sm bg-black accent-rose-500 cursor-pointer"
-              />
-            </div>
-            <div className="flex items-center justify-between pt-2 border-t border-rose-950/20">
-              <span>VISUAL SETTINGS</span>
-              <span className="text-[14px] text-rose-500 cursor-pointer hover:rotate-45 transition-transform duration-300">⚙</span>
-            </div>
-          </div>
+        {/* Right Side: Quest Details & Controls (Desktop) */}
+        <aside className="hidden lg:flex w-[280px] border-l border-rose-950/30 bg-black/40 p-6 flex-col justify-between shrink-0 gap-6 text-rose-500/80 uppercase">
+          {renderQuestContent()}
         </aside>
 
+      </div>
+
+      {/* Mobile Drawer (Left: Profile) */}
+      <div 
+        className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${isProfileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} 
+        onClick={() => setIsProfileOpen(false)}
+      >
+        <div 
+          className={`absolute top-0 left-0 bottom-0 w-[280px] bg-[#030102] border-r border-rose-950/40 p-6 flex flex-col justify-between transition-transform duration-300 transform ${isProfileOpen ? "translate-x-0" : "-translate-x-full"}`} 
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-[10px] tracking-widest font-black text-rose-500">AVATAR INVENTORY</span>
+            <button 
+              onClick={() => setIsProfileOpen(false)} 
+              className="text-rose-600 hover:text-rose-400 font-bold text-xs px-2.5 py-1.5 cursor-pointer"
+            >
+              ✕ CLOSE
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+            {renderProfileContent()}
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Drawer (Right: Quest) */}
+      <div 
+        className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${isQuestOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`} 
+        onClick={() => setIsQuestOpen(false)}
+      >
+        <div 
+          className={`absolute top-0 right-0 bottom-0 w-[280px] bg-[#030102] border-l border-rose-950/40 p-6 flex flex-col justify-between transition-transform duration-300 transform ${isQuestOpen ? "translate-x-0" : "translate-x-full"}`} 
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-[10px] tracking-widest font-black text-rose-500">QUEST MISSION PANEL</span>
+            <button 
+              onClick={() => setIsQuestOpen(false)} 
+              className="text-rose-600 hover:text-rose-400 font-bold text-xs px-2.5 py-1.5 cursor-pointer"
+            >
+              ✕ CLOSE
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+            {renderQuestContent()}
+          </div>
+        </div>
       </div>
 
     </main>
