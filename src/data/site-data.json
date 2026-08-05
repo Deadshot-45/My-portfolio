@@ -1,0 +1,167 @@
+{
+  "profile": {
+    "name": "MAYANK SAHU",
+    "occupation": "MERN DEVELOPER",
+    "corporation": "LincPay Solution",
+    "level": 48,
+    "coins": 1428,
+    "availability": "OPEN FOR HIRE",
+    "motto": "BUILDING HIGH-PERFORMANCE WEB ARTIFACTS WITH SPATIAL PRECISION."
+  },
+  "quest": {
+    "questName": "REACT WEBSITE",
+    "goal": "BUILD THIS WEBSITE. IMPLEMENT A FULL REACT WEBSITE WITH MULTIPLE ROUTERS, UI ELEMENTS AND TRICKY STYLING. MAKE IT ALL WORK GREAT!",
+    "xpReward": 5,
+    "coinsReward": 25
+  },
+  "experiences": [
+    {
+      "role": "React Developer (Intern)",
+      "company": "LincPay Solution Pvt. Ltd.",
+      "type": "Internship",
+      "period": "Dec 2025 – Apr 2026",
+      "location": "Bhopal, India",
+      "details": [
+        "Architected an application-wide performance optimization strategy using React.memo, useMemo, and dynamic imports (code-splitting), reducing Largest Contentful Paint (LCP) by 18% and improving SEO Core Web Vitals.",
+        "Engineered a centralized UI component library in React and TypeScript based on Atomic Design principles, accelerating multi-role feature delivery cycles by 20%.",
+        "Built Psych-Up, a healthcare management platform (React, TypeScript, TanStack Query), architecting a scalable UI ecosystem that enforced design parity across 3+ enterprise modules and cut engineering overhead by 20%.",
+        "Implemented a secure Role-Based Access Control (RBAC) framework using React Higher-Order Components (HOCs), ensuring data isolation across 5 distinct user personas.",
+        "Engineered an optimized data layer with TanStack Query, implementing optimistic state updates and cache invalidation strategies that cut API calls by 40%."
+      ],
+      "isCurrent": true
+    },
+    {
+      "role": "IT Systems Engineer",
+      "company": "TCI Express Ltd",
+      "type": "Full-time",
+      "period": "Apr 2025 – Nov 2025",
+      "location": "Chennai, India",
+      "details": [
+        "Maintained 99.9% system uptime while transitioning technical focus toward full-stack development and the MERN stack."
+      ],
+      "isCurrent": false
+    }
+  ],
+  "education": [
+    {
+      "institution": "Oriental University, Indore",
+      "degree": "Master in Computer Applications (MCA)",
+      "field": "Computer Application",
+      "period": "2022 - 2024",
+      "description": "A postgraduate degree focusing on advanced computing, software engineering, databases, and algorithms. Relevant Coursework: Data Structures & Algorithms, DBMS, Software Engineering.",
+      "icon": "GraduationCap"
+    },
+    {
+      "institution": "Zakir Husain Delhi College, Delhi University",
+      "degree": "BA in Economics and Mathematics",
+      "field": "Economics & Mathematics",
+      "period": "2019 - 2022",
+      "description": "Focus on analytical problem solving, mathematical modeling, and statistical analysis. Provides a strong logical and quantitative foundation for software engineering.",
+      "icon": "BookOpen"
+    }
+  ],
+  "certifications": [
+    {
+      "institution": "J-Spider Development Center",
+      "degree": "MERN Full-Stack Development Certificate",
+      "field": "6-Month Intensive Program",
+      "period": "2025",
+      "description": "Comprehensive training covering MongoDB, Express.js, React, Node.js, and modern full-stack web development methodologies.",
+      "icon": "Award"
+    }
+  ],
+  "achievements": [
+    {
+      "title": "Chess Tournament Athlete",
+      "category": "LEGENDARY",
+      "description": "Represented Indore at State Level Tournaments (Sports Ministry of Madhya Pradesh), building strategic planning expertise.",
+      "status": "COMPLETED"
+    },
+    {
+      "title": "Master of Computer Applications",
+      "category": "EPIC",
+      "description": "Graduated Oriental University Indore (2024) with deep software engineering and algorithms coursework.",
+      "status": "COMPLETED"
+    },
+    {
+      "title": "MERN Stack Intern Developer",
+      "category": "EPIC",
+      "description": "Successfully developed healthcare product lines and role-based architectures at LincPay Solutions.",
+      "status": "COMPLETED"
+    },
+    {
+      "title": "Develop open source tools",
+      "category": "RARE",
+      "description": "Contribute libraries or custom React/Node utility plugins to the public GitHub community.",
+      "status": "ONGOING"
+    }
+  ],
+  "projects": [
+    {
+      "title": "Vault-Vogue - Premium E-Commerce Application",
+      "category": "E-Commerce (MERN Stack)",
+      "description": "Independently designed and built the full stack — frontend UI with dynamic product collections and advanced filtering, backend REST APIs, and MongoDB schema design.",
+      "link": "https://vault-vogue-lite.vercel.app/"
+    },
+    {
+      "title": "Psych-up - Digital Healthcare",
+      "category": "Digital Healthcare",
+      "description": "Built Psych-Up, a healthcare platform with a scalable UI ecosystem that enforced design parity across 3+ enterprise modules and cut engineering overhead by 20%.",
+      "link": "https://dev.psychup.health/"
+    },
+    {
+      "title": "Personal Portfolio",
+      "category": "AI Product",
+      "description": "Built a high-performance portfolio to present projects, skills, and product thinking through a clean, structured, and interactive experience.",
+      "link": "https://mayank-sahu.vercel.app/"
+    },
+    {
+      "title": "Procurelinc e-Procurement Solution",
+      "category": "B2B SaaS / Fintech",
+      "description": "Contributed to UI enhancements, bug resolution, and feature improvements for a large-scale procurement platform used by Government and PSU departments.",
+      "link": "https://dev.procurelinc.in/"
+    }
+  ],
+  "skills": [
+    {
+      "name": "JavaScript",
+      "level": 95
+    },
+    {
+      "name": "TypeScript",
+      "level": 90
+    },
+    {
+      "name": "React.js",
+      "level": 94
+    },
+    {
+      "name": "Next.js",
+      "level": 92
+    },
+    {
+      "name": "Node.js",
+      "level": 88
+    },
+    {
+      "name": "Express.js",
+      "level": 90
+    },
+    {
+      "name": "MongoDB",
+      "level": 85
+    },
+    {
+      "name": "SQL/MySQL",
+      "level": 80
+    },
+    {
+      "name": "Tailwind CSS",
+      "level": 92
+    },
+    {
+      "name": "Redux Toolkit",
+      "level": 88
+    }
+  ]
+}

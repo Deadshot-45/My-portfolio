@@ -37,7 +37,7 @@ export default function About() {
           <div className="absolute -inset-4 bg-linear-to-r from-emerald-500/20 to-blue-500/20 rounded-[2.5rem] blur-2xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
           <div className="relative aspect-square rounded-4xl overflow-hidden border border-slate-800/50 shadow-2xl glass">
             <Image
-              src={getAssetUrl("profile.png")}
+              src={getAssetUrl("profile.webp")}
               alt="Mayank Sahu"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
@@ -62,7 +62,7 @@ export default function About() {
                   Experience
                 </span>
                 <span className="text-white font-black text-sm uppercase italic">
-                  Developer Graduate
+                  MERN Developer
                 </span>
               </div>
               <div className="glass px-4 py-2 rounded-xl backdrop-blur-3xl border-slate-700/50">
@@ -93,9 +93,8 @@ export default function About() {
             <p className="text-lg text-slate-400 leading-relaxed">
               I<span>&apos;m</span>{" "}
               <span className="text-white font-bold">Mayank Sahu</span>, a
-              Front-End Web Developer and graduate. I specialize in building
-              high-performance, interactive web applications using modern
-              technologies.
+              MERN Stack Developer. I specialize in building high-performance,
+              interactive web applications using modern full-stack technologies.
             </p>
 
             <p className="text-lg text-slate-400 leading-relaxed">

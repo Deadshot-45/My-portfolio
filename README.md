@@ -2,7 +2,7 @@
 
 A high-performance, aesthetically driven personal portfolio website built with **Next.js 16**, **React 19**, **TypeScript**, **Framer Motion**, and **Tailwind CSS 4**. This project serves as a comprehensive professional showcase for **Mayank Sahu**, a Front-End Web Developer and MCA 2024 graduate.
 
-![Portfolio Preview](/hero-image.png)
+![Portfolio Preview](/portfolio.png)
 
 ## 🚀 Key Features
 

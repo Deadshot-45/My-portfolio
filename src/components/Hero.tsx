@@ -1,122 +1,121 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
-import { containerVariants, fadeUpVariants, scaleInVariants } from "./motion";
-import StaggeredText from "./StaggeredText";
 import { getAssetUrl } from "@/data/site";
+import { scaleInVariants, fadeUpVariants } from "./motion";
 
 export default function Hero() {
+  const stats = [
+    { value: "1,200+", label: "Hours of Work" },
+    { value: "15+", label: "Projects Done" },
+    { value: "10+", label: "Happy Clients" },
+    { value: "1", label: "State Distinction" },
+  ];
+
   return (
-    <section className="relative flex flex-col items-center justify-center min-h-screen px-4 overflow-hidden pt-32 lg:pt-20 text-center">
-      {/* Background */}
+    <section id="subheader" className="relative flex flex-col items-center justify-center py-20 px-4 overflow-hidden text-center">
+      
+      {/* Background Orbs */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
         <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/15 blur-[120px] rounded-full"
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 blur-[120px] rounded-full"
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.8)_100%)]" />
       </div>
 
-      {/* Content */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="space-y-10 max-w-5xl z-10"
-      >
-        {/* Badge */}
-        <motion.div
+      {/* Center Giant Logo */}
+      <div className="max-w-7xl mx-auto space-y-6 pt-12 relative z-10 w-full">
+        <motion.h1
           variants={scaleInVariants}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-slate-900/50 backdrop-blur-md border border-slate-800 text-[10px] sm:text-xs font-bold tracking-[0.2em] text-accent uppercase shadow-2xl"
+          initial="hidden"
+          animate="show"
+          transition={{ duration: 1, delay: 0.2 }}
+          className="text-6xl sm:text-8xl md:text-[10rem] font-display font-black tracking-wider leading-[0.75] uppercase text-white"
         >
-          <Sparkles className="w-3 h-3 animate-pulse" />
-          AVAILABLE FOR NEW INNOVATIONS & COLLABORATIONS
-        </motion.div>
+          Mayank<br />Sahu
+        </motion.h1>
+        
+        <motion.h4
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="show"
+          transition={{ duration: 1, delay: 0.4 }}
+          className="text-accent font-bold uppercase tracking-[0.3em] text-xs sm:text-sm md:text-base"
+        >
+          ● Available for Work
+        </motion.h4>
+      </div>
 
-        {/* Heading + Description */}
-        <div className="space-y-6">
-          <motion.h1
-            variants={scaleInVariants}
-            transition={{ duration: 1, delay: 0.3 }}
-            className="text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter leading-[1.1] text-white"
-          >
-            <StaggeredText text="Digital" className="block" />
-
-            <StaggeredText
-              text="Architect."
-              className="text-gradient inline-block"
-            />
-          </motion.h1>
-
-          <motion.p
-            variants={fadeUpVariants}
-            transition={{ duration: 1, delay: 0.6 }}
-            className="text-lg md:text-2xl text-slate-400 max-w-3xl mx-auto font-medium"
-          >
-            I&apos;m <span className="text-white font-bold">Mayank Sahu</span> —
-            crafting high-performance, visually stunning web experiences as a{" "}
-            <span className="text-accent underline decoration-accent/20 underline-offset-8">
-              Full Stack Engineer
-            </span>
-            <span>.</span>
-          </motion.p>
-        </div>
-
-        {/* CTA */}
+      {/* Two-Column Showcase Details */}
+      <div className="grid xl:grid-cols-2 gap-8 w-full max-w-7xl mx-auto px-4 pt-16 relative z-10">
+        
+        {/* Left: Hero Image (Double Bezel) */}
         <motion.div
-          variants={scaleInVariants}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6"
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="show"
+          transition={{ duration: 1, delay: 0.6 }}
+          className="relative aspect-video rounded-[2.5rem] overflow-hidden p-2 bg-white/5 border border-white/5 shadow-2xl backdrop-blur-2xl"
         >
-          <motion.a
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.96 }}
-            href="#projects"
-            className="group relative px-10 py-5 bg-accent text-slate-950 font-black rounded-2xl shadow-2xl shadow-accent/20 transition-all text-xs uppercase tracking-[0.2em]"
-          >
-            Explore Projects
-            <ArrowRight className="inline-block ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </motion.a>
-
-          <motion.a
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            href="#about"
-            className="px-10 py-5 bg-slate-900/50 backdrop-blur-sm text-slate-200 border border-slate-800 font-black rounded-2xl hover:bg-slate-800 transition-all text-xs uppercase tracking-[0.2em]"
-          >
-            About Me
-          </motion.a>
-        </motion.div>
-      </motion.div>
-
-      {/* Hero Image */}
-      <motion.div
-        variants={fadeUpVariants}
-        initial="hidden"
-        animate="show"
-        transition={{ duration: 1, delay: 1 }}
-        className="mt-24 lg:mt-32 w-full max-w-6xl px-4 perspective-1000"
-      >
-        <div className="relative aspect-video rounded-[3rem] overflow-hidden border border-slate-800 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] glass p-3 group transform-gpu will-change-transform">
-          <div className="w-full h-full rounded-[2.5rem] flex items-center justify-center overflow-hidden bg-slate-900/50">
+          <div className="w-full h-full rounded-[calc(2.5rem-0.5rem)] overflow-hidden relative">
             <Image
-              src={getAssetUrl("/hero-developer.png")}
-              alt="Digital Product Showcase"
+              src={getAssetUrl("/hero-developer.webp")}
+              alt="Mayank Sahu Developer"
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 1280px"
-              className="object-cover group-hover:scale-105 transition-transform duration-1000 opacity-90"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover hover:scale-105 transition-transform duration-700"
               priority
               quality={90}
             />
-            <div className="absolute inset-0 bg-linear-to-t from-slate-950/40 via-transparent to-transparent" />
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+
+        {/* Right: Vision Blurb (Double Bezel) */}
+        <motion.div
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="show"
+          transition={{ duration: 1, delay: 0.8 }}
+          className="p-2 rounded-[2.5rem] bg-white/5 border border-white/5 shadow-2xl backdrop-blur-2xl text-left"
+        >
+          <div className="bg-[#050912]/80 rounded-[calc(2.5rem-0.5rem)] p-8 md:p-12 border border-white/5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] h-full flex flex-col justify-center gap-4">
+            <span className="text-[10px] font-display font-black uppercase tracking-[0.2em] text-slate-500">
+              Vision & Focus
+            </span>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-display font-black text-white leading-relaxed">
+              Transforming your vision into a dynamic web experience through meticulously crafted designs, intuitive MERN stack user interfaces, and robust functionality.
+            </h2>
+          </div>
+        </motion.div>
+
+      </div>
+
+      {/* Counters Block */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-7xl mx-auto px-4 mt-8 relative z-10">
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            variants={scaleInVariants}
+            initial="hidden"
+            animate="show"
+            transition={{ duration: 0.8, delay: 0.8 + i * 0.1 }}
+            className="p-2 rounded-2xl bg-white/5 border border-white/5 text-center shadow-lg"
+          >
+            <div className="bg-[#050912]/80 rounded-[calc(1rem)] py-6 border border-white/5 shadow-inner">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-display font-black text-accent mb-1">
+                {stat.value}
+              </h3>
+              <span className="text-[9px] md:text-[10px] font-display font-bold uppercase tracking-widest text-slate-400">
+                {stat.label}
+              </span>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
     </section>
   );
 }
