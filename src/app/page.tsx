@@ -352,7 +352,7 @@ export default function Home() {
       <div className="flex-1 w-full flex flex-col lg:flex-row overflow-hidden relative z-10">
         
         {/* Left Side: Profile Panel (Desktop) */}
-        <aside className="hidden lg:flex w-[280px] border-r border-rose-950/30 bg-black/40 p-6 flex-col justify-between shrink-0 gap-6">
+        <aside className="hidden lg:flex w-70 border-r border-rose-950/30 bg-black/40 p-6 flex-col justify-between shrink-0 gap-6">
           {renderProfileContent()}
         </aside>
 
@@ -816,8 +816,8 @@ export default function Home() {
           </div>
 
           {/* Bottom HUD tab links */}
-          <footer className="w-full pt-6 border-t border-rose-950/20 flex items-center justify-center shrink-0">
-            <div className="flex items-center gap-1 sm:gap-3 md:gap-4 bg-slate-950/80 border border-rose-950/30 rounded-full px-2 py-1.5 shadow-2xl">
+          <footer className="w-full overflow-x-auto pt-6 border-t border-rose-950/20 flex items-center justify-start shrink-0">
+            <div className="w-max min-w-max flex items-center gap-1 sm:gap-3 md:gap-4 bg-slate-950/80 border border-rose-950/30 rounded-full px-2 py-1.5 shadow-2xl">
               {(["beginning", "logs", "achievements", "creations", "socials"] as const).map((tab) => (
                 <button
                   key={tab}
@@ -836,7 +836,7 @@ export default function Home() {
         </section>
 
         {/* Right Side: Quest Details & Controls (Desktop) */}
-        <aside className="hidden lg:flex w-[280px] border-l border-rose-950/30 bg-black/40 p-6 flex-col justify-between shrink-0 gap-6 text-rose-500/80 uppercase">
+        <aside className="hidden lg:flex w-70 border-l border-rose-950/30 bg-black/40 p-6 flex-col justify-between shrink-0 gap-6 text-rose-500/80 uppercase">
           {renderQuestContent()}
         </aside>
 
@@ -848,7 +848,7 @@ export default function Home() {
         onClick={() => setIsProfileOpen(false)}
       >
         <div 
-          className={`absolute top-0 left-0 bottom-0 w-[280px] bg-[#030102] border-r border-rose-950/40 p-6 flex flex-col justify-between transition-transform duration-300 transform ${isProfileOpen ? "translate-x-0" : "-translate-x-full"}`} 
+          className={`absolute top-0 left-0 bottom-0 w-70 bg-[#030102] border-r border-rose-950/40 p-6 flex flex-col justify-between transition-transform duration-300 transform ${isProfileOpen ? "translate-x-0" : "-translate-x-full"}`} 
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex justify-between items-center mb-4">
@@ -872,7 +872,7 @@ export default function Home() {
         onClick={() => setIsQuestOpen(false)}
       >
         <div 
-          className={`absolute top-0 right-0 bottom-0 w-[280px] bg-[#030102] border-l border-rose-950/40 p-6 flex flex-col justify-between transition-transform duration-300 transform ${isQuestOpen ? "translate-x-0" : "translate-x-full"}`} 
+          className={`absolute top-0 right-0 bottom-0 w-70 bg-[#030102] border-l border-rose-950/40 p-6 flex flex-col justify-between transition-transform duration-300 transform ${isQuestOpen ? "translate-x-0" : "translate-x-full"}`} 
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex justify-between items-center mb-4">
