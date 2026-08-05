@@ -123,14 +123,15 @@ export default function AdminCMS() {
     }));
   };
 
-  // Resume Upload Handler
-  const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // File Upload Handler (Resume, Avatar, Banner)
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "resume" | "avatar" | "banner") => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadStatus("uploading");
     playBeep(950, 0.1, "triangle");
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("type", type);
     try {
       const res = await fetch("/api/upload", {
         method: "POST",
@@ -705,24 +706,65 @@ export default function AdminCMS() {
                       <input
                         type="file"
                         accept=".pdf"
-                        onChange={handleResumeUpload}
+                        onChange={(e) => handleFileUpload(e, "resume")}
                         className="text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border file:border-rose-500/30 file:text-[10px] file:font-black file:uppercase file:bg-rose-500/10 file:text-rose-400 file:cursor-pointer hover:file:bg-rose-500/20 file:transition-all"
                       />
-
                       {uploadStatus === "uploading" && (
-                        <span className="text-[9px] text-amber-400 font-bold uppercase tracking-wider animate-pulse">
-                          UPLOADING PDF...
-                        </span>
+                        <span className="text-[9px] text-amber-400 font-bold uppercase tracking-wider animate-pulse">UPLOADING...</span>
                       )}
                       {uploadStatus === "success" && (
-                        <span className="text-[9px] text-teal-400 font-bold uppercase tracking-wider">
-                          RESUME PDF OVERWRITTEN!
-                        </span>
+                        <span className="text-[9px] text-teal-400 font-bold uppercase tracking-wider">RESUME UPLINKED!</span>
                       )}
                       {uploadStatus === "error" && (
-                        <span className="text-[9px] text-rose-400 font-bold uppercase tracking-wider">
-                          UPLOAD FAILURE!
-                        </span>
+                        <span className="text-[9px] text-rose-400 font-bold uppercase tracking-wider">UPLOAD FAILURE!</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Profile Avatar Upload Module */}
+                  <div className="space-y-3 col-span-2 pt-4 border-t border-rose-950/20">
+                    <label className="text-[9px] font-bold text-rose-500 uppercase">
+                      UPLINK PROFILE AVATAR IMAGE (.WEBP, .PNG, .JPG)
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileUpload(e, "avatar")}
+                        className="text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border file:border-rose-500/30 file:text-[10px] file:font-black file:uppercase file:bg-rose-500/10 file:text-rose-400 file:cursor-pointer hover:file:bg-rose-500/20 file:transition-all"
+                      />
+                      {uploadStatus === "uploading" && (
+                        <span className="text-[9px] text-amber-400 font-bold uppercase tracking-wider animate-pulse">UPLOADING...</span>
+                      )}
+                      {uploadStatus === "success" && (
+                        <span className="text-[9px] text-teal-400 font-bold uppercase tracking-wider">AVATAR UPLINKED!</span>
+                      )}
+                      {uploadStatus === "error" && (
+                        <span className="text-[9px] text-rose-400 font-bold uppercase tracking-wider">UPLOAD FAILURE!</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Hero Banner Upload Module */}
+                  <div className="space-y-3 col-span-2 pt-4 border-t border-rose-950/20">
+                    <label className="text-[9px] font-bold text-rose-500 uppercase">
+                      UPLINK HERO HOLOGRAM BANNER (.WEBP, .PNG, .JPG)
+                    </label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileUpload(e, "banner")}
+                        className="text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border file:border-rose-500/30 file:text-[10px] file:font-black file:uppercase file:bg-rose-500/10 file:text-rose-400 file:cursor-pointer hover:file:bg-rose-500/20 file:transition-all"
+                      />
+                      {uploadStatus === "uploading" && (
+                        <span className="text-[9px] text-amber-400 font-bold uppercase tracking-wider animate-pulse">UPLOADING...</span>
+                      )}
+                      {uploadStatus === "success" && (
+                        <span className="text-[9px] text-teal-400 font-bold uppercase tracking-wider">BANNER UPLINKED!</span>
+                      )}
+                      {uploadStatus === "error" && (
+                        <span className="text-[9px] text-rose-400 font-bold uppercase tracking-wider">UPLOAD FAILURE!</span>
                       )}
                     </div>
                   </div>

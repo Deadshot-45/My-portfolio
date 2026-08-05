@@ -192,7 +192,7 @@ export default function Home() {
               <div className="hud-notch-bottom-right" />
               <div className="relative aspect-square rounded-[calc(1.5rem-0.25rem)] overflow-hidden bg-slate-950 border border-rose-900/30">
                 <Image
-                  src={getAssetUrl("/hero-developer.webp")}
+                  src={getAssetUrl("/profile-avatar.webp")}
                   alt="Mayank Sahu Avatar"
                   fill
                   sizes="260px"
@@ -274,7 +274,7 @@ export default function Home() {
                       <div className="p-2 rounded-[2rem] bg-white/5 border border-rose-900/20 shadow-2xl backdrop-blur-2xl w-[260px] transform-gpu transition-all duration-700 hover:rotate-2">
                         <div className="relative aspect-square rounded-[calc(2rem-0.5rem)] overflow-hidden bg-slate-950 border border-rose-900/20">
                           <Image
-                            src={getAssetUrl("/hero-developer.webp")}
+                            src={getAssetUrl("/hero-banner.webp")}
                             alt="Hologram concepts"
                             fill
                             sizes="260px"
