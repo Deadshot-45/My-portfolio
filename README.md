@@ -1,3 +1,5 @@
+<AsyncImage query="GitHub repository README.md file edit pencil icon GitHub interface" aspectRatio="16:9" width="100%"/>
+
 # Mayank Sahu — Premium Developer Portfolio
 
 A high-performance, aesthetically driven personal portfolio website built with **Next.js 16**, **React 19**, **TypeScript**, **Framer Motion**, and **Tailwind CSS 4**. This project serves as a comprehensive professional showcase for **Mayank Sahu**, a Front-End Web Developer and MCA 2024 graduate.
