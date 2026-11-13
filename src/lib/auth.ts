@@ -88,6 +88,7 @@ function cookieOptions(): { httpOnly: boolean; secure: boolean; sameSite: 'lax' 
 export async function findAdminByEmail(email: string): Promise<AdminUserDoc | null> {
   const adminCol = await getCollection<AdminUserDoc>('admin_users');
   const admin = await adminCol.findOne({ email: email.toLowerCase() });
+  console.log('[Auth] Admin lookup:', admin ? admin.email : 'null');
   return admin ? serializeDoc<AdminUserDoc>(admin) : null;
 }
 

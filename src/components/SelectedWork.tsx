@@ -9,12 +9,16 @@ import { filterProjectsByCategory } from '../utils/portfolioUtils';
 interface SelectedWorkProps {
   onSelectProject: (project: Project) => void;
   theme?: ThemeMode;
+  projects?: Project[];
 }
 
-export const SelectedWork: React.FC<SelectedWorkProps> = ({ onSelectProject }) => {
+export const SelectedWork: React.FC<SelectedWorkProps> = ({
+  onSelectProject,
+  projects = PROJECTS,
+}) => {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>('all');
 
-  const filteredProjects = filterProjectsByCategory(PROJECTS, activeCategory);
+  const filteredProjects = filterProjectsByCategory(projects, activeCategory);
 
   const categories: { label: string; value: ProjectCategory }[] = [
     { label: 'All Work', value: 'all' },

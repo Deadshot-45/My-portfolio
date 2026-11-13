@@ -1,6 +1,8 @@
 import { listProjects } from '@/lib/cms/projects';
 import { requireSession } from '@/lib/auth';
 import { setProjectStatusAction, deleteProjectAction } from '@/app/cms/actions/projects';
+import { DeleteButton } from '@/components/cms/DeleteButton';
+import Link from 'next/link';
 
 export default async function ProjectsPage({
   searchParams,
@@ -75,7 +77,7 @@ export default async function ProjectsPage({
                 <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Project</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Client</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Category</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-500">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Status</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Order</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Actions</th>
               </tr>
@@ -102,8 +104,8 @@ export default async function ProjectsPage({
                       {p.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right text-sm text-zinc-300 font-mono">{p.displayOrder}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-center text-sm text-zinc-300 font-mono">{p.displayOrder}</td>
+                  <td className="pl-4 py-3 text-end">
                     <ProjectRowActions project={p} />
                   </td>
                 </tr>
@@ -137,29 +139,26 @@ export default async function ProjectsPage({
 function ProjectRowActions({ project }: { project: any }) {
   const isPublished = project.status === 'PUBLISHED';
   return (
-    <div className="flex gap-2">
-      <a
+    <div className="flex gap-2 items-end justify-end">
+      <Link
         href={`/cms/projects/${project.id}/edit`}
         className="p-2 text-zinc-400 hover:text-emerald-400 transition-colors"
         title="Edit"
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z" aria-hidden="true" /></svg>
-      </a>
-      <form action={setProjectStatusAction} method="POST" className="inline">
-        <input name="id" value={project.id} hidden />
-        <input name="status" value={isPublished ? 'DRAFT' : 'PUBLISHED'} hidden />
+      </Link>
+      <form action={setProjectStatusAction} className="inline">
+        <input name="id" defaultValue={project.id} type="hidden" />
+        <input name="status" defaultValue={isPublished ? 'DRAFT' : 'PUBLISHED'} type="hidden" />
         <button type="submit" className="p-2 rounded-md text-zinc-400 hover:bg-zinc-800 transition-colors" title={isPublished ? 'Unpublish' : 'Publish'}>
           {isPublished ? '↓' : '↑'}
         </button>
       </form>
-      <form action={deleteProjectAction} method="POST" className="inline" onSubmit={(e) => {
-        if (!confirm(`Delete "${project.title}"? This cannot be undone.`)) e.preventDefault();
-      }}>
-        <input name="id" value={project.id} hidden />
-        <button type="submit" className="p-2 rounded-md text-zinc-400 hover:bg-rose-500/20 hover:text-rose-400 transition-colors" title="Delete">
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" aria-hidden="true" /></svg>
-        </button>
-      </form>
+      <DeleteButton
+        action={deleteProjectAction}
+        id={project.id}
+        itemTitle={project.title}
+      />
     </div>
   );
 }

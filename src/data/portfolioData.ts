@@ -77,6 +77,12 @@ export const WORK_EXPERIENCE: ExperienceItem[] = [
 export const CLIENT_MARKS: ClientMark[] = [
   { name: 'Lijoi', city: 'Rome', country: 'Italy', category: 'Luxury Atelier' },
   { name: 'Secnd Soul', city: 'London', country: 'UK', category: '3D WebGL Identity' },
+  { name: 'Third Angle', city: 'Paris', country: 'France', category: 'Architecture' },
+  { name: 'Forte', city: 'Berlin', country: 'Germany', category: 'Fashion' },
+  { name: 'Nexus', city: 'Amsterdam', country: 'Netherlands', category: 'Tech' },
+  { name: 'Optima', city: 'Stockholm', country: 'Sweden', category: 'Design' },
+  { name: 'Pulse', city: 'Barcelona', country: 'Spain', category: 'Creative' },
+  { name: 'Quantum', city: 'NYC', country: 'USA', category: 'Innovation' },
   { name: 'RGA', city: 'New York', country: 'USA', category: 'Digital Innovation' },
   { name: 'Marianna Caliandro', city: 'Milan', country: 'Italy', category: 'Haute Couture' },
   { name: 'Toronto Distillery', city: 'Toronto', country: 'Canada', category: 'Craft Spirits' },

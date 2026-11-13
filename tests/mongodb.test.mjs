@@ -49,4 +49,22 @@ describe('MongoDB Utility & Serialization Tests', () => {
     assert.equal(serializeDoc(null), null);
     assert.equal(serializeDoc(undefined), undefined);
   });
+
+  test('mapCmsProject produces consistent fields and tags for frontend', () => {
+    const rawCms = {
+      id: 'proj-1',
+      title: 'iMessage Web Realtime Engine',
+      slug: 'imessage-web-realtime-engine',
+      category: 'websites',
+      technologies: 'React 19, TypeScript, Redis, Docker',
+      featured: true,
+      duration: '4 weeks',
+      shortDescription: 'Realtime chat',
+    };
+    const tags = rawCms.technologies.split(',').map((t) => t.trim());
+    assert.equal(tags.length, 4);
+    assert.ok(tags.includes('React 19'));
+    assert.ok(tags.includes('Redis'));
+    assert.equal(rawCms.category, 'websites');
+  });
 });

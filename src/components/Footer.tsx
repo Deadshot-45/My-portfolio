@@ -2,18 +2,21 @@
 
 import React, { useState } from 'react';
 import { USER_PROFILE } from '../data/portfolioData';
+import { UserProfile } from '../types/index';
 import { ArrowUp, Github, Linkedin, Mail } from 'lucide-react';
 
 interface FooterProps {
   onOpenInquiry?: () => void;
+  profile?: UserProfile;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenInquiry }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenInquiry, profile = USER_PROFILE }) => {
+  const activeProfile = profile || USER_PROFILE;
   const [copied, setCopied] = useState(false);
 
   const handleCopyEmail = async () => {
     try {
-      await navigator.clipboard.writeText(USER_PROFILE.email);
+      await navigator.clipboard.writeText(activeProfile.email);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -59,11 +62,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry }) => {
                 Email me
               </p>
               <a
-                href={`mailto:${USER_PROFILE.email}`}
+                href={`mailto:${activeProfile.email}`}
                 className="group block w-fit font-grotesk text-[clamp(1.3rem,4.5vw,2.8rem)] font-medium leading-[1.15] tracking-[-0.03em] md:ml-auto text-white hover:text-[#9bf35a] transition-colors"
               >
                 <span className="block whitespace-nowrap">
-                  {USER_PROFILE.email}
+                  {activeProfile.email}
                 </span>
                 <span className="mt-1 block h-px w-full origin-left bg-[#9bf35a] transition-transform duration-500 scale-x-0 group-hover:scale-x-100" />
               </a>
@@ -147,7 +150,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry }) => {
               <ul className="space-y-2 list-none p-0 m-0 text-zinc-300">
                 <li>
                   <a
-                    href={USER_PROFILE.github}
+                    href={activeProfile.github}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-[#9bf35a] transition-colors inline-flex items-center gap-1.5"
@@ -158,7 +161,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry }) => {
                 </li>
                 <li>
                   <a
-                    href={USER_PROFILE.linkedin}
+                    href={activeProfile.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-[#9bf35a] transition-colors inline-flex items-center gap-1.5"
@@ -169,7 +172,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry }) => {
                 </li>
                 <li>
                   <a
-                    href={`mailto:${USER_PROFILE.email}`}
+                    href={`mailto:${activeProfile.email}`}
                     className="hover:text-[#9bf35a] transition-colors inline-flex items-center gap-1.5"
                   >
                     <span>Email Direct</span>

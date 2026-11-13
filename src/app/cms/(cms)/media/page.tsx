@@ -1,6 +1,7 @@
 import { listMedia } from '@/lib/media';
 import { requireSession } from '@/lib/auth';
 import { deleteMediaAction } from '@/app/cms/actions/media';
+import { DeleteButton } from '@/components/cms/DeleteButton';
 
 export default async function MediaPage() {
   const { user } = await requireSession();
@@ -53,22 +54,12 @@ export default async function MediaPage() {
                   <p className="text-xs text-center text-zinc-200 mb-1 truncate" title={item.originalName}>
                     {item.originalName}
                   </p>
-                  <form
+                  <DeleteButton
                     action={deleteMediaAction}
-                    method="POST"
-                    className="inline"
-                    onSubmit={(e) => {
-                      if (!confirm(`Delete "${item.originalName}"?`)) e.preventDefault();
-                    }}
-                  >
-                    <input name="id" value={item.id} hidden />
-                    <button
-                      type="submit"
-                      className="w-full rounded-lg border border-rose-500/30 bg-rose-500/10 px-2 py-1.5 text-xs text-rose-400 hover:bg-rose-500/20 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </form>
+                    id={item.id}
+                    itemTitle={item.originalName}
+                    variant="button"
+                  />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
                   <p className="text-[10px] text-zinc-400 truncate" title={item.filename}>

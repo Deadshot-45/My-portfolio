@@ -2,13 +2,19 @@
 
 import React from 'react';
 import { CLIENT_MARKS } from '../data/portfolioData';
+import { ClientMark } from '../types/index';
 import { ArrowUpRight } from 'lucide-react';
 
 interface ClientsSectionProps {
   onSelectService?: (serviceName: string) => void;
+  clients?: ClientMark[];
 }
 
-export const ClientsSection: React.FC<ClientsSectionProps> = ({ onSelectService }) => {
+export const ClientsSection: React.FC<ClientsSectionProps> = ({
+  onSelectService,
+  clients = CLIENT_MARKS,
+}) => {
+  const marksList = clients && clients.length > 0 ? clients : CLIENT_MARKS;
   const serviceOfferings = [
     {
       id: 'websites',
@@ -59,7 +65,7 @@ export const ClientsSection: React.FC<ClientsSectionProps> = ({ onSelectService 
       {/* 2. Client Ticker / Dual Marquee Row */}
       <div className="relative z-10 my-12 -mx-[4vw] md:-mx-[var(--page-x)] py-6 bg-white/[0.02] border-y border-white/10 overflow-hidden">
         <div className="flex gap-8 whitespace-nowrap animate-[marquee_28s_linear_infinite] hover:[animation-play-state:paused]">
-          {[...CLIENT_MARKS, ...CLIENT_MARKS].map((mark, i) => (
+          {[...marksList, ...marksList].map((mark, i) => (
             <div
               key={`${mark.name}-${i}`}
               className="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-white/5 border border-white/10"

@@ -2,15 +2,20 @@
 
 import React from 'react';
 import { WORK_EXPERIENCE } from '../data/portfolioData';
-import { ThemeMode } from '../types/index';
+import { ThemeMode, ExperienceItem } from '../types/index';
 import { Briefcase, Calendar, MapPin, CheckCircle2, GraduationCap, Award } from 'lucide-react';
 
 interface ExperienceSectionProps {
   theme: ThemeMode;
+  experiences?: ExperienceItem[];
 }
 
-export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ theme }) => {
+export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
+  theme,
+  experiences = WORK_EXPERIENCE,
+}) => {
   const isDark = theme === 'dark';
+  const list = experiences && experiences.length > 0 ? experiences : WORK_EXPERIENCE;
 
   return (
     <section id="experience" className={`py-24 border-t relative overflow-hidden ${
@@ -34,7 +39,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ theme }) =
 
         {/* Experience Timeline Cards */}
         <div className="space-y-6 mb-16">
-          {WORK_EXPERIENCE.map((exp) => (
+          {list.map((exp) => (
             <div
               key={exp.id || `${exp.company}-${exp.period}`}
               className={`p-7 sm:p-9 rounded-3xl border transition-all ${

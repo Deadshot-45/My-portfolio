@@ -2,6 +2,8 @@ import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { Shell } from '@/components/cms/Shell';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProtectedLayout({
   children,
 }: {

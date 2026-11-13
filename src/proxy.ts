@@ -9,7 +9,7 @@ const SESSION_COOKIE = 'portfolio_cms_session';
  * The session cookie itself is validated against the database on each protected request,
  * so a stolen/expired cookie cannot bypass authorization.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isCms = pathname.startsWith('/cms');
   const isLogin = pathname === '/cms/login';

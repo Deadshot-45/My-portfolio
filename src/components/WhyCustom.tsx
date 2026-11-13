@@ -2,28 +2,34 @@
 
 import React, { useState, useEffect } from 'react';
 import { CLIENT_REVIEWS } from '../data/portfolioData';
+import { ClientReview } from '../types/index';
 
-export const WhyCustom: React.FC = () => {
+interface WhyCustomProps {
+  testimonials?: ClientReview[];
+}
+
+export const WhyCustom: React.FC<WhyCustomProps> = ({ testimonials = CLIENT_REVIEWS }) => {
+  const reviewsList = testimonials && testimonials.length > 0 ? testimonials : CLIENT_REVIEWS;
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Auto-advance reviews every 6.5s matching reference animation duration
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % CLIENT_REVIEWS.length);
+      setCurrentIndex((prev) => (prev + 1) % reviewsList.length);
     }, 6500);
     return () => clearInterval(timer);
-  }, []);
+  }, [reviewsList.length]);
 
   const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + CLIENT_REVIEWS.length) % CLIENT_REVIEWS.length);
+    setCurrentIndex((prev) => (prev - 1 + reviewsList.length) % reviewsList.length);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % CLIENT_REVIEWS.length);
+    setCurrentIndex((prev) => (prev + 1) % reviewsList.length);
   };
 
-  const currentReview = CLIENT_REVIEWS[currentIndex] || CLIENT_REVIEWS[0];
-  const countStr = `${String(currentIndex + 1).padStart(2, '0')}/${String(CLIENT_REVIEWS.length).padStart(2, '0')}`;
+  const currentReview = reviewsList[currentIndex] || reviewsList[0];
+  const countStr = `${String(currentIndex + 1).padStart(2, '0')}/${String(reviewsList.length).padStart(2, '0')}`;
 
   return (
     <section

@@ -6,20 +6,24 @@ import { Hero3DCanvas } from './Hero3DCanvas';
 import { SkyDial } from './SkyDial';
 import { SkyMode } from '../types/index';
 import { USER_PROFILE } from '../data/portfolioData';
+import { UserProfile } from '../types/index';
 import { getSkySceneConfig } from '../utils/portfolioUtils';
 
 interface HeroProps {
   onOpenInquiry?: () => void;
   skyMode?: SkyMode;
   onSkyModeChange?: (mode: SkyMode) => void;
+  profile?: UserProfile;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   skyMode = 'sunset',
   onSkyModeChange,
+  profile = USER_PROFILE,
 }) => {
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
-  const firstName = USER_PROFILE.name.split(' ')[0];
+  const activeProfile = profile || USER_PROFILE;
+  const firstName = activeProfile.name.split(' ')[0];
   const sceneConfig = getSkySceneConfig(skyMode);
 
   // Subtle pointer depth parallax on fine-pointer desktop screens (respecting reduced-motion)
