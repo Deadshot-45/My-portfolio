@@ -36,7 +36,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ theme }) =
         <div className="space-y-6 mb-16">
           {WORK_EXPERIENCE.map((exp) => (
             <div
-              key={exp.id}
+              key={exp.id || `${exp.company}-${exp.period}`}
               className={`p-7 sm:p-9 rounded-3xl border transition-all ${
                 isDark
                   ? 'bg-zinc-900/60 border-zinc-800/80 hover:border-zinc-700'
@@ -71,12 +71,12 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ theme }) =
               <p className={`text-sm sm:text-base leading-relaxed mb-6 ${
                 isDark ? 'text-zinc-300' : 'text-zinc-700'
               }`}>
-                {exp.summary}
+                {exp.summary || exp.description}
               </p>
 
               {/* Bulleted Achievements */}
               <ul className="space-y-3 mb-6">
-                {exp.achievements.map((item, idx) => (
+                {(exp.achievements || exp.highlights || []).map((item: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-3 text-xs sm:text-sm leading-relaxed">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                     <span className={isDark ? 'text-zinc-300' : 'text-zinc-700'}>{item}</span>

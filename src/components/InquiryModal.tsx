@@ -23,6 +23,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
     name: '',
     email: '',
     projectType: defaultProjectTitle || 'Full-Stack Web Application',
+    budgetRange: 'Flexible ($5k - $15k)',
     timeline: 'Standard (2 - 4 weeks)',
     message: '',
   });

@@ -1,184 +1,148 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Terminal, Github, Linkedin, Mail, ExternalLink, Clock, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
 import { Hero3DCanvas } from './Hero3DCanvas';
-import { ThemeMode } from '../types/index';
-import { USER_PROFILE, KEY_METRICS } from '../data/portfolioData';
+import { SkyDial } from './SkyDial';
+import { SkyMode } from '../types/index';
+import { USER_PROFILE } from '../data/portfolioData';
+import { getSkySceneConfig } from '../utils/portfolioUtils';
 
 interface HeroProps {
-  onOpenInquiry: () => void;
-  theme: ThemeMode;
+  onOpenInquiry?: () => void;
+  skyMode?: SkyMode;
+  onSkyModeChange?: (mode: SkyMode) => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
-  onOpenInquiry,
-  theme,
+  skyMode = 'sunset',
+  onSkyModeChange,
 }) => {
-  const [timeStr, setTimeStr] = useState<string>('');
-  const isDark = theme === 'dark';
+  const [parallax, setParallax] = useState({ x: 0, y: 0 });
+  const firstName = USER_PROFILE.name.split(' ')[0];
+  const sceneConfig = getSkySceneConfig(skyMode);
 
-  // Live time ticker for India (IST)
+  // Subtle pointer depth parallax on fine-pointer desktop screens (respecting reduced-motion)
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const options: Intl.DateTimeFormatOptions = {
-        timeZone: 'Asia/Kolkata',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true,
-      };
-      setTimeStr(new Intl.DateTimeFormat('en-US', options).format(now));
+    if (typeof window === 'undefined') return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    if (reduced || !finePointer) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const nx = (e.clientX / window.innerWidth - 0.5) * -14;
+      const ny = (e.clientY / window.innerHeight - 0.5) * -10;
+      setParallax({ x: nx, y: ny });
     };
 
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const handleModeChange = (newMode: SkyMode) => {
+    if (onSkyModeChange) {
+      onSkyModeChange(newMode);
+    }
+  };
+
+  const inkClass = sceneConfig.isDarkText ? 'hero-ink-dark' : 'hero-ink-light';
+
   return (
-    <section id="hero" className="relative min-h-[92dvh] pt-32 pb-16 md:pt-40 md:pb-24 overflow-hidden flex flex-col justify-between">
-      {/* Background kinetic watermark */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none -z-10 opacity-[0.03] w-full text-center">
-        <span className="text-[14vw] font-extrabold tracking-widest uppercase font-mono whitespace-nowrap block">
-          M A Y A N K
-        </span>
+    <section
+      id="hero"
+      data-surface={skyMode}
+      className="relative z-10 w-full h-[100svh] min-h-[600px] overflow-hidden select-none bg-[#181924]"
+    >
+      {/* 1. Sculptural Creation-of-Adam & Developer Artwork Layer with Pointer Depth */}
+      <div
+        className="absolute inset-0 z-[1] transition-transform duration-700 ease-out will-change-transform"
+        style={{
+          transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0) scale(1.035)`,
+        }}
+      >
+        <Image
+          src="/images/hero-sunset.jpg"
+          alt="Stylized 3D artwork of Mayank coding on a laptop atop a moss-covered stone hand reaching toward another hand in the sky"
+          fill
+          priority
+          unoptimized
+          sizes="100vw"
+          className="object-cover object-[38%_54%] md:object-center transition-[filter] duration-1000 ease-out"
+          style={{
+            filter: sceneConfig.imageFilter,
+          }}
+        />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
-          {/* Left Column: Authoritative Editorial Copy */}
-          <div className="lg:col-span-7 flex flex-col items-start text-left z-10">
-            
-            {/* Live Status Row */}
-            <div className="flex items-center gap-3 text-xs font-mono mb-6">
-              <span className="flex h-2.5 w-2.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-              </span>
-              <span className={isDark ? 'text-zinc-200 font-medium' : 'text-zinc-800 font-medium'}>
-                Available for Full-Stack & MERN Engineering
-              </span>
-              <span className={isDark ? 'text-zinc-600' : 'text-zinc-400'}>/</span>
-              <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>
-                Indore, MP, India
-              </span>
-            </div>
+      {/* 2. Sky-Mode Atmospheric Blend & Corner Readability Scrims */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[2] transition-opacity duration-1000"
+        style={{ background: sceneConfig.atmosphereOverlay }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[3] hidden md:block transition-opacity duration-1000"
+        style={{ background: sceneConfig.introScrimBackground }}
+      />
 
-            {/* Main Headline - High Contrast, No AI Slop Gradients */}
-            <h1 className={`text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 ${
-              isDark ? 'text-white' : 'text-zinc-950'
-            }`}>
-              Full-Stack Developer.
-              <span className={`block font-normal mt-2 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                Building resilient web apps & real-time systems.
-              </span>
-            </h1>
+      {/* 3. Ambient Three.js Sky Particles / Night Starfield Layer */}
+      <Hero3DCanvas skyMode={skyMode} />
 
-            {/* Subtitle - Exact Professional Summary from Resume */}
-            <p className={`text-base sm:text-lg leading-relaxed max-w-2xl mb-8 ${
-              isDark ? 'text-zinc-300' : 'text-zinc-700'
-            }`}>
-              I’m <strong className={isDark ? 'text-white' : 'text-zinc-950'}>{USER_PROFILE.name}</strong>. I architect and deliver full-stack products across <strong>React 19 / Next.js</strong> on the frontend and <strong>Node.js / Express</strong> on the backend, with <strong>PostgreSQL, MongoDB, Redis, and Socket.io</strong>. Focused on reducing latency, cutting redundant network calls, and engineering reliable interfaces from schema to release.
-            </p>
-
-            {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto mb-10">
-              <a
-                href="#work"
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl font-bold text-xs sm:text-sm active:scale-95 transition-all shadow-md ${
-                  isDark
-                    ? 'bg-white hover:bg-zinc-200 text-black'
-                    : 'bg-zinc-950 hover:bg-zinc-800 text-white'
-                }`}
-              >
-                <span>Explore Featured Work</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-
-              <a
-                href={USER_PROFILE.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-mono text-xs border active:scale-95 transition-all ${
-                  isDark
-                    ? 'bg-zinc-900/60 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
-                    : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-800'
-                }`}
-              >
-                <Github className="w-4 h-4" />
-                <span>github.com/Deadshot-45</span>
-              </a>
-
-              <a
-                href={USER_PROFILE.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl font-mono text-xs border active:scale-95 transition-all ${
-                  isDark
-                    ? 'bg-zinc-900/60 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
-                    : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-800'
-                }`}
-              >
-                <Linkedin className="w-4 h-4 text-sky-500" />
-                <span>LinkedIn Profile</span>
-              </a>
-            </div>
-
-            {/* Real Key Technical Metrics from Resume */}
-            <div className={`grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t w-full text-xs font-mono ${
-              isDark ? 'border-zinc-800/80' : 'border-zinc-200'
-            }`}>
-              {KEY_METRICS.map((metric) => (
-                <div key={metric.label} className="flex flex-col">
-                  <span className={`text-2xl font-extrabold tracking-tight ${
-                    isDark ? 'text-white' : 'text-zinc-950'
-                  }`}>
-                    {metric.value}
-                  </span>
-                  <span className={`font-semibold mt-0.5 ${isDark ? 'text-zinc-300' : 'text-zinc-800'}`}>
-                    {metric.label}
-                  </span>
-                  <span className={`text-[11px] leading-snug mt-1 ${isDark ? 'text-zinc-500' : 'text-zinc-600'}`}>
-                    {metric.desc}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-          </div>
-
-          {/* Right Column: Real-Time Interactive Three.js WebGL Element */}
-          <div className="lg:col-span-5 relative flex items-center justify-center">
-            <div className="w-full relative z-10">
-              <Hero3DCanvas />
-            </div>
-          </div>
-
-        </div>
+      {/* 4. Top-Center Display Headline */}
+      <div
+        className={`absolute inset-x-0 top-[14svh] md:top-[9svh] z-10 flex flex-col items-center px-[4vw] md:px-[6vw] text-center pointer-events-none transition-colors duration-700 ${inkClass}`}
+      >
+        <h1 className="font-grotesk font-normal text-[clamp(2.2rem,5.4vw,4.9rem)] leading-[1.03] tracking-[-0.03em] capitalize max-w-[16em] m-0">
+          Websites That Sell.
+          <br />
+          AI That Never Sleeps.
+        </h1>
       </div>
 
-      {/* Bottom Technical Ticker Bar */}
-      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-10 pt-4 border-t flex flex-wrap items-center justify-between gap-4 text-xs font-mono ${
-        isDark ? 'border-zinc-800/60 text-zinc-400' : 'border-zinc-200 text-zinc-600'
-      }`}>
-        <div className="flex items-center gap-2">
-          <Clock className="w-3.5 h-3.5 text-zinc-500" />
-          <span className={isDark ? 'text-zinc-200' : 'text-zinc-800'}>{timeStr || '19:30 IST'}</span>
-          <span>in Indore, India (GMT +5:30)</span>
-        </div>
+      {/* 5. Curved SVG Arrow Annotation ("That's me, on my third coffee.") */}
+      <div
+        className={`pointer-events-none absolute left-[44%] top-[78%] sm:left-[45%] sm:top-[71%] md:left-[44.5%] md:top-[69%] z-10 flex items-center gap-2 transition-colors duration-700 ${inkClass}`}
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 46 38"
+          fill="none"
+          className="w-8 h-7 md:w-11 md:h-9 shrink-0 -mt-5 opacity-90"
+        >
+          <path
+            d="M42 32C24 31 12 22 9 5"
+            stroke="currentColor"
+            strokeWidth="1.25"
+            strokeLinecap="round"
+          />
+          <path
+            d="M4 11L9 4.5L15 9.5"
+            stroke="currentColor"
+            strokeWidth="1.25"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        <p className="font-grotesk text-[12px] md:text-[14px] font-normal leading-[1.28] tracking-[-0.01em] whitespace-nowrap m-0">
+          That’s me,
+          <br />
+          on my third coffee.
+        </p>
+      </div>
 
-        <div className="flex items-center gap-3">
-          <span>React 19</span>
-          <span>•</span>
-          <span>Next.js App Router</span>
-          <span>•</span>
-          <span>Socket.io</span>
-          <span>•</span>
-          <span>PostgreSQL & Redis</span>
-        </div>
+      {/* 6. Bottom-Center Interactive SkyDial (Day / Sunset / Night) */}
+      <div className="pointer-events-auto absolute bottom-6 left-1/2 -translate-x-1/2 md:bottom-8 z-30">
+        <SkyDial mode={skyMode} onChange={handleModeChange} />
+      </div>
+
+      {/* 7. Bottom-Right Intro Paragraph (Desktop / Tablet Landscape) */}
+      <div
+        className={`pointer-events-none absolute bottom-8 right-[4vw] z-10 hidden max-w-[23.5em] text-right md:block transition-colors duration-700 ${inkClass}`}
+      >
+        <p className="font-grotesk text-[14px] md:text-[15px] font-medium leading-[1.38] tracking-[-0.01em] text-pretty m-0">
+          I’m {firstName}, a web developer. I design and build your website, your online store, and the AI tools that do the busywork for you, so more people find you, trust you and buy from you.
+        </p>
       </div>
     </section>
   );

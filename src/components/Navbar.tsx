@@ -1,308 +1,391 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, Volume2, VolumeX, Sun, Moon, Github, Linkedin, Mail } from 'lucide-react';
-import { ThemeMode } from '../types/index';
-import { USER_PROFILE } from '../data/portfolioData';
+import React, { useState, useEffect, useRef } from "react";
+import { SkyMode } from "../types/index";
+import { USER_PROFILE } from "../data/portfolioData";
+import { ArrowUpRight } from "lucide-react";
 
 interface NavbarProps {
   onOpenInquiry: () => void;
-  theme: ThemeMode;
-  onToggleTheme: () => void;
+  skyMode: SkyMode;
+  onSkyModeChange?: (mode: SkyMode) => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
-  onOpenInquiry,
-  theme,
-  onToggleTheme,
-}) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [soundActive, setSoundActive] = useState(true);
+export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [soundActive, setSoundActive] = useState(false);
+  const [surfaceTone, setSurfaceTone] = useState<"hero" | "white" | "dark">(
+    "hero",
+  );
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const oscRef = useRef<OscillatorNode | null>(null);
+  const gainRef = useRef<GainNode | null>(null);
 
+  // Determine nav contrast cleanly against section directly beneath the header
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+    const updateSurfaceTone = () => {
+      if (window.scrollY < window.innerHeight * 0.65) {
+        setSurfaceTone("hero");
+        return;
+      }
+      const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-surface]"));
+      const probeY = 42;
+      for (const section of sections) {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= probeY && rect.bottom >= probeY) {
+          const surface = section.getAttribute("data-surface");
+          if (surface === "white" || surface === "day") {
+            setSurfaceTone("white");
+          } else {
+            setSurfaceTone("dark");
+          }
+          return;
+        }
+      }
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    updateSurfaceTone();
+    window.addEventListener("scroll", updateSurfaceTone, { passive: true });
+    window.addEventListener("resize", updateSurfaceTone, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", updateSurfaceTone);
+      window.removeEventListener("resize", updateSurfaceTone);
+    };
   }, []);
 
-  const playToggleSound = (willBeActive: boolean) => {
-    if (typeof window === 'undefined') return;
-    try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+  // Close drawer on Escape key
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen]);
 
-      osc.type = 'sine';
-      if (willBeActive) {
-        osc.frequency.setValueAtTime(440, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08);
-      } else {
-        osc.frequency.setValueAtTime(440, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.06);
+  // Clean up Web Audio on unmount
+  useEffect(() => {
+    return () => {
+      try {
+        oscRef.current?.stop();
+        audioCtxRef.current?.close();
+      } catch {
+        // safe fallback
       }
-
-      gain.gain.setValueAtTime(0.03, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.08);
-    } catch {
-      // Safe fallback
-    }
-  };
+    };
+  }, []);
 
   const handleToggleSound = () => {
     const nextState = !soundActive;
     setSoundActive(nextState);
-    playToggleSound(nextState);
+
+    if (typeof window === "undefined") return;
+    try {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+      if (!AudioCtx) return;
+
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioCtx();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") {
+        void ctx.resume();
+      }
+
+      if (nextState) {
+        // Subtle gentle ambient chime + warm soft drone
+        const chime = ctx.createOscillator();
+        const chimeGain = ctx.createGain();
+        chime.type = "sine";
+        chime.frequency.setValueAtTime(523.25, ctx.currentTime);
+        chime.frequency.exponentialRampToValueAtTime(
+          659.25,
+          ctx.currentTime + 0.14,
+        );
+        chimeGain.gain.setValueAtTime(0.025, ctx.currentTime);
+        chimeGain.gain.exponentialRampToValueAtTime(
+          0.0001,
+          ctx.currentTime + 0.28,
+        );
+        chime.connect(chimeGain);
+        chimeGain.connect(ctx.destination);
+        chime.start();
+        chime.stop(ctx.currentTime + 0.3);
+
+        // Soft warm ambient bed at very low level
+        const drone = ctx.createOscillator();
+        const droneGain = ctx.createGain();
+        drone.type = "sine";
+        drone.frequency.setValueAtTime(110, ctx.currentTime);
+        droneGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+        droneGain.gain.linearRampToValueAtTime(0.012, ctx.currentTime + 0.4);
+        drone.connect(droneGain);
+        droneGain.connect(ctx.destination);
+        drone.start();
+        oscRef.current = drone;
+        gainRef.current = droneGain;
+      } else {
+        if (gainRef.current && audioCtxRef.current) {
+          gainRef.current.gain.linearRampToValueAtTime(
+            0.0001,
+            ctx.currentTime + 0.2,
+          );
+        }
+        const osc = oscRef.current;
+        if (osc) {
+          setTimeout(() => {
+            try {
+              osc.stop();
+            } catch {
+              // ignore if already stopped
+            }
+          }, 220);
+          oscRef.current = null;
+        }
+      }
+    } catch {
+      // Audio unavailable safely ignored
+    }
   };
 
+  // Match reference: dark crisp ink over bright Day/Sunset top sky & white surfaces; crisp light ink on Night or dark sections
+  const useDarkInk =
+    surfaceTone === "white" || (surfaceTone === "hero" && skyMode !== "night");
+
+  const inkColorClass = useDarkInk ? "text-[#121214]" : "text-[#fffaf3]";
+
   const navLinks = [
-    { label: 'Projects', href: '#work' },
-    { label: 'Skills', href: '#skills' },
-    { label: 'Experience', href: '#experience' },
-    { label: 'Capabilities', href: '#capabilities' },
-    { label: 'Architecture', href: '#architecture' },
-    { label: 'Contact', href: '#contact' },
+    { label: "Home", href: "#hero" },
+    { label: "Why Custom", href: "#why" },
+    { label: "Work", href: "#work" },
+    { label: "Services", href: "#services" },
+    { label: "Craft", href: "#craft" },
+    { label: "Process", href: "#process" },
+    { label: "Contact", href: "#contact" },
   ];
 
-  const isDark = theme === 'dark';
-
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 pt-4 pb-2 transition-all duration-300">
+    <>
+      {/* Screen Scrim when Menu Drawer is open */}
       <div
-        className={`max-w-7xl mx-auto rounded-2xl transition-all duration-300 ${
-          scrolled
-            ? isDark
-              ? 'bg-[#09090b]/90 backdrop-blur-xl border border-zinc-800/80 shadow-2xl py-3 px-4 sm:px-6'
-              : 'bg-white/90 backdrop-blur-xl border border-zinc-200/90 shadow-xl py-3 px-4 sm:px-6'
-            : isDark
-            ? 'bg-[#09090b]/60 backdrop-blur-md border border-zinc-800/40 py-4 px-4 sm:px-6'
-            : 'bg-white/70 backdrop-blur-md border border-zinc-200/60 py-4 px-4 sm:px-6'
+        data-surface="data-surface"
+        aria-hidden="true"
+        onClick={() => setMenuOpen(false)}
+        className={`fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px] transition-opacity duration-500 ${
+          menuOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
+      />
+
+      {/* Minimalist Transparent Fixed Editorial Header Bar */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 px-[18px] md:px-[30px] pt-[14px] md:pt-[18px] flex items-center justify-between pointer-events-none transition-colors duration-500 ${inkColorClass}`}
       >
-        <div className="flex items-center justify-between">
-          
-          {/* Logo & Identity */}
-          <a href="#" className="flex items-center gap-3 group">
-            <div
-              className={`w-9 h-9 rounded-xl flex items-center justify-center font-mono font-bold text-sm transition-transform group-hover:scale-95 ${
-                isDark
-                  ? 'bg-zinc-800 text-white border border-zinc-700'
-                  : 'bg-zinc-900 text-white border border-zinc-800'
-              }`}
+        {/* Left: Bold Geometric Monogram Mark */}
+        <a
+          href="#hero"
+          aria-label={`${USER_PROFILE.name} - Home`}
+          className="pointer-events-auto flex items-center justify-center h-[42px] md:h-[48px] transition-transform duration-300 hover:scale-95 active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 rounded-full"
+        >
+          <svg
+            viewBox="0 0 64 64"
+            fill="currentColor"
+            className="w-7 h-7 md:w-[34px] md:h-[34px]"
+            role="img"
+            aria-label="Mayank Monogram"
+          >
+            {/* Geometric sculpted 4-part 'M' mark */}
+            <path d="M8 52V14C8 10 12 8 15 11L30 28V52C22 52 14 52 8 52Z" />
+            <path
+              d="M56 14V52C50 52 42 52 34 52V28L49 11C52 8 56 10 56 14Z"
+              opacity="0.92"
+            />
+            <circle cx="32" cy="14" r="5.5" />
+          </svg>
+        </a>
+
+        {/* Center: Clean Editorial Wordmark */}
+        <a
+          href="#hero"
+          className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 font-grotesk font-medium text-[1.05rem] md:text-[1.25rem] tracking-[-0.03em] leading-none transition-opacity duration-300 hover:opacity-70 ${
+            menuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+        >
+          {USER_PROFILE.name}
+        </a>
+
+        {/* Right: SOUND Equalizer + MENU Trigger */}
+        <div className="pointer-events-auto flex items-center gap-4 md:gap-6">
+          <button
+            type="button"
+            onClick={handleToggleSound}
+            aria-label={soundActive ? "Sound off" : "Sound on"}
+            aria-pressed={soundActive}
+            className={`flex items-center gap-2 h-[42px] px-1 cursor-pointer transition-opacity duration-300 hover:opacity-70 ${
+              soundActive ? "nav-eq-on opacity-100" : "opacity-80"
+            } ${menuOpen ? "opacity-0 pointer-events-none" : ""}`}
+          >
+            <span className="hidden sm:inline font-mono text-[11px] font-semibold tracking-[0.1em] uppercase">
+              Sound
+            </span>
+            <svg
+              viewBox="0 0 20 16"
+              fill="currentColor"
+              className="w-[18px] h-[14px] overflow-visible"
+              aria-hidden="true"
             >
-              MS
-            </div>
+              <rect
+                className="nav-eq-bar"
+                x="1"
+                y="0"
+                width="2.6"
+                height="16"
+                rx="1.3"
+                style={{
+                  transform: soundActive ? undefined : "scaleY(0.55)",
+                  animationDelay: "0s",
+                }}
+              />
+              <rect
+                className="nav-eq-bar"
+                x="6"
+                y="0"
+                width="2.6"
+                height="16"
+                rx="1.3"
+                style={{
+                  transform: soundActive ? undefined : "scaleY(0.9)",
+                  animationDelay: "-0.37s",
+                }}
+              />
+              <rect
+                className="nav-eq-bar"
+                x="11"
+                y="0"
+                width="2.6"
+                height="16"
+                rx="1.3"
+                style={{
+                  transform: soundActive ? undefined : "scaleY(0.45)",
+                  animationDelay: "-0.74s",
+                }}
+              />
+              <rect
+                className="nav-eq-bar"
+                x="16"
+                y="0"
+                width="2.6"
+                height="16"
+                rx="1.3"
+                style={{
+                  transform: soundActive ? undefined : "scaleY(0.75)",
+                  animationDelay: "-1.11s",
+                }}
+              />
+            </svg>
+          </button>
 
-            <div className="flex flex-col">
-              <span className={`font-bold text-sm sm:text-base tracking-tight flex items-center gap-1.5 ${isDark ? 'text-white' : 'text-zinc-950'}`}>
-                {USER_PROFILE.name}
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              </span>
-              <span className={`text-[11px] font-mono tracking-wider ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                Full-Stack Developer
-              </span>
-            </div>
-          </a>
-
-          {/* Center: Desktop Nav Links */}
-          <nav
-            className={`hidden md:flex items-center gap-1 p-1 rounded-xl border ${
-              isDark
-                ? 'bg-zinc-900/50 border-zinc-800/60'
-                : 'bg-zinc-100/70 border-zinc-200/80'
+          <button
+            type="button"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            className={`px-2.5 font-grotesk font-semibold text-[0.95rem] md:text-[1.05rem] tracking-[-0.01em] uppercase cursor-pointer transition-all duration-200 hover:opacity-80 ${
+              menuOpen
+                ? "h-[36px] rounded-sm bg-white text-[#111111] shadow-md"
+                : useDarkInk
+                ? "h-[42px] [text-shadow:0_1px_12px_rgba(255,255,255,0.45)]"
+                : "h-[42px]"
             }`}
           >
-            {navLinks.map((link) => (
+            {menuOpen ? "CLOSE" : "MENU"}
+          </button>
+        </div>
+      </header>
+
+      {/* Slide-Down Editorial Navigation Drawer (#site-menu) */}
+      <nav
+        id="site-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Site navigation"
+        aria-hidden={!menuOpen}
+        className={`fixed top-[62px] md:top-[76px] right-[18px] md:right-[30px] z-50 w-[calc(100vw-36px)] max-w-[23rem] rounded-sm p-6 md:p-7 shadow-[0_24px_60px_rgba(0,0,0,0.28)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          useDarkInk
+            ? "bg-white text-[#111111] border border-black/10"
+            : "bg-[#0f0f12] text-[#fffaf3] border border-white/15"
+        } ${
+          menuOpen
+            ? "opacity-100 translate-y-0 pointer-events-auto visible"
+            : "opacity-0 -translate-y-4 pointer-events-none invisible"
+        }`}
+      >
+        <div className="flex items-center justify-between pb-4 mb-2 border-b border-current/15">
+          <span className="font-grotesk font-medium text-sm tracking-tight">
+            {USER_PROFILE.name}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              onOpenInquiry();
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#9bf35a] text-[#0f0f0f] font-grotesk font-semibold text-xs hover:bg-[#aefb6f] transition-colors cursor-pointer"
+          >
+            <span>Say Hi</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <ul className="flex flex-col list-none p-0 m-0 divide-y divide-current/15">
+          {navLinks.map((item) => (
+            <li key={item.label}>
               <a
-                key={link.label}
-                href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  isDark
-                    ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/60'
-                    : 'text-zinc-600 hover:text-zinc-950 hover:bg-white'
-                }`}
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+                className="group flex items-center justify-between py-2.5 font-grotesk text-[1.25rem] md:text-[1.45rem] font-normal uppercase tracking-[-0.02em] transition-transform duration-300 hover:translate-x-2"
               >
-                {link.label}
+                <span>{item.label}</span>
+                <span className="font-mono text-xs opacity-40 group-hover:opacity-100 transition-opacity">
+                  ↗
+                </span>
               </a>
-            ))}
-          </nav>
+            </li>
+          ))}
+        </ul>
 
-          {/* Right Action Cluster */}
-          <div className="flex items-center gap-2.5">
-            
-            {/* Dark / Light Mode Switcher */}
-            <button
-              type="button"
-              onClick={onToggleTheme}
-              className={`p-2 rounded-xl border transition-all active:scale-95 ${
-                isDark
-                  ? 'bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-amber-400'
-                  : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-800'
-              }`}
-              aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-              title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-            >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-
-            {/* Sound Toggle */}
-            <button
-              type="button"
-              onClick={handleToggleSound}
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-2 rounded-xl border text-xs font-mono transition-all active:scale-95 ${
-                isDark
-                  ? 'bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-300'
-                  : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-700'
-              }`}
-              aria-label={soundActive ? 'Sound On' : 'Sound Off'}
-            >
-              {soundActive ? (
-                <>
-                  <span className="flex items-end gap-[2px] h-3 w-3">
-                    <span className="w-[2px] bg-emerald-500 rounded-full animate-[pulse_0.6s_ease-in-out_infinite] h-full" />
-                    <span className="w-[2px] bg-emerald-500 rounded-full animate-[pulse_0.9s_ease-in-out_infinite] h-2/3" />
-                    <span className="w-[2px] bg-emerald-500 rounded-full animate-[pulse_0.75s_ease-in-out_infinite] h-4/5" />
-                  </span>
-                  <span className="text-[10px]">SFX</span>
-                </>
-              ) : (
-                <>
-                  <VolumeX className="w-3 h-3 text-zinc-500" />
-                  <span className="text-[10px] text-zinc-500">Muted</span>
-                </>
-              )}
-            </button>
-
-            {/* GitHub Profile Icon Link */}
-            <a
-              href={USER_PROFILE.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`p-2 rounded-xl border transition-all active:scale-95 hidden sm:inline-flex ${
-                isDark
-                  ? 'bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-300 hover:text-white'
-                  : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-700 hover:text-zinc-950'
-              }`}
-              title="GitHub Profile (Deadshot-45)"
-              aria-label="GitHub Profile"
-            >
-              <Github className="w-4 h-4" />
-            </a>
-
-            {/* LinkedIn Profile Icon Link */}
+        <div className="mt-5 pt-4 border-t border-current/15 flex flex-col gap-2 font-mono text-xs">
+          <a
+            href={`mailto:${USER_PROFILE.email}`}
+            className="hover:underline w-fit font-medium"
+          >
+            {USER_PROFILE.email}
+          </a>
+          <div className="flex items-center gap-4 opacity-70">
             <a
               href={USER_PROFILE.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className={`p-2 rounded-xl border transition-all active:scale-95 hidden sm:inline-flex ${
-                isDark
-                  ? 'bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-300 hover:text-white'
-                  : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-700 hover:text-zinc-950'
-              }`}
-              title="LinkedIn Profile (mayank-sahu-ou)"
-              aria-label="LinkedIn Profile"
+              className="hover:opacity-100 transition-opacity"
             >
-              <Linkedin className="w-4 h-4" />
+              LinkedIn
             </a>
-
-            {/* Get In Touch CTA */}
-            <button
-              onClick={onOpenInquiry}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-95 shadow-sm ${
-                isDark
-                  ? 'bg-white hover:bg-zinc-200 text-black'
-                  : 'bg-zinc-950 hover:bg-zinc-800 text-white'
-              }`}
+            <a
+              href={USER_PROFILE.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:opacity-100 transition-opacity"
             >
-              <span>Get In Touch</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
-
-            {/* Mobile Hamburger Toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`p-2 md:hidden rounded-lg transition-colors ${
-                isDark
-                  ? 'text-zinc-400 hover:text-white hover:bg-zinc-800'
-                  : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200'
-              }`}
-              aria-label="Toggle Menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+              GitHub
+            </a>
           </div>
-
         </div>
-
-        {/* Mobile Dropdown */}
-        {mobileMenuOpen && (
-          <div className={`md:hidden mt-3 pt-3 border-t space-y-2 ${isDark ? 'border-zinc-800' : 'border-zinc-200'}`}>
-            <div className="grid grid-cols-2 gap-2">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                    isDark
-                      ? 'text-zinc-300 bg-zinc-900/60 hover:bg-zinc-800'
-                      : 'text-zinc-700 bg-zinc-100 hover:bg-zinc-200'
-                  }`}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-              <div className="flex items-center gap-2">
-                <a
-                  href={USER_PROFILE.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-2 rounded-lg border text-xs font-mono flex items-center gap-1.5 ${
-                    isDark ? 'border-zinc-800 text-zinc-300' : 'border-zinc-300 text-zinc-700'
-                  }`}
-                >
-                  <Github className="w-3.5 h-3.5" />
-                  <span>GitHub</span>
-                </a>
-                <a
-                  href={USER_PROFILE.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`p-2 rounded-lg border text-xs font-mono flex items-center gap-1.5 ${
-                    isDark ? 'border-zinc-800 text-zinc-300' : 'border-zinc-300 text-zinc-700'
-                  }`}
-                >
-                  <Linkedin className="w-3.5 h-3.5" />
-                  <span>LinkedIn</span>
-                </a>
-              </div>
-
-              <button
-                type="button"
-                onClick={onToggleTheme}
-                className={`p-2 rounded-lg border text-xs font-mono flex items-center gap-1.5 ${
-                  isDark ? 'border-zinc-800 text-amber-400' : 'border-zinc-300 text-zinc-800'
-                }`}
-              >
-                {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-                <span>{isDark ? 'Light' : 'Dark'}</span>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </header>
+      </nav>
+    </>
   );
 };

@@ -52,7 +52,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             {project.title}
           </h2>
           <p className={`text-sm font-mono mt-1 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
-            {project.subtitle}
+            {project.subtitle || project.categoryLabel || project.client}
           </p>
         </div>
 

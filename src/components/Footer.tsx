@@ -1,18 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowUp, Mail, Copy, Check, Github, Linkedin, Phone, MapPin } from 'lucide-react';
 import { USER_PROFILE } from '../data/portfolioData';
-import { ThemeMode } from '../types/index';
+import { ArrowUp, Github, Linkedin, Mail } from 'lucide-react';
 
 interface FooterProps {
-  onOpenInquiry: () => void;
-  theme: ThemeMode;
+  onOpenInquiry?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenInquiry, theme }) => {
+export const Footer: React.FC<FooterProps> = ({ onOpenInquiry }) => {
   const [copied, setCopied] = useState(false);
-  const isDark = theme === 'dark';
 
   const handleCopyEmail = async () => {
     try {
@@ -29,178 +26,210 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry, theme }) => {
   };
 
   return (
-    <footer id="contact" className={`pt-24 pb-12 border-t relative overflow-hidden ${
-      isDark ? 'border-zinc-800/80 bg-[#07070a]' : 'border-zinc-200 bg-zinc-50'
-    }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Contact Hero CTA */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-20 pb-16 border-b border-zinc-800/50">
-          
-          <div className="lg:col-span-7">
-            <h2 className={`text-4xl sm:text-6xl font-extrabold tracking-tight leading-[1.08] mb-6 ${
-              isDark ? 'text-white' : 'text-zinc-950'
-            }`}>
-              Let’s build something remarkable together.
-            </h2>
-            <p className={`text-base sm:text-lg leading-relaxed max-w-xl mb-8 ${
-              isDark ? 'text-zinc-300' : 'text-zinc-700'
-            }`}>
-              Currently open to Full-Stack, Frontend, or MERN developer roles (full-time or contract) where software craftsmanship, performance, and real-time reliability matter.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-4">
-              <button
-                type="button"
-                onClick={onOpenInquiry}
-                className={`inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-xs sm:text-sm active:scale-95 transition-all shadow-md ${
-                  isDark
-                    ? 'bg-white hover:bg-zinc-200 text-black'
-                    : 'bg-zinc-950 hover:bg-zinc-800 text-white'
-                }`}
+    <footer
+      id="contact"
+      data-surface="data-surface"
+      aria-labelledby="contact-title"
+      className="relative flex flex-col overflow-hidden px-[4vw] pb-[4vw] pt-[10svh] md:px-[var(--page-x)] md:pb-[var(--page-x)] md:min-h-[90svh] md:pt-[24svh]"
+      style={{
+        background:
+          "linear-gradient(to bottom, #a7c3e2 0%, #c6d6e8 44%, #d6dee7 66%, #dde1e5 100%)",
+      }}
+    >
+      <div className="relative mt-auto w-full">
+        {/* Dark Container Card matching ex.tsx */}
+        <div className="relative flex flex-col gap-10 overflow-hidden px-[6vw] pb-8 pt-12 text-[#f2efe8] md:gap-14 md:px-[5vw] md:pb-10 md:pt-16 rounded-3xl bg-[#050505] shadow-2xl">
+          {/* Top Row: Still scrolling & Email CTA */}
+          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between border-b border-white/10 pb-12">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-widest text-[#f2efe8]/60 mb-2">
+                Still scrolling? Good sign.
+              </p>
+              <h2
+                id="contact-title"
+                className="font-grotesk text-[clamp(2.4rem,6vw,5rem)] font-light leading-[1.05] tracking-[-0.03em] text-white m-0"
               >
-                <span>Send Direct Inquiry</span>
-              </button>
+                <span className="block">Got a project</span>
+                <span className="block">in mind?</span>
+              </h2>
+            </div>
 
+            <div className="md:text-right">
+              <p className="font-mono text-xs uppercase tracking-widest text-[#f2efe8]/60 mb-2">
+                Email me
+              </p>
               <a
                 href={`mailto:${USER_PROFILE.email}`}
-                className={`inline-flex items-center gap-2 px-5 py-3.5 rounded-xl font-mono text-xs border active:scale-95 transition-all ${
-                  isDark
-                    ? 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
-                    : 'bg-white hover:bg-zinc-100 border-zinc-300 text-zinc-800'
-                }`}
+                className="group block w-fit font-grotesk text-[clamp(1.3rem,4.5vw,2.8rem)] font-medium leading-[1.15] tracking-[-0.03em] md:ml-auto text-white hover:text-[#9bf35a] transition-colors"
               >
-                <Mail className="w-4 h-4 text-emerald-500" />
-                <span>{USER_PROFILE.email}</span>
+                <span className="block whitespace-nowrap">
+                  {USER_PROFILE.email}
+                </span>
+                <span className="mt-1 block h-px w-full origin-left bg-[#9bf35a] transition-transform duration-500 scale-x-0 group-hover:scale-x-100" />
               </a>
+              <div className="flex items-center gap-3 mt-3 md:justify-end">
+                <button
+                  type="button"
+                  onClick={handleCopyEmail}
+                  className="font-mono text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  {copied ? "✓ Email Copied" : "Copy address"}
+                </button>
+                <span className="text-zinc-600">·</span>
+                <p className="font-mono text-xs text-zinc-400 m-0">
+                  I usually reply within a day.
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Quick Contact & Metadata Details */}
-          <div className="lg:col-span-5 flex flex-col gap-6">
-            
-            {/* Email Card with 1-Click Copy */}
-            <div className={`p-6 rounded-2xl border flex items-center justify-between gap-4 ${
-              isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-200 shadow-sm'
-            }`}>
-              <div className="flex flex-col">
-                <span className={`text-xs font-mono ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>
-                  Primary Email
+          {/* Navigation & Social Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 font-grotesk text-sm">
+            {/* Pages Navigation */}
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500 mb-3">
+                Pages
+              </p>
+              <ul className="space-y-2 list-none p-0 m-0 text-zinc-300">
+                <li>
+                  <a
+                    href="#hero"
+                    className="hover:text-white transition-colors"
+                  >
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="#why" className="hover:text-white transition-colors">
+                    Why Custom
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#work"
+                    className="hover:text-white transition-colors"
+                  >
+                    Selected Work
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#clients"
+                    className="hover:text-white transition-colors"
+                  >
+                    Clients & Services
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#craft"
+                    className="hover:text-white transition-colors"
+                  >
+                    Craft & Architecture
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#process"
+                    className="hover:text-white transition-colors"
+                  >
+                    How We Build
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Socials */}
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500 mb-3">
+                Socials
+              </p>
+              <ul className="space-y-2 list-none p-0 m-0 text-zinc-300">
+                <li>
+                  <a
+                    href={USER_PROFILE.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#9bf35a] transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <span>GitHub</span>
+                    <Github className="w-3.5 h-3.5" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={USER_PROFILE.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#9bf35a] transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <span>LinkedIn</span>
+                    <Linkedin className="w-3.5 h-3.5" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={`mailto:${USER_PROFILE.email}`}
+                    className="hover:text-[#9bf35a] transition-colors inline-flex items-center gap-1.5"
+                  >
+                    <span>Email Direct</span>
+                    <Mail className="w-3.5 h-3.5" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Office & Time */}
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500 mb-3">
+                Base
+              </p>
+              <p className="text-zinc-300 text-sm leading-relaxed m-0">
+                Indore, MP, India
+                <br />
+                Available Worldwide
+                <br />
+                <span className="font-mono text-xs text-[#9bf35a] mt-2 inline-block">
+                  ● Available for Work
                 </span>
-                <span className={`font-mono text-sm sm:text-base font-bold mt-1 ${
-                  isDark ? 'text-white' : 'text-zinc-950'
-                }`}>
-                  {USER_PROFILE.email}
-                </span>
+              </p>
+            </div>
+
+            {/* Back to top */}
+            <div className="flex flex-col justify-between items-start md:items-end">
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-widest text-zinc-500 mb-3">
+                  Inquiries
+                </p>
+                {onOpenInquiry && (
+                  <button
+                    type="button"
+                    onClick={onOpenInquiry}
+                    className="px-4 py-2 rounded-lg bg-[#9bf35a] text-black font-semibold text-xs font-grotesk hover:bg-[#b0ff72] transition-colors cursor-pointer"
+                  >
+                    Start a Project
+                  </button>
+                )}
               </div>
 
               <button
                 type="button"
-                onClick={handleCopyEmail}
-                className={`p-2.5 rounded-xl border transition-all active:scale-95 ${
-                  copied
-                    ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                    : isDark
-                    ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300'
-                    : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-700'
-                }`}
-                title="Copy email to clipboard"
-                aria-label="Copy email"
+                onClick={scrollToTop}
+                className="mt-6 inline-flex items-center gap-2 font-mono text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer p-1"
+                aria-label="Back to top"
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                <span>Back to top</span>
+                <ArrowUp className="w-3.5 h-3.5" />
               </button>
             </div>
-
-            {/* Phone & Location */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className={`p-5 rounded-2xl border ${
-                isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-200 shadow-sm'
-              }`}>
-                <span className={`text-xs font-mono flex items-center gap-1.5 ${
-                  isDark ? 'text-zinc-500' : 'text-zinc-500'
-                }`}>
-                  <Phone className="w-3.5 h-3.5 text-emerald-500" />
-                  Direct Phone
-                </span>
-                <span className={`font-mono text-xs sm:text-sm font-bold block mt-1.5 ${
-                  isDark ? 'text-zinc-200' : 'text-zinc-800'
-                }`}>
-                  {USER_PROFILE.phone}
-                </span>
-              </div>
-
-              <div className={`p-5 rounded-2xl border ${
-                isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-200 shadow-sm'
-              }`}>
-                <span className={`text-xs font-mono flex items-center gap-1.5 ${
-                  isDark ? 'text-zinc-500' : 'text-zinc-500'
-                }`}>
-                  <MapPin className="w-3.5 h-3.5 text-sky-500" />
-                  Base Location
-                </span>
-                <span className={`font-mono text-xs sm:text-sm font-bold block mt-1.5 ${
-                  isDark ? 'text-zinc-200' : 'text-zinc-800'
-                }`}>
-                  Indore, MP, India
-                </span>
-              </div>
-            </div>
-
-            {/* Social & Code Profiles */}
-            <div className="flex items-center gap-3">
-              <a
-                href={USER_PROFILE.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex-1 p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-mono transition-all active:scale-95 ${
-                  isDark
-                    ? 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
-                    : 'bg-white hover:bg-zinc-100 border-zinc-300 text-zinc-800 shadow-sm'
-                }`}
-              >
-                <Github className="w-4 h-4" />
-                <span>github.com/Deadshot-45</span>
-              </a>
-
-              <a
-                href={USER_PROFILE.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex-1 p-3.5 rounded-xl border flex items-center justify-center gap-2 text-xs font-mono transition-all active:scale-95 ${
-                  isDark
-                    ? 'bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white'
-                    : 'bg-white hover:bg-zinc-100 border-zinc-300 text-zinc-800 shadow-sm'
-                }`}
-              >
-                <Linkedin className="w-4 h-4 text-sky-500" />
-                <span>LinkedIn</span>
-              </a>
-            </div>
-
           </div>
 
-        </div>
-
-        {/* Bottom Bar: Copyright & Back To Top */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono text-zinc-500">
-          <div>
-            <span>© {new Date().getFullYear()} {USER_PROFILE.name}. All rights reserved.</span>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <button
-              type="button"
-              onClick={scrollToTop}
-              className={`inline-flex items-center gap-1.5 hover:underline transition-colors ${
-                isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-zinc-950'
-              }`}
-            >
-              <span>Back to top</span>
-              <ArrowUp className="w-3.5 h-3.5" />
-            </button>
+          {/* Bottom Copyright */}
+          <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-zinc-500">
+            <span>© 2026 {USER_PROFILE.name}. All rights reserved.</span>
+            <span>Crafted with Next.js, React 19, and Tailwind CSS.</span>
           </div>
         </div>
-
       </div>
     </footer>
   );

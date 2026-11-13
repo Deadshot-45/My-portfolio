@@ -2,15 +2,23 @@
 
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { SkyMode } from '../types/index';
 
-export const Hero3DCanvas: React.FC = () => {
+interface Hero3DCanvasProps {
+  skyMode: SkyMode;
+}
+
+export const Hero3DCanvas: React.FC<Hero3DCanvasProps> = ({ skyMode }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
 
-    // Check WebGL availability
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     try {
       const testCanvas = document.createElement('canvas');
       const gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
@@ -19,180 +27,143 @@ export const Hero3DCanvas: React.FC = () => {
       return;
     }
 
-    const width = container.clientWidth || 400;
-    const height = container.clientHeight || 400;
+    const width = container.clientWidth || 1200;
+    const height = container.clientHeight || 800;
 
-    // Scene & Camera
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.z = 4.8;
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+    camera.position.z = 5;
 
-    // Renderer
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
-    // Group for rotation
-    const group = new THREE.Group();
-    scene.add(group);
-
-    // 1. Particle Cloud Sphere
-    const particleCount = 1400;
+    // Subtle atmospheric dust motes (day/sunset) or crisp night starfield (night)
+    const particleCount = skyMode === 'night' ? 320 : 140;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
+    const speeds = new Float32Array(particleCount);
 
-    const color1 = new THREE.Color(0x06b6d4); // Cyan
-    const color2 = new THREE.Color(0x8b5cf6); // Violet
-    const color3 = new THREE.Color(0x10b981); // Emerald
+    const palette =
+      skyMode === 'night'
+        ? [new THREE.Color(0xe2e8f0), new THREE.Color(0xfffaf3), new THREE.Color(0x93c5fd)]
+        : skyMode === 'sunset'
+        ? [new THREE.Color(0xfff1dc), new THREE.Color(0xfcd39a), new THREE.Color(0xf6b8a0)]
+        : [new THREE.Color(0xffffff), new THREE.Color(0xeef6ff), new THREE.Color(0xddeeff)];
 
     for (let i = 0; i < particleCount; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const radius = 1.6 + (Math.random() - 0.5) * 0.45;
+      positions[i * 3] = (Math.random() - 0.5) * 11;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 6.5;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 3;
+      speeds[i] = 0.25 + Math.random() * 0.6;
 
-      const x = radius * Math.sin(phi) * Math.cos(theta);
-      const y = radius * Math.sin(phi) * Math.sin(theta);
-      const z = radius * Math.cos(phi);
-
-      positions[i * 3] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
-
-      // Color interpolation
-      const mixRatio = (y + 1.8) / 3.6;
-      const pointColor = new THREE.Color();
-      if (mixRatio < 0.5) {
-        pointColor.lerpColors(color1, color2, mixRatio * 2);
-      } else {
-        pointColor.lerpColors(color2, color3, (mixRatio - 0.5) * 2);
-      }
-
-      colors[i * 3] = pointColor.r;
-      colors[i * 3 + 1] = pointColor.g;
-      colors[i * 3 + 2] = pointColor.b;
+      const c = palette[i % palette.length];
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    const particleMaterial = new THREE.PointsMaterial({
-      size: 0.038,
+    // Soft circular radial texture so particles never render as sharp square pixels
+    const spriteCanvas = document.createElement('canvas');
+    spriteCanvas.width = 32;
+    spriteCanvas.height = 32;
+    const sCtx = spriteCanvas.getContext('2d');
+    if (sCtx) {
+      const grad = sCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.35, 'rgba(255, 255, 255, 0.75)');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      sCtx.fillStyle = grad;
+      sCtx.fillRect(0, 0, 32, 32);
+    }
+    const pointTexture = new THREE.CanvasTexture(spriteCanvas);
+
+    const material = new THREE.PointsMaterial({
+      size: skyMode === 'night' ? 0.055 : 0.075,
+      map: pointTexture,
       vertexColors: true,
       transparent: true,
-      opacity: 0.85,
+      opacity: skyMode === 'night' ? 0.72 : 0.55,
       blending: THREE.AdditiveBlending,
+      depthWrite: false,
     });
 
-    const particles = new THREE.Points(geometry, particleMaterial);
-    group.add(particles);
+    const points = new THREE.Points(geometry, material);
+    scene.add(points);
 
-    // 2. Inner Wireframe Core (Icosahedron)
-    const innerGeo = new THREE.IcosahedronGeometry(1.05, 2);
-    const wireframeMat = new THREE.MeshBasicMaterial({
-      color: 0x8b5cf6,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.22,
-    });
-    const wireframeMesh = new THREE.Mesh(innerGeo, wireframeMat);
-    group.add(wireframeMesh);
-
-    // 3. Ambient & Point Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-    scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0x06b6d4, 2, 50);
-    pointLight.position.set(5, 5, 5);
-    scene.add(pointLight);
-
-    // Mouse Interaction
-    let mouseX = 0;
-    let mouseY = 0;
     let targetX = 0;
     let targetY = 0;
 
     const handleMouseMove = (event: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width - 0.5;
-      const y = (event.clientY - rect.top) / rect.height - 0.5;
-      targetX = x * 1.5;
-      targetY = y * 1.5;
+      targetX = (event.clientX / window.innerWidth - 0.5) * 0.28;
+      targetY = -(event.clientY / window.innerHeight - 0.5) * 0.18;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // Resize Handler
     const handleResize = () => {
       if (!container) return;
-      const newWidth = container.clientWidth;
-      const newHeight = container.clientHeight;
-      camera.aspect = newWidth / newHeight;
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(newWidth, newHeight);
+      renderer.setSize(w, h);
     };
 
+    if (!prefersReducedMotion) {
+      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    }
     window.addEventListener('resize', handleResize);
 
-    // Animation Loop
-    let animationFrameId: number;
-    let clock = new THREE.Clock();
+    let animationFrameId = 0;
+    const clock = new THREE.Clock();
 
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      const elapsed = clock.getElapsedTime();
 
-      // Smooth inertia rotation to mouse
-      mouseX += (targetX - mouseX) * 0.05;
-      mouseY += (targetY - mouseY) * 0.05;
+      camera.position.x += (targetX - camera.position.x) * 0.04;
+      camera.position.y += (targetY - camera.position.y) * 0.04;
 
-      group.rotation.y = elapsedTime * 0.18 + mouseX;
-      group.rotation.x = elapsedTime * 0.12 + mouseY;
-
-      wireframeMesh.rotation.y = -elapsedTime * 0.22;
-      wireframeMesh.rotation.z = Math.sin(elapsedTime * 0.5) * 0.2;
-
-      // Pulse particle size gently
-      const pulse = Math.sin(elapsedTime * 1.5) * 0.005 + 0.038;
-      particleMaterial.size = pulse;
+      if (!prefersReducedMotion) {
+        const posAttr = geometry.getAttribute('position') as THREE.BufferAttribute;
+        for (let i = 0; i < particleCount; i++) {
+          const y = posAttr.getY(i) + 0.0012 * speeds[i];
+          posAttr.setY(i, y > 3.25 ? -3.25 : y);
+        }
+        posAttr.needsUpdate = true;
+        points.rotation.z = Math.sin(elapsed * 0.05) * 0.03;
+      }
 
       renderer.render(scene, camera);
+      if (!prefersReducedMotion) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
 
     animate();
 
-    // Clean up
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }
       geometry.dispose();
-      particleMaterial.dispose();
-      innerGeo.dispose();
-      wireframeMat.dispose();
+      pointTexture.dispose();
+      material.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [skyMode]);
 
   return (
-    <div className="relative w-full h-[360px] sm:h-[420px] md:h-[480px] flex items-center justify-center">
-      {/* Glow Backdrop */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-violet-500/10 to-transparent blur-3xl pointer-events-none rounded-full" />
-      
-      {/* Canvas Mount */}
-      <div ref={mountRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
-
-      {/* Floating 3D Badge */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3.5 py-1.5 rounded-full bg-dark-900/80 backdrop-blur-md border border-white/10 text-xs font-mono text-zinc-400 flex items-center gap-2 pointer-events-none shadow-xl">
-        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-        <span>Interactive WebGL 3D • Drag & Hover</span>
-      </div>
-    </div>
+    <div
+      ref={mountRef}
+      className="pointer-events-none absolute inset-0 z-[2] h-full w-full"
+      aria-hidden="true"
+    />
   );
 };

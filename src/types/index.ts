@@ -1,6 +1,26 @@
+export type SkyMode = 'day' | 'sunset' | 'night';
 export type ThemeMode = 'dark' | 'light';
 
-export type ProjectCategory = 'all' | 'fullstack' | 'realtime' | 'crm' | 'ecommerce';
+export interface TechnicalSkillGroup {
+  category: string;
+  skills: string[];
+}
+
+export interface ExperienceItem {
+  id?: string;
+  period: string;
+  role: string;
+  company: string;
+  location: string;
+  type: string;
+  description: string;
+  summary?: string;
+  highlights: string[];
+  achievements?: string[];
+  technologies: string[];
+}
+
+export type ProjectCategory = 'all' | 'websites' | 'ecommerce' | 'threejs' | 'ai';
 
 export interface ProjectMetric {
   label: string;
@@ -10,7 +30,10 @@ export interface ProjectMetric {
 export interface Project {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
+  client: string;
+  location: string;
+  year: string;
   category: ProjectCategory;
   categoryLabel: string;
   description: string;
@@ -20,9 +43,9 @@ export interface Project {
   deliverables: string[];
   liveUrl?: string;
   githubUrl?: string;
-  featured: boolean;
   accentColor: string;
-  imagePlaceholder?: {
+  featured: boolean;
+  imagePlaceholder: {
     badge: string;
     headline: string;
     gradientFrom: string;
@@ -30,20 +53,13 @@ export interface Project {
   };
 }
 
-export interface ExperienceItem {
+export interface ClientReview {
   id: string;
-  role: string;
+  clientName: string;
   company: string;
-  location: string;
-  period: string;
-  summary: string;
-  achievements: string[];
-  technologies: string[];
-}
-
-export interface TechnicalSkillGroup {
-  category: string;
-  skills: string[];
+  rating: number;
+  serviceTag: string;
+  quote: string;
 }
 
 export interface ServiceItem {
@@ -55,6 +71,7 @@ export interface ServiceItem {
   tags: string[];
   deliverables: { title: string; description: string }[];
   techStack: string[];
+  badge: string;
 }
 
 export interface ProcessStep {
@@ -65,10 +82,18 @@ export interface ProcessStep {
   details: string[];
 }
 
+export interface ClientMark {
+  name: string;
+  city: string;
+  country: string;
+  category: string;
+}
+
 export interface InquiryFormData {
   name: string;
   email: string;
   projectType: string;
+  budgetRange?: string;
   timeline: string;
   message: string;
 }
