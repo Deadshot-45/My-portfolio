@@ -11,47 +11,12 @@ interface NavbarProps {
   onSkyModeChange?: (mode: SkyMode) => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [soundActive, setSoundActive] = useState(false);
-  const [surfaceTone, setSurfaceTone] = useState<"hero" | "white" | "dark">(
-    "hero",
-  );
   const audioCtxRef = useRef<AudioContext | null>(null);
   const oscRef = useRef<OscillatorNode | null>(null);
   const gainRef = useRef<GainNode | null>(null);
-
-  // Determine nav contrast cleanly against section directly beneath the header
-  useEffect(() => {
-    const updateSurfaceTone = () => {
-      if (window.scrollY < window.innerHeight * 0.65) {
-        setSurfaceTone("hero");
-        return;
-      }
-      const sections = Array.from(document.querySelectorAll<HTMLElement>("[data-surface]"));
-      const probeY = 42;
-      for (const section of sections) {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= probeY && rect.bottom >= probeY) {
-          const surface = section.getAttribute("data-surface");
-          if (surface === "white" || surface === "day") {
-            setSurfaceTone("white");
-          } else {
-            setSurfaceTone("dark");
-          }
-          return;
-        }
-      }
-    };
-
-    updateSurfaceTone();
-    window.addEventListener("scroll", updateSurfaceTone, { passive: true });
-    window.addEventListener("resize", updateSurfaceTone, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", updateSurfaceTone);
-      window.removeEventListener("resize", updateSurfaceTone);
-    };
-  }, []);
 
   // Close drawer on Escape key
   useEffect(() => {
@@ -151,12 +116,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
     }
   };
 
-  // Match reference: dark crisp ink over bright Day/Sunset top sky & white surfaces; crisp light ink on Night or dark sections
-  const useDarkInk =
-    surfaceTone === "white" || (surfaceTone === "hero" && skyMode !== "night");
-
-  const inkColorClass = useDarkInk ? "text-[#121214]" : "text-[#fffaf3]";
-
   const navLinks = [
     { label: "Home", href: "#hero" },
     { label: "Why Custom", href: "#why" },
@@ -171,25 +130,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
     <>
       {/* Screen Scrim when Menu Drawer is open */}
       <div
-        data-surface="data-surface"
         aria-hidden="true"
         onClick={() => setMenuOpen(false)}
-        className={`fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px] transition-opacity duration-500 ${
+        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-opacity duration-500 ${
           menuOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         }`}
       />
 
-      {/* Minimalist Transparent Fixed Editorial Header Bar */}
+      {/* Signature Awwwards Inverted Navigation Bar (mix-blend-mode: difference against all surfaces) */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 px-[18px] md:px-[30px] pt-[14px] md:pt-[18px] flex items-center justify-between pointer-events-none transition-colors duration-500 ${inkColorClass}`}
+        className={`fixed top-0 left-0 right-0 z-50 px-[18px] md:px-[30px] pt-[14px] md:pt-[18px] flex items-center justify-between pointer-events-none transition-all duration-300 ${
+          menuOpen ? "" : "mix-blend-difference text-white"
+        }`}
       >
         {/* Left: Bold Geometric Monogram Mark */}
         <a
           href="#hero"
           aria-label={`${USER_PROFILE.name} - Home`}
-          className="pointer-events-auto flex items-center justify-center h-[42px] md:h-[48px] transition-transform duration-300 hover:scale-95 active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 rounded-full"
+          className={`pointer-events-auto flex items-center justify-center h-[42px] md:h-[48px] transition-all duration-300 hover:scale-95 active:scale-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 rounded-full text-white ${
+            menuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
         >
           <svg
             viewBox="0 0 64 64"
@@ -208,10 +170,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
           </svg>
         </a>
 
-        {/* Center: Clean Editorial Wordmark */}
+        {/* Center: Clean Editorial Wordmark - Automatically inverts over white sections & dark laptop stage */}
         <a
           href="#hero"
-          className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 font-grotesk font-medium text-[1.05rem] md:text-[1.25rem] tracking-[-0.03em] leading-none transition-opacity duration-300 hover:opacity-70 ${
+          className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 font-grotesk font-semibold text-[1.05rem] md:text-[1.25rem] tracking-[-0.03em] leading-none transition-opacity duration-300 hover:opacity-70 text-white ${
             menuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
         >
@@ -219,17 +181,21 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
         </a>
 
         {/* Right: SOUND Equalizer + MENU Trigger */}
-        <div className="pointer-events-auto flex items-center gap-4 md:gap-6">
+        <div
+          className={`pointer-events-auto flex items-center gap-4 md:gap-6 ${
+            menuOpen ? "text-[#111111]" : "text-white"
+          }`}
+        >
           <button
             type="button"
             onClick={handleToggleSound}
             aria-label={soundActive ? "Sound off" : "Sound on"}
             aria-pressed={soundActive}
-            className={`flex items-center gap-2 h-[42px] px-1 cursor-pointer transition-opacity duration-300 hover:opacity-70 ${
-              soundActive ? "nav-eq-on opacity-100" : "opacity-80"
+            className={`flex items-center gap-2 h-[42px] px-1 cursor-pointer transition-opacity duration-300 hover:opacity-70 text-white ${
+              soundActive ? "nav-eq-on opacity-100" : "opacity-90"
             } ${menuOpen ? "opacity-0 pointer-events-none" : ""}`}
           >
-            <span className="hidden sm:inline font-mono text-[11px] font-semibold tracking-[0.1em] uppercase">
+            <span className="hidden sm:inline font-mono text-[11px] font-bold tracking-[0.1em] uppercase">
               Sound
             </span>
             <svg
@@ -295,12 +261,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls="site-menu"
-            className={`px-2.5 font-grotesk font-semibold text-[0.95rem] md:text-[1.05rem] tracking-[-0.01em] uppercase cursor-pointer transition-all duration-200 hover:opacity-80 ${
+            className={`px-3 font-grotesk font-semibold text-[0.95rem] md:text-[1.05rem] tracking-[-0.01em] uppercase cursor-pointer transition-all duration-200 ${
               menuOpen
-                ? "h-[36px] rounded-sm bg-white text-[#111111] shadow-md"
-                : useDarkInk
-                ? "h-[42px] [text-shadow:0_1px_12px_rgba(255,255,255,0.45)]"
-                : "h-[42px]"
+                ? "h-[36px] rounded-sm bg-white text-[#111111] shadow-lg hover:bg-zinc-100"
+                : "h-[42px] text-white hover:opacity-70"
             }`}
           >
             {menuOpen ? "CLOSE" : "MENU"}
@@ -315,18 +279,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
         aria-modal="true"
         aria-label="Site navigation"
         aria-hidden={!menuOpen}
-        className={`fixed top-[62px] md:top-[76px] right-[18px] md:right-[30px] z-50 w-[calc(100vw-36px)] max-w-[23rem] rounded-sm p-6 md:p-7 shadow-[0_24px_60px_rgba(0,0,0,0.28)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-          useDarkInk
-            ? "bg-white text-[#111111] border border-black/10"
-            : "bg-[#0f0f12] text-[#fffaf3] border border-white/15"
-        } ${
+        className={`fixed top-[62px] md:top-[76px] right-[18px] md:right-[30px] z-50 w-[calc(100vw-36px)] max-w-[23rem] rounded-sm p-6 md:p-7 shadow-[0_24px_60px_rgba(0,0,0,0.5)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] bg-[#0f0f12] text-[#fffaf3] border border-white/15 ${
           menuOpen
             ? "opacity-100 translate-y-0 pointer-events-auto visible"
             : "opacity-0 -translate-y-4 pointer-events-none invisible"
         }`}
       >
-        <div className="flex items-center justify-between pb-4 mb-2 border-b border-current/15">
-          <span className="font-grotesk font-medium text-sm tracking-tight">
+        <div className="flex items-center justify-between pb-4 mb-2 border-b border-white/15">
+          <span className="font-grotesk font-medium text-sm tracking-tight text-zinc-300">
             {USER_PROFILE.name}
           </span>
           <button
@@ -342,13 +302,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
           </button>
         </div>
 
-        <ul className="flex flex-col list-none p-0 m-0 divide-y divide-current/15">
+        <ul className="flex flex-col list-none p-0 m-0 divide-y divide-white/10">
           {navLinks.map((item) => (
             <li key={item.label}>
               <a
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className="group flex items-center justify-between py-2.5 font-grotesk text-[1.25rem] md:text-[1.45rem] font-normal uppercase tracking-[-0.02em] transition-transform duration-300 hover:translate-x-2"
+                className="group flex items-center justify-between py-2.5 font-grotesk text-[1.25rem] md:text-[1.45rem] font-normal uppercase tracking-[-0.02em] transition-transform duration-300 hover:translate-x-2 text-zinc-100 hover:text-white"
               >
                 <span>{item.label}</span>
                 <span className="font-mono text-xs opacity-40 group-hover:opacity-100 transition-opacity">
@@ -359,31 +319,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry, skyMode }) => {
           ))}
         </ul>
 
-        <div className="mt-5 pt-4 border-t border-current/15 flex flex-col gap-2 font-mono text-xs">
-          <a
-            href={`mailto:${USER_PROFILE.email}`}
-            className="hover:underline w-fit font-medium"
-          >
-            {USER_PROFILE.email}
-          </a>
-          <div className="flex items-center gap-4 opacity-70">
-            <a
-              href={USER_PROFILE.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:opacity-100 transition-opacity"
-            >
-              LinkedIn
-            </a>
-            <a
-              href={USER_PROFILE.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:opacity-100 transition-opacity"
-            >
-              GitHub
-            </a>
-          </div>
+        <div className="pt-6 mt-4 border-t border-white/15 flex items-center justify-between font-mono text-xs text-zinc-400">
+          <span>{USER_PROFILE.location}</span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#9bf35a] animate-pulse" />
+            <span className="text-zinc-200">Available for Work</span>
+          </span>
         </div>
       </nav>
     </>

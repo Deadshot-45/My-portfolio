@@ -31,7 +31,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry, profile = USER_PR
   return (
     <footer
       id="contact"
-      data-surface="data-surface"
+      data-surface="white"
       aria-labelledby="contact-title"
       className="relative flex flex-col overflow-hidden px-[4vw] pb-[4vw] pt-[10svh] md:px-[var(--page-x)] md:pb-[var(--page-x)] md:min-h-[90svh] md:pt-[24svh]"
       style={{

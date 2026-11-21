@@ -18,7 +18,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
   const list = experiences && experiences.length > 0 ? experiences : WORK_EXPERIENCE;
 
   return (
-    <section id="experience" className={`py-24 border-t relative overflow-hidden ${
+    <section id="experience" data-surface="dark" className={`py-24 border-t relative overflow-hidden ${
       isDark ? 'border-zinc-800/80 bg-zinc-950/70' : 'border-zinc-200 bg-zinc-50/60'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -52,8 +52,8 @@ html[data-scroll-behavior="smooth"] {
 
 /* Surface Themes */
 [data-surface="white"] {
-  background-color: #ffffff !important;
-  color: #0f0f0f !important;
+  background-color: #ffffff;
+  color: #0f0f0f;
 }
 
 [data-surface="white"] * {
@@ -61,8 +61,8 @@ html[data-scroll-behavior="smooth"] {
 }
 
 [data-surface="dark"] {
-  background-color: #07070a !important;
-  color: #f3f4f6 !important;
+  background-color: #07070a;
+  color: #f3f4f6;
 }
 
 [data-surface="dark"] * {

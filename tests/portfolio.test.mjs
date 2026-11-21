@@ -71,4 +71,61 @@ describe('Portfolio Reference & Integrity Tests', () => {
     assert.equal(night.isDarkText, false);
     assert.ok(night.imageFilter.includes('brightness(0.38)'));
   });
+
+  test('navbar difference blend contrast guarantees readable inverted colors across all surfaces', () => {
+    function computeDifferenceColor(hexBg) {
+      const cleanHex = hexBg.replace('#', '');
+      const r = parseInt(cleanHex.substring(0, 2), 16);
+      const g = parseInt(cleanHex.substring(2, 4), 16);
+      const b = parseInt(cleanHex.substring(4, 6), 16);
+      // In difference mode against pure white (255, 255, 255):
+      return {
+        r: 255 - r,
+        g: 255 - g,
+        b: 255 - b,
+      };
+    }
+
+    // Relative luminance calculation for WCAG contrast verification
+    function getLuminance({ r, g, b }) {
+      const a = [r, g, b].map((v) => {
+        const val = v / 255;
+        return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+      });
+      return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
+
+    function getContrast(hexBg) {
+      const fg = computeDifferenceColor(hexBg);
+      const cleanHex = hexBg.replace('#', '');
+      const bg = {
+        r: parseInt(cleanHex.substring(0, 2), 16),
+        g: parseInt(cleanHex.substring(2, 4), 16),
+        b: parseInt(cleanHex.substring(4, 6), 16),
+      };
+      const l1 = Math.max(getLuminance(fg), getLuminance(bg));
+      const l2 = Math.min(getLuminance(fg), getLuminance(bg));
+      return (l1 + 0.05) / (l2 + 0.05);
+    }
+
+    // 1. White sections (WhyCustom, Craft, Process): pure black inverted output
+    const whiteOut = computeDifferenceColor('ffffff');
+    assert.deepEqual(whiteOut, { r: 0, g: 0, b: 0 });
+    assert.ok(getContrast('ffffff') >= 20, 'Contrast on white surfaces must be >= 20:1');
+
+    // 2. Dark sections (ServicesIntro, SelectedWork, Experience): crisp near-white output
+    const darkOut = computeDifferenceColor('07070a');
+    assert.ok(darkOut.r >= 240 && darkOut.g >= 240 && darkOut.b >= 240);
+    assert.ok(getContrast('07070a') >= 15, 'Contrast on dark surfaces must be >= 15:1');
+
+    // 3. Laptop stage center mockup (0f0f0f) - solves the center wordmark clash!
+    const laptopOut = computeDifferenceColor('0f0f0f');
+    assert.ok(laptopOut.r >= 235 && laptopOut.g >= 235 && laptopOut.b >= 235);
+    assert.ok(getContrast('0f0f0f') >= 14, 'Contrast on laptop bezel must be >= 14:1');
+
+    // 4. Footer container card (050505) - solves the footer card clash!
+    const footerCardOut = computeDifferenceColor('050505');
+    assert.ok(footerCardOut.r >= 245 && footerCardOut.g >= 245 && footerCardOut.b >= 245);
+    assert.ok(getContrast('050505') >= 18, 'Contrast on footer dark card must be >= 18:1');
+  });
 });

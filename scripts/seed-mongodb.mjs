@@ -1,12 +1,50 @@
 import { MongoClient } from "mongodb";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "node:crypto";
+import fs from "node:fs";
+
+// Load environment variables natively in Node.js from .env.local and .env
+for (const envFile of [".env.local", ".env"]) {
+  if (fs.existsSync(envFile)) {
+    try {
+      if (typeof process.loadEnvFile === "function") {
+        process.loadEnvFile(envFile);
+      } else {
+        const content = fs.readFileSync(envFile, "utf-8");
+        for (const line of content.split("\n")) {
+          const trimmed = line.trim();
+          if (!trimmed || trimmed.startsWith("#")) continue;
+          const eqIdx = trimmed.indexOf("=");
+          if (eqIdx !== -1) {
+            const key = trimmed.slice(0, eqIdx).trim();
+            let val = trimmed.slice(eqIdx + 1).trim();
+            if (
+              (val.startsWith('"') && val.endsWith('"')) ||
+              (val.startsWith("'") && val.endsWith("'"))
+            ) {
+              val = val.slice(1, -1);
+            }
+            if (!process.env[key]) {
+              process.env[key] = val;
+            }
+          }
+        }
+      }
+    } catch {
+      // safe fallback
+    }
+  }
+}
 
 const uri =
   process.env.MONGODB_URI ||
   process.env.mongodb ||
+  process.env.DATABASE_URL ||
   "mongodb://127.0.0.1:27017/mayank_portfolio";
-const sanitizedUri = uri.replace(/\/\/[^@]+@/, "//***:***@");
+
+const sanitizedUri = uri
+  ? uri.replace(/\/\/[^@]+@/, "//***:***@")
+  : "unknown";
 
 async function main() {
   console.log(`[MongoDB] Connecting to ${sanitizedUri}...`);
