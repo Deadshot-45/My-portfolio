@@ -54,6 +54,7 @@ function mapCmsProjectToFrontendProject(cms: CmsProject): Project {
     githubUrl: cms.githubUrl || undefined,
     accentColor: '#9bf35a',
     featured: !!cms.featured,
+    coverImage: cms.coverImage || (cms.images && cms.images[0]?.url) || undefined,
     imagePlaceholder: {
       badge: `${categoryLabels[category]} • Live`,
       headline: cms.title,

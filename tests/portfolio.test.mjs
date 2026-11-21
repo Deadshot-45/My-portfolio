@@ -2,7 +2,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { filterProjectsByCategory, calculateCaffeinePerk, formatInquiryMailto, getSkySceneConfig } from '../dist-test/utils/portfolioUtils.js';
+import { filterProjectsByCategory, calculateCaffeinePerk, formatInquiryMailto, getSkySceneConfig, cleanDisplayUrl, getProjectPreviewUrl } from '../dist-test/utils/portfolioUtils.js';
 import { PROJECTS, SERVICES, CLIENT_REVIEWS, CLIENT_MARKS } from '../dist-test/data/portfolioData.js';
 
 describe('Portfolio Reference & Integrity Tests', () => {
@@ -45,6 +45,24 @@ describe('Portfolio Reference & Integrity Tests', () => {
 
     assert.ok(link.startsWith('mailto:mayanksahu8179@gmail.com?subject='));
     assert.ok(link.includes('Elena%20Rostova'));
+  });
+
+  test('cleanDisplayUrl and getProjectPreviewUrl generate clean preview URLs and hostnames', () => {
+    // URL cleaning
+    assert.equal(cleanDisplayUrl('https://crm-management-zrog.vercel.app/'), 'crm-management-zrog.vercel.app');
+    assert.equal(cleanDisplayUrl('http://www.example.com/demo'), 'example.com');
+    assert.equal(cleanDisplayUrl(''), '');
+
+    // Preview URL generation
+    const withCover = getProjectPreviewUrl({ coverImage: 'https://ik.imagekit.io/crm.jpg', liveUrl: 'https://demo.com' });
+    assert.equal(withCover, 'https://ik.imagekit.io/crm.jpg');
+
+    const withLiveUrl = getProjectPreviewUrl({ liveUrl: 'https://crm-management-zrog.vercel.app/' });
+    assert.ok(withLiveUrl?.includes('wp.com/mshots/v1/'));
+    assert.ok(withLiveUrl?.includes('crm-management-zrog.vercel.app'));
+
+    const empty = getProjectPreviewUrl({});
+    assert.equal(empty, undefined);
   });
 
   test('all required services exist in portfolioData', () => {
@@ -153,5 +171,78 @@ describe('Portfolio Reference & Integrity Tests', () => {
     assert.ok(fs.existsSync(postCssPath), 'postcss.config.mjs must exist');
     const postCss = fs.readFileSync(postCssPath, 'utf8');
     assert.ok(postCss.includes('@tailwindcss/postcss'), 'PostCSS config must use @tailwindcss/postcss');
+  });
+
+  test('InquiryModal and ProjectDetailModal integrate Shadcn Dialog primitives with accessible labels', () => {
+    const inquiryPath = path.resolve('src/components/InquiryModal.tsx');
+    const projectPath = path.resolve('src/components/ProjectDetailModal.tsx');
+
+    assert.ok(fs.existsSync(inquiryPath), 'InquiryModal must exist');
+    assert.ok(fs.existsSync(projectPath), 'ProjectDetailModal must exist');
+
+    const inquirySrc = fs.readFileSync(inquiryPath, 'utf8');
+    const projectSrc = fs.readFileSync(projectPath, 'utf8');
+
+    // Both must use Shadcn Dialog components
+    assert.ok(inquirySrc.includes("from '@/components/ui/dialog'"), 'InquiryModal must import from shadcn dialog');
+    assert.ok(inquirySrc.includes('<Dialog open={isOpen}'), 'InquiryModal must use Dialog with open prop');
+    assert.ok(inquirySrc.includes('<DialogTitle'), 'InquiryModal must provide DialogTitle');
+    assert.ok(inquirySrc.includes('<DialogDescription'), 'InquiryModal must provide DialogDescription');
+
+    assert.ok(projectSrc.includes("from '@/components/ui/dialog'"), 'ProjectDetailModal must import from shadcn dialog');
+    assert.ok(projectSrc.includes('<Dialog open={Boolean(project)}'), 'ProjectDetailModal must use Dialog with open prop');
+    assert.ok(projectSrc.includes('<DialogTitle'), 'ProjectDetailModal must provide DialogTitle');
+    assert.ok(projectSrc.includes('<DialogDescription'), 'ProjectDetailModal must provide DialogDescription');
+
+    // Both must use responsive bottom layout to prevent small screen cramping
+    assert.ok(inquirySrc.includes('flex flex-col-reverse sm:flex-row'), 'InquiryModal must stack bottom actions on small screens');
+    assert.ok(projectSrc.includes('flex flex-col sm:flex-row'), 'ProjectDetailModal must stack action links on small screens');
+    assert.ok(inquirySrc.includes('100dvh'), 'InquiryModal must fit within dynamic viewport height');
+    assert.ok(projectSrc.includes('100dvh'), 'ProjectDetailModal must fit within dynamic viewport height');
+  });
+
+  test('InViewSection and page.tsx implement on-demand viewport-based section imports', () => {
+    const inViewSectionPath = path.resolve('src/components/InViewSection.tsx');
+    const pagePath = path.resolve('src/app/page.tsx');
+
+    assert.ok(fs.existsSync(inViewSectionPath), 'InViewSection.tsx must exist');
+    assert.ok(fs.existsSync(pagePath), 'page.tsx must exist');
+
+    const inViewSrc = fs.readFileSync(inViewSectionPath, 'utf8');
+    const pageSrc = fs.readFileSync(pagePath, 'utf8');
+
+    // InViewSection must use IntersectionObserver, handle hash deep-links, and clean up observer
+    assert.ok(inViewSrc.includes('IntersectionObserver'), 'InViewSection must use native IntersectionObserver');
+    assert.ok(inViewSrc.includes('rootMargin'), 'InViewSection must support rootMargin pre-fetching');
+    assert.ok(inViewSrc.includes('window.location.hash'), 'InViewSection must support URL hash anchor navigation');
+    assert.ok(inViewSrc.includes('observer.disconnect()'), 'InViewSection must clean up observer on intersection or unmount');
+
+    // page.tsx must use dynamic imports for below-the-fold sections
+    assert.ok(pageSrc.includes("import dynamic from 'next/dynamic'"), 'page.tsx must import dynamic from next/dynamic');
+    assert.ok(pageSrc.includes('dynamic('), 'page.tsx must configure dynamic imports');
+    assert.ok(pageSrc.includes('<InViewSection'), 'page.tsx must wrap below-the-fold sections in InViewSection');
+    assert.ok(pageSrc.includes('isInquiryOpen && ('), 'page.tsx must conditionally mount InquiryModal on demand');
+    assert.ok(pageSrc.includes('selectedProject && ('), 'page.tsx must conditionally mount ProjectDetailModal on demand');
+  });
+
+  test('GitHub Actions CI and Deploy workflows use pnpm with correct lockfile caching', () => {
+    const ciPath = path.resolve('.github/workflows/ci.yml');
+    const deployPath = path.resolve('.github/workflows/deploy.yml');
+
+    assert.ok(fs.existsSync(ciPath), 'ci.yml must exist');
+    assert.ok(fs.existsSync(deployPath), 'deploy.yml must exist');
+
+    const ciSrc = fs.readFileSync(ciPath, 'utf8');
+    const deploySrc = fs.readFileSync(deployPath, 'utf8');
+
+    // Both workflows must use pnpm setup action and pnpm cache
+    assert.ok(ciSrc.includes('pnpm/action-setup'), 'ci.yml must use pnpm/action-setup');
+    assert.ok(ciSrc.includes("cache: 'pnpm'"), 'ci.yml must configure setup-node with pnpm cache');
+    assert.ok(ciSrc.includes('pnpm install --frozen-lockfile'), 'ci.yml must install via pnpm frozen lockfile');
+    assert.ok(ciSrc.includes('pnpm-lock.yaml'), 'ci.yml cache key must track pnpm-lock.yaml');
+
+    assert.ok(deploySrc.includes('pnpm/action-setup'), 'deploy.yml must use pnpm/action-setup');
+    assert.ok(deploySrc.includes("cache: 'pnpm'"), 'deploy.yml must configure setup-node with pnpm cache');
+    assert.ok(deploySrc.includes('pnpm install --frozen-lockfile'), 'deploy.yml must install via pnpm frozen lockfile');
   });
 });

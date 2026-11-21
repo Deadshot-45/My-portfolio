@@ -3,13 +3,108 @@
 import React, { useState } from 'react';
 import { Project, ProjectCategory, ThemeMode } from '../types/index';
 import { ExternalLink, Github, ArrowUpRight } from 'lucide-react';
-import { filterProjectsByCategory } from '../utils/portfolioUtils';
+import { filterProjectsByCategory, cleanDisplayUrl, getProjectPreviewUrl } from '../utils/portfolioUtils';
 
 interface SelectedWorkProps {
   onSelectProject: (project: Project) => void;
   theme?: ThemeMode;
   projects?: Project[];
 }
+
+const ProjectVisualStage: React.FC<{ project: Project }> = ({ project }) => {
+  const [imageError, setImageError] = useState(false);
+  const previewUrl = getProjectPreviewUrl(project);
+  const displayHost = cleanDisplayUrl(project.liveUrl);
+  const showLivePreview = Boolean(previewUrl && !imageError);
+
+  return (
+    <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-6 flex flex-col bg-zinc-900 border border-white/10 group-hover:border-white/25 transition-all duration-500 shadow-xl">
+      {/* Browser Window Header Bar */}
+      <div className="w-full h-8 px-3.5 bg-zinc-950/90 border-b border-white/10 flex items-center justify-between z-20 shrink-0 backdrop-blur-sm">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/80" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/80" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80" />
+        </div>
+
+        {displayHost ? (
+          <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-zinc-300 truncate max-w-[65%]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#9bf35a] animate-pulse shrink-0" />
+            <span className="truncate">{displayHost}</span>
+          </div>
+        ) : (
+          <span className="text-[10px] font-mono text-zinc-500 uppercase">
+            {project.imagePlaceholder.badge}
+          </span>
+        )}
+
+        <span className="font-mono text-[10px] text-zinc-500">
+          {project.year}
+        </span>
+      </div>
+
+      {/* Screen Preview Container */}
+      <div className="relative flex-1 w-full overflow-hidden bg-zinc-950 flex flex-col justify-between">
+        {showLivePreview ? (
+          <>
+            {/* Live Website Preview Screenshot */}
+            <img
+              src={previewUrl}
+              alt={`${project.title} live preview`}
+              loading="lazy"
+              decoding="async"
+              onError={() => setImageError(true)}
+              className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+            {/* Subtle dark gradient overlay to anchor text and keep badge legible */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none opacity-60 group-hover:opacity-40 transition-opacity" />
+
+            <div className="relative z-10 p-5 mt-auto flex items-end justify-between">
+              <div>
+                <span className="font-mono text-[11px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white/90 border border-white/15">
+                  {project.imagePlaceholder.badge}
+                </span>
+                <h4 className="font-grotesk text-xl md:text-2xl font-bold text-white tracking-tight drop-shadow-md mt-2">
+                  {project.title}
+                </h4>
+              </div>
+
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#9bf35a] text-black text-xs font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg shrink-0">
+                <span>View</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
+          </>
+        ) : (
+          /* Branded Canvas Fallback */
+          <div
+            className="w-full h-full p-6 flex flex-col justify-between"
+            style={{
+              background: `linear-gradient(135deg, ${project.imagePlaceholder.gradientFrom}, ${project.imagePlaceholder.gradientTo})`,
+            }}
+          >
+            <div className="flex items-center justify-between z-10">
+              <span className="font-mono text-xs uppercase px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/15">
+                {project.imagePlaceholder.badge}
+              </span>
+              <span className="font-mono text-xs text-white/70">
+                {project.year}
+              </span>
+            </div>
+
+            <div className="z-10">
+              <h4 className="font-grotesk text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md">
+                {project.imagePlaceholder.headline}
+              </h4>
+            </div>
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const SelectedWork: React.FC<SelectedWorkProps> = ({
   onSelectProject,
@@ -79,31 +174,8 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({
             onClick={() => onSelectProject(project)}
             className="group relative rounded-3xl border border-white/10 bg-zinc-950/80 p-6 md:p-8 flex flex-col justify-between overflow-hidden cursor-pointer transition-all duration-500 hover:border-white/30 hover:-translate-y-1"
           >
-            {/* Visual Canvas / Gradient Poster */}
-            <div
-              className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-6 flex flex-col justify-between p-6 transition-transform duration-700 group-hover:scale-[1.02]"
-              style={{
-                background: `linear-gradient(135deg, ${project.imagePlaceholder.gradientFrom}, ${project.imagePlaceholder.gradientTo})`,
-              }}
-            >
-              <div className="flex items-center justify-between z-10">
-                <span className="font-mono text-xs uppercase px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/15">
-                  {project.imagePlaceholder.badge}
-                </span>
-                <span className="font-mono text-xs text-white/70">
-                  {project.year}
-                </span>
-              </div>
-
-              <div className="z-10">
-                <h4 className="font-grotesk text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md">
-                  {project.imagePlaceholder.headline}
-                </h4>
-              </div>
-
-              {/* Overlay glow */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-            </div>
+            {/* Visual Website Preview Stage */}
+            <ProjectVisualStage project={project} />
 
             {/* Meta & Info */}
             <div className="flex flex-col flex-1 justify-between">

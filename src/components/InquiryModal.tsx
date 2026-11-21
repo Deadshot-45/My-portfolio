@@ -1,10 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Send, CheckCircle2, Copy, Check, Mail } from 'lucide-react';
+import { Send, CheckCircle2, Copy, Check } from 'lucide-react';
 import { InquiryFormData, ThemeMode } from '../types/index';
 import { USER_PROFILE } from '../data/portfolioData';
 import { formatInquiryMailto } from '../utils/portfolioUtils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 
 interface InquiryModalProps {
   isOpen: boolean;
@@ -31,8 +38,6 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
   const [submitted, setSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
   const isDark = theme === 'dark';
-
-  if (!isOpen) return null;
 
   const projectTypes = [
     'Full-Stack Web Application',
@@ -72,45 +77,42 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className={`relative w-full max-w-2xl my-8 p-6 sm:p-10 rounded-3xl border shadow-2xl ${
-        isDark ? 'bg-zinc-900 border-zinc-750 text-white' : 'bg-white border-zinc-200 text-zinc-950'
-      }`}>
-        
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className={`absolute top-6 right-6 p-2 rounded-xl transition-colors ${
-            isDark ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100'
-          }`}
-          aria-label="Close"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent
+        className={`w-[calc(100%-1.5rem)] sm:max-w-2xl p-5 sm:p-8 rounded-3xl border shadow-2xl max-h-[calc(100dvh-2.5rem)] min-h-0 overflow-y-auto overscroll-contain no-scrollbar ${
+          isDark
+            ? 'bg-zinc-900 border-zinc-750 text-white'
+            : 'bg-white border-zinc-200 text-zinc-950'
+        }`}
+      >
         {!submitted ? (
           <div>
             {/* Header */}
-            <div className="mb-8">
-              <h3 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
-                isDark ? 'text-white' : 'text-zinc-950'
-              }`}>
+            <DialogHeader className="mb-8 space-y-1.5 text-left">
+              <DialogTitle
+                className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
+                  isDark ? 'text-white' : 'text-zinc-950'
+                }`}
+              >
                 Start A Conversation.
-              </h3>
-              <p className={`text-xs sm:text-sm mt-1.5 ${
-                isDark ? 'text-zinc-400' : 'text-zinc-600'
-              }`}>
+              </DialogTitle>
+              <DialogDescription
+                className={`text-xs sm:text-sm mt-1.5 ${
+                  isDark ? 'text-zinc-400' : 'text-zinc-600'
+                }`}
+              >
                 Reaching out regarding a full-time role, contract, or architecture consultation.
-              </p>
-            </div>
+              </DialogDescription>
+            </DialogHeader>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              
               {/* Focus Area */}
               <div>
-                <label className={`block text-xs font-mono font-semibold mb-2 ${
-                  isDark ? 'text-zinc-300' : 'text-zinc-700'
-                }`}>
+                <label
+                  className={`block text-xs font-mono font-semibold mb-2 ${
+                    isDark ? 'text-zinc-300' : 'text-zinc-700'
+                  }`}
+                >
                   Focus Area / Role Type:
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -119,7 +121,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                       type="button"
                       key={type}
                       onClick={() => setFormData({ ...formData, projectType: type })}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all border ${
+                      className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all border cursor-pointer ${
                         formData.projectType === type
                           ? isDark
                             ? 'bg-white text-black border-white font-bold'
@@ -137,9 +139,11 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
 
               {/* Timeline */}
               <div>
-                <label className={`block text-xs font-mono font-semibold mb-2 ${
-                  isDark ? 'text-zinc-300' : 'text-zinc-700'
-                }`}>
+                <label
+                  className={`block text-xs font-mono font-semibold mb-2 ${
+                    isDark ? 'text-zinc-300' : 'text-zinc-700'
+                  }`}
+                >
                   Timeline:
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -148,7 +152,7 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                       type="button"
                       key={timeline}
                       onClick={() => setFormData({ ...formData, timeline })}
-                      className={`p-2.5 rounded-xl text-xs text-center border transition-all ${
+                      className={`p-2.5 rounded-xl text-xs text-center border transition-all cursor-pointer ${
                         formData.timeline === timeline
                           ? isDark
                             ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 font-bold'
@@ -167,9 +171,11 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
               {/* Name & Email Fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={`block text-xs font-mono font-semibold mb-1.5 ${
-                    isDark ? 'text-zinc-300' : 'text-zinc-700'
-                  }`}>
+                  <label
+                    className={`block text-xs font-mono font-semibold mb-1.5 ${
+                      isDark ? 'text-zinc-300' : 'text-zinc-700'
+                    }`}
+                  >
                     Your Name *
                   </label>
                   <input
@@ -187,9 +193,11 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                 </div>
 
                 <div>
-                  <label className={`block text-xs font-mono font-semibold mb-1.5 ${
-                    isDark ? 'text-zinc-300' : 'text-zinc-700'
-                  }`}>
+                  <label
+                    className={`block text-xs font-mono font-semibold mb-1.5 ${
+                      isDark ? 'text-zinc-300' : 'text-zinc-700'
+                    }`}
+                  >
                     Your Email *
                   </label>
                   <input
@@ -209,9 +217,11 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
 
               {/* Message */}
               <div>
-                <label className={`block text-xs font-mono font-semibold mb-1.5 ${
-                  isDark ? 'text-zinc-300' : 'text-zinc-700'
-                }`}>
+                <label
+                  className={`block text-xs font-mono font-semibold mb-1.5 ${
+                    isDark ? 'text-zinc-300' : 'text-zinc-700'
+                  }`}
+                >
                   Project or Role Brief *
                 </label>
                 <textarea
@@ -228,55 +238,63 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                 />
               </div>
 
-              {/* Submit Button */}
-              <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
+              {/* Submit Button & Direct Email */}
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3.5 pt-5 pb-6 sm:pb-2 border-t border-zinc-800/50">
                 <button
                   type="button"
                   onClick={handleCopyEmail}
-                  className={`text-xs font-mono flex items-center gap-1.5 transition-colors ${
+                  className={`text-xs font-mono flex items-center justify-center sm:justify-start gap-1.5 transition-colors cursor-pointer py-1.5 px-1 ${
                     isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-zinc-950'
                   }`}
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Email copied!' : 'Or copy mayanksahu8179@gmail.com'}</span>
+                  {copied ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 shrink-0" />
+                  )}
+                  <span className="truncate">{copied ? 'Email copied!' : 'Or copy mayanksahu8179@gmail.com'}</span>
                 </button>
 
                 <button
                   type="submit"
-                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm active:scale-95 transition-all shadow-md ${
+                  className={`inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm active:scale-95 transition-all shadow-md cursor-pointer w-full sm:w-auto shrink-0 ${
                     isDark
                       ? 'bg-white hover:bg-zinc-200 text-black'
                       : 'bg-zinc-950 hover:bg-zinc-800 text-white'
                   }`}
                 >
-                  <span>Send via Email</span>
-                  <Send className="w-3.5 h-3.5" />
+                  <span className="whitespace-nowrap">Send via Email</span>
+                  <Send className="w-3.5 h-3.5 shrink-0" />
                 </button>
               </div>
-
             </form>
           </div>
         ) : (
           <div className="py-12 text-center">
             <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-            <h3 className={`text-2xl font-extrabold mb-2 ${isDark ? 'text-white' : 'text-zinc-950'}`}>
+            <DialogTitle
+              className={`text-2xl font-extrabold mb-2 ${isDark ? 'text-white' : 'text-zinc-950'}`}
+            >
               Draft Prepared!
-            </h3>
-            <p className={`text-sm max-w-md mx-auto mb-6 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              Your email client should have opened with the formatted inquiry. You can also write directly to <strong>{USER_PROFILE.email}</strong>.
-            </p>
+            </DialogTitle>
+            <DialogDescription
+              className={`text-sm max-w-md mx-auto mb-6 ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}
+            >
+              Your email client should have opened with the formatted inquiry. You can also write directly to{' '}
+              <strong>{USER_PROFILE.email}</strong>.
+            </DialogDescription>
             <button
+              type="button"
               onClick={onClose}
-              className={`px-6 py-2.5 rounded-xl text-xs font-bold font-mono border transition-all ${
-                isDark ? 'bg-zinc-800 border-zinc-700 text-white' : 'bg-zinc-100 border-zinc-300 text-zinc-950'
+              className={`px-6 py-2.5 rounded-xl text-xs font-bold font-mono border transition-all cursor-pointer ${
+                isDark ? 'bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700' : 'bg-zinc-100 border-zinc-300 text-zinc-950 hover:bg-zinc-200'
               }`}
             >
               Close Window
             </button>
           </div>
         )}
-
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

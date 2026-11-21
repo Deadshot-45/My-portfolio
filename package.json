@@ -2,6 +2,7 @@
   "name": "mayank-portfolio",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.5.2",
   "scripts": {
     "admin:password": "node scripts/set-admin-password.mjs",
     "db:seed": "node scripts/seed-mongodb.mjs",

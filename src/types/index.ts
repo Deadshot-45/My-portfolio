@@ -45,6 +45,7 @@ export interface Project {
   githubUrl?: string;
   accentColor: string;
   featured: boolean;
+  coverImage?: string;
   imagePlaceholder: {
     badge: string;
     headline: string;

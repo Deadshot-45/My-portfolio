@@ -182,6 +182,16 @@ html[data-scroll-behavior="smooth"] {
   scroll-behavior: smooth;
 }
 
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Surface Themes */
 [data-surface="white"] {
   background-color: #ffffff;
@@ -292,20 +302,26 @@ html[data-scroll-behavior="smooth"] {
   border-color: #27272a !important;
 }
 
-[data-slot="select-item"] {
+[data-slot="select-item"],
+[role="option"] {
   color: #e4e4e7 !important;
 }
 
 [data-slot="select-item"]:hover,
 [data-slot="select-item"]:focus,
-[data-slot="select-item"][data-highlighted] {
+[data-slot="select-item"][data-highlighted],
+[role="option"]:hover,
+[role="option"]:focus,
+[role="option"][data-highlighted] {
   background-color: #27272a !important;
   color: #ffffff !important;
 }
 
 [data-slot="select-item"]:hover *,
 [data-slot="select-item"]:focus *,
-[data-slot="select-item"][data-highlighted] * {
+[data-slot="select-item"][data-highlighted] *,
+[role="option"]:hover *,
+[role="option"]:focus *,
+[role="option"][data-highlighted] * {
   color: #ffffff !important;
 }
-

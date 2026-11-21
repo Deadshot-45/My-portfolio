@@ -77,3 +77,24 @@ export function formatInquiryMailto(data: {
   );
   return `mailto:${recipient}?subject=${subject}&body=${body}`;
 }
+
+export function cleanDisplayUrl(url?: string): string {
+  if (!url) return '';
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.replace(/^www\./, '');
+  } catch {
+    return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  }
+}
+
+export function getProjectPreviewUrl(project: { coverImage?: string; liveUrl?: string }): string | undefined {
+  if (project.coverImage) {
+    return project.coverImage;
+  }
+  if (project.liveUrl) {
+    return `https://s0.wp.com/mshots/v1/${encodeURIComponent(project.liveUrl)}?w=1280`;
+  }
+  return undefined;
+}
+
