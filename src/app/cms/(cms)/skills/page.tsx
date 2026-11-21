@@ -6,6 +6,8 @@ import {
   setSkillActiveAction,
 } from '@/app/cms/actions/skills';
 import { DeleteButton } from '@/components/cms/DeleteButton';
+import { CmsSelect } from '@/components/cms/CmsSelect';
+import { FilterBar } from '@/components/cms/FilterBar';
 
 export default async function SkillsPage({
   searchParams,
@@ -74,32 +76,26 @@ export default async function SkillsPage({
               <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
                 Category
               </label>
-              <select
+              <CmsSelect
                 name="category"
-                defaultValue="Frontend"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-              >
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+                defaultValue={categories[0] || 'Frontend'}
+                options={categories.map((c) => ({ value: c, label: c }))}
+              />
             </div>
             <div>
               <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
                 Proficiency Level
               </label>
-              <select
+              <CmsSelect
                 name="level"
                 defaultValue="Advanced"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-              >
-                <option value="Expert">Expert</option>
-                <option value="Advanced">Advanced</option>
-                <option value="Proficient">Proficient</option>
-                <option value="Familiar">Familiar</option>
-              </select>
+                options={[
+                  { value: 'Expert', label: 'Expert' },
+                  { value: 'Advanced', label: 'Advanced' },
+                  { value: 'Proficient', label: 'Proficient' },
+                  { value: 'Familiar', label: 'Familiar' },
+                ]}
+              />
             </div>
           </div>
 
@@ -150,107 +146,139 @@ export default async function SkillsPage({
         </form>
       </details>
 
-      {/* Filter Bar */}
-      <form
-        method="get"
-        className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 p-4 grid grid-cols-1 sm:grid-cols-4 gap-3"
-      >
-        <div className="col-span-2">
-          <input
-            name="search"
-            defaultValue={search}
-            placeholder="Search skills by name..."
-            className="w-full px-3.5 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-          />
-        </div>
-        <select
-          name="category"
-          defaultValue={category || 'all'}
-          className="px-3.5 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-        >
-          <option value="all">All Categories</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          className="px-4 py-2 rounded-lg border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-900/80 transition-colors text-sm font-medium"
-        >
-          Filter
-        </button>
-      </form>
+      {/* Responsive Filter Bar */}
+      <FilterBar
+        initialSearch={search}
+        initialActive={category || 'all'}
+        filterKey="category"
+        placeholder="Search skills by name..."
+        selectPlaceholder="All Categories"
+        items={[
+          { value: 'all', label: 'All Categories' },
+          ...categories.map((c) => ({ value: c, label: c })),
+        ]}
+      />
 
-      {/* Skills Table */}
+      {/* Skills Container */}
       {skills.length === 0 ? (
         <div className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 p-12 text-center">
           <p className="text-zinc-500 text-sm">No skills found.</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-zinc-900/50 bg-zinc-900/30">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Skill</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Category</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Level</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-500">Status</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Order</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-900/40">
-              {skills.map((skill) => (
-                <tr key={skill.id} className="hover:bg-zinc-900/30 transition-colors">
-                  <td className="px-4 py-3 font-medium text-zinc-200">
-                    {skill.name}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-zinc-400">
-                    <span className="inline-block px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700/60">
-                      {skill.category || 'General'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-emerald-400 font-medium">
-                    {skill.level || 'Advanced'}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                        skill.active
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : 'bg-zinc-800/50 text-zinc-400 border border-zinc-700'
-                      }`}
+        <div className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 overflow-hidden shadow-sm">
+          {/* Mobile Card Layout (< md) */}
+          <div className="block md:hidden divide-y divide-zinc-900/50">
+            {skills.map((skill) => (
+              <div key={skill.id} className="p-4 space-y-3 hover:bg-zinc-900/20 transition-colors">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold text-zinc-100">{skill.name}</h3>
+                    <p className="text-xs text-emerald-400 mt-0.5">{skill.level || 'Advanced'}</p>
+                  </div>
+                  <span
+                    className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      skill.active
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-zinc-800/50 text-zinc-400 border border-zinc-700'
+                    }`}
+                  >
+                    {skill.active ? 'Active' : 'Hidden'}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
+                  <span>
+                    Category: <strong className="text-zinc-300 font-normal">{skill.category || 'General'}</strong>
+                  </span>
+                  <span className="font-mono text-zinc-500">Order: #{skill.displayOrder}</span>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-900/40">
+                  <form action={setSkillActiveAction} className="inline">
+                    <input type="hidden" name="id" defaultValue={skill.id} />
+                    <input type="hidden" name="active" defaultValue={String(!skill.active)} />
+                    <button
+                      type="submit"
+                      className="px-2.5 py-1.5 rounded-md border border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors text-xs font-medium"
+                      title={skill.active ? 'Hide skill' : 'Show skill'}
                     >
-                      {skill.active ? 'Active' : 'Hidden'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right font-mono text-zinc-300 text-xs">
-                    {skill.displayOrder}
-                  </td>
-                  <td className="px-4 py-3 text-right space-x-1">
-                    <form action={setSkillActiveAction} className="inline">
-                      <input type="hidden" name="id" defaultValue={skill.id} />
-                      <input type="hidden" name="active" defaultValue={String(!skill.active)} />
-                      <button
-                        type="submit"
-                        className="p-2 rounded-md text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors text-xs"
-                        title={skill.active ? 'Hide skill' : 'Show skill'}
-                      >
-                        {skill.active ? 'Hide' : 'Show'}
-                      </button>
-                    </form>
-                    <DeleteButton
-                      action={deleteSkillAction}
-                      id={skill.id}
-                      itemTitle={skill.name}
-                    />
-                  </td>
+                      {skill.active ? 'Hide' : 'Show'}
+                    </button>
+                  </form>
+                  <DeleteButton
+                    action={deleteSkillAction}
+                    id={skill.id}
+                    itemTitle={skill.name}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-zinc-900/50 bg-zinc-900/30">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Skill</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Category</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Level</th>
+                  <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-500">Status</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Order</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-zinc-900/40">
+                {skills.map((skill) => (
+                  <tr key={skill.id} className="hover:bg-zinc-900/30 transition-colors">
+                    <td className="px-4 py-3 font-medium text-zinc-200">
+                      {skill.name}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-zinc-400">
+                      <span className="inline-block px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700/60">
+                        {skill.category || 'General'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-emerald-400 font-medium">
+                      {skill.level || 'Advanced'}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                          skill.active
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : 'bg-zinc-800/50 text-zinc-400 border border-zinc-700'
+                        }`}
+                      >
+                        {skill.active ? 'Active' : 'Hidden'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-zinc-300 text-xs">
+                      {skill.displayOrder}
+                    </td>
+                    <td className="px-4 py-3 text-right space-x-1">
+                      <form action={setSkillActiveAction} className="inline">
+                        <input type="hidden" name="id" defaultValue={skill.id} />
+                        <input type="hidden" name="active" defaultValue={String(!skill.active)} />
+                        <button
+                          type="submit"
+                          className="p-2 rounded-md text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors text-xs"
+                          title={skill.active ? 'Hide skill' : 'Show skill'}
+                        >
+                          {skill.active ? 'Hide' : 'Show'}
+                        </button>
+                      </form>
+                      <DeleteButton
+                        action={deleteSkillAction}
+                        id={skill.id}
+                        itemTitle={skill.name}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

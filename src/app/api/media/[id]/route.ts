@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { deleteMediaRecord, getMedia, deleteUploadFile } from '@/lib/media';
+import { hasImagekitConfig, deletePortfolioMedia } from '@/lib/imagekit';
 import { revalidatePath } from 'next/cache';
 
 export async function DELETE(
@@ -28,7 +29,15 @@ export async function DELETE(
   }
 
   await deleteMediaRecord(id);
-  await deleteUploadFile(media.filename);
+  if (media.fileId && hasImagekitConfig()) {
+    try {
+      await deletePortfolioMedia(media.fileId);
+    } catch (err) {
+      console.warn('[ImageKit Delete Warning]:', err);
+    }
+  } else {
+    await deleteUploadFile(media.filename);
+  }
   revalidatePath('/cms/media');
   return NextResponse.json({ ok: true });
 }

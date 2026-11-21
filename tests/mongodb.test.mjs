@@ -1,5 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import bcrypt from 'bcryptjs';
 import { serializeDoc, serializeDocs, generateId } from '../src/lib/mongodb.ts';
 
 describe('MongoDB Utility & Serialization Tests', () => {
@@ -66,5 +67,15 @@ describe('MongoDB Utility & Serialization Tests', () => {
     assert.ok(tags.includes('React 19'));
     assert.ok(tags.includes('Redis'));
     assert.equal(rawCms.category, 'websites');
+  });
+
+  test('admin password hashing and verification conforms to bcrypt 12 rounds', async () => {
+    const rawPassword = 'SecureAdminPassword2026!';
+    const passwordHash = await bcrypt.hash(rawPassword, 12);
+    assert.ok(passwordHash.startsWith('$2'));
+    const isMatch = await bcrypt.compare(rawPassword, passwordHash);
+    const isWrongMatch = await bcrypt.compare('WrongPassword123!', passwordHash);
+    assert.equal(isMatch, true);
+    assert.equal(isWrongMatch, false);
   });
 });

@@ -36,7 +36,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#09090b] text-zinc-100 px-4">
+    <div className="flex min-h-[92dvh] items-center justify-center bg-[#09090b] text-zinc-100 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 mb-4">
@@ -103,10 +103,7 @@ export default function LoginPage() {
               Sign In
             </button>
           </form>
-          <p className="mt-6 text-center text-xs text-zinc-500">
-            First time? The admin account is created server-side via{' '}
-            <code className="text-zinc-400">pnpm db:seed</code>.
-          </p>
+         
         </div>
       </div>
     </div>

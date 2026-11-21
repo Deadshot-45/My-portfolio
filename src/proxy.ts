@@ -4,10 +4,13 @@ import type { NextRequest } from 'next/server';
 const SESSION_COOKIE = 'portfolio_cms_session';
 
 /**
- * Middleware provides UX-level redirects for CMS routes.
+ * Next.js 16 Proxy runs on the edge before route rendering.
  * Real authorization is enforced server-side in every route/action via `requireSession`.
- * The session cookie itself is validated against the database on each protected request,
- * so a stolen/expired cookie cannot bypass authorization.
+ * The edge proxy only redirects unauthenticated requests on protected CMS routes.
+ *
+ * CRITICAL: We NEVER redirect from `/cms/login` to `/cms/dashboard` here based
+ * solely on cookie presence, because an expired or invalid cookie will trigger
+ * an infinite redirect loop (ERR_TOO_MANY_REDIRECTS) between /cms/login and /cms/dashboard.
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -17,13 +20,13 @@ export function proxy(request: NextRequest) {
 
   if (!isCms) return NextResponse.next();
 
-  // Authenticated user trying to open the login page -> dashboard.
-  if (isLogin && hasSession) {
-    return NextResponse.redirect(new URL('/cms/dashboard', request.url));
+  // If visiting /cms/login, ALWAYS allow the login page to render.
+  if (isLogin) {
+    return NextResponse.next();
   }
 
   // Unauthenticated user accessing any CMS route other than login -> login.
-  if (!isLogin && !hasSession) {
+  if (!hasSession) {
     return NextResponse.redirect(new URL('/cms/login', request.url));
   }
 

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Project, ProjectCategory, ThemeMode } from '../types/index';
-import { PROJECTS } from '../data/portfolioData';
 import { ExternalLink, Github, ArrowUpRight } from 'lucide-react';
 import { filterProjectsByCategory } from '../utils/portfolioUtils';
 
@@ -14,7 +13,7 @@ interface SelectedWorkProps {
 
 export const SelectedWork: React.FC<SelectedWorkProps> = ({
   onSelectProject,
-  projects = PROJECTS,
+  projects = [],
 }) => {
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>('all');
 

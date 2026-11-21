@@ -1,16 +1,25 @@
 import { getCollection, generateId, serializeDoc, serializeDocs } from '@/lib/mongodb';
+import { hasImagekitConfig, uploadPortfolioMedia, deletePortfolioMedia } from '@/lib/imagekit';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 
 const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads');
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB (supports PDFs and images)
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/avif',
+  'application/pdf',
+];
 
 export interface MediaItem {
   id: string;
   filename: string;
   originalName: string;
   url: string;
+  fileId?: string | null;
   mimeType: string | null;
   size: number | null;
   width: number | null;
@@ -32,7 +41,7 @@ export async function ensureUploadDir(): Promise<void> {
 /** Validate an uploaded File before storing it. */
 export function validateUpload(file: File): { ok: true } | { ok: false; error: string } {
   if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-    return { ok: false, error: 'Unsupported file type. Allowed: JPEG, PNG, WebP, GIF, AVIF.' };
+    return { ok: false, error: 'Unsupported file type. Allowed: JPEG, PNG, WebP, GIF, AVIF, PDF.' };
   }
   if (file.size > MAX_FILE_SIZE) {
     return { ok: false, error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024} MB.` };
@@ -66,6 +75,7 @@ export async function createMedia(data: {
   filename: string;
   originalName: string;
   url: string;
+  fileId?: string | null;
   mimeType?: string;
   size?: number;
   width?: number;
@@ -79,6 +89,7 @@ export async function createMedia(data: {
     filename: data.filename,
     originalName: data.originalName,
     url: data.url,
+    fileId: data.fileId ?? null,
     mimeType: data.mimeType ?? null,
     size: data.size ?? null,
     width: data.width ?? null,

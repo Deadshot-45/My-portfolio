@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { ensureUploadDir, safeFilename, validateUpload, createMedia } from '@/lib/media';
+import { hasImagekitConfig, uploadPortfolioMedia } from '@/lib/imagekit';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 import { revalidatePath } from 'next/cache';
@@ -24,7 +25,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  await ensureUploadDir();
   const formData = await request.formData();
   const file = formData.get('file') as File | null;
   if (!file) {
@@ -38,14 +38,43 @@ export async function POST(request: Request) {
 
   const filename = safeFilename(file.name);
   const buffer = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(join(UPLOAD_DIR, filename), buffer);
+
+  let mediaUrl = `/uploads/${filename}`;
+  let fileId: string | null = null;
+  let imgWidth: number | undefined;
+  let imgHeight: number | undefined;
+
+  // Use ImageKit cloud CDN when configured, otherwise fall back to local disk
+  if (hasImagekitConfig()) {
+    try {
+      const ikResult = await uploadPortfolioMedia({
+        buffer,
+        originalname: file.name,
+        mimetype: file.type,
+      });
+      mediaUrl = ikResult.url;
+      fileId = ikResult.fileId;
+      imgWidth = ikResult.width;
+      imgHeight = ikResult.height;
+    } catch (err) {
+      console.error('[ImageKit Upload Error] Falling back to local storage:', err);
+      await ensureUploadDir();
+      await fs.writeFile(join(UPLOAD_DIR, filename), buffer);
+    }
+  } else {
+    await ensureUploadDir();
+    await fs.writeFile(join(UPLOAD_DIR, filename), buffer);
+  }
 
   const media = await createMedia({
     filename,
     originalName: file.name,
-    url: `/uploads/${filename}`,
+    url: mediaUrl,
+    fileId,
     mimeType: file.type,
     size: file.size,
+    width: imgWidth,
+    height: imgHeight,
     uploadedBy: user.id,
   });
 

@@ -1,8 +1,8 @@
-import { getSession } from '@/lib/auth';
-import { redirect } from 'next/navigation';
-import { Shell } from '@/components/cms/Shell';
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { Shell } from "@/components/cms/Shell";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function ProtectedLayout({
   children,
@@ -10,8 +10,10 @@ export default async function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const { user } = await getSession();
+
   if (!user) {
-    redirect('/cms/login');
+    redirect("/cms/login");
   }
+
   return <Shell user={user}>{children}</Shell>;
 }

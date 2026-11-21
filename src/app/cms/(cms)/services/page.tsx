@@ -1,17 +1,23 @@
 import { listServices } from "@/lib/cms/services";
-import { requireSession } from "@/lib/auth";
 import {
   setServiceActiveAction,
   deleteServiceAction,
 } from "@/app/cms/actions/services";
 import { DeleteButton } from "@/components/cms/DeleteButton";
+import { FilterBar } from "@/components/cms/FilterBar";
+import { Pencil, Plus, Power } from "lucide-react";
+
+const items = [
+  { value: "all", label: "All" },
+  { value: "1", label: "Active" },
+  { value: "0", label: "Inactive" },
+];
 
 export default async function ServicesPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { user } = await requireSession();
   const sp = await searchParams;
   const search = String(sp.search || "");
   const active = String(sp.active || "");
@@ -19,12 +25,13 @@ export default async function ServicesPage({
 
   const { services, total, totalPages } = await listServices({
     search: search || undefined,
-    active: active === "true" ? true : active === "false" ? false : undefined,
+    active: active === "1" ? true : active === "0" ? false : undefined,
     page,
   });
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-zinc-100">Services</h1>
@@ -34,155 +41,216 @@ export default async function ServicesPage({
         </div>
         <a
           href="/cms/services/create"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-black bg-emerald-500 hover:bg-emerald-400 transition-all"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-black bg-emerald-500 hover:bg-emerald-400 transition-all shrink-0 shadow-sm"
         >
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 4v16m8-8H4"
-            ></path>
-          </svg>
-          Add Service
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          <span>Add Service</span>
         </a>
       </div>
-      <form
-        method="get"
-        className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 p-4 grid grid-cols-1 sm:grid-cols-4 gap-3"
-      >
-        <div className="col-span-3 relative">
-          <input
-            name="search"
-            defaultValue={search}
-            placeholder="Search title or description..."
-            className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-          />
-        </div>
-        <select
-          name="active"
-          defaultValue={active || "all"}
-          className="pl-3 pr-9 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-        >
-          <option value="all">All</option>
-          <option value="true">Active</option>
-          <option value="false">Inactive</option>
-        </select>
-        <button className="px-4 py-2.5 rounded-lg border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-900/80 transition-colors">
-          Filter
-        </button>
-      </form>
 
+      {/* Responsive Filter Bar with Debounced Live Search */}
+      <FilterBar
+        initialSearch={search}
+        initialActive={active}
+        filterKey="active"
+        placeholder="Search services by title or description..."
+        selectPlaceholder="All Status"
+        items={items}
+      />
+
+      {/* Services List / Table */}
       {total === 0 ? (
         <div className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 p-12 text-center">
           <p className="text-zinc-500 text-sm">No services found.</p>
         </div>
       ) : (
         <div className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-zinc-900/50 bg-zinc-900/30">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">
-                  Service
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">
-                  Slug
-                </th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-500">
-                  Active
-                </th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">
-                  Order
-                </th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-900/40">
-              {services.map((s) => (
-                <tr
-                  key={s.id}
-                  className="hover:bg-zinc-900/30 transition-colors"
-                >
-                  <td className="px-4 py-3 text-sm font-medium text-zinc-200">
-                    {s.title}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-zinc-300 truncate max-w-xs">
-                    {s.slug}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${s.active ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-zinc-800/50 text-zinc-400 border border-zinc-700"}`}
-                    >
-                      {s.active ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right text-sm text-zinc-300 font-mono">
-                    {s.displayOrder}
-                  </td>
-                  <td className="px-4 py-3 text-right">
+          {/* Mobile Card Layout (< md) */}
+          <div className="block md:hidden divide-y divide-zinc-900/50">
+            {services.map((s) => (
+              <div
+                key={s.id}
+                className="p-4 space-y-3 hover:bg-zinc-900/20 transition-colors"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold text-zinc-100 truncate">
+                      {s.title}
+                    </h3>
+                    <p className="text-xs font-mono text-zinc-400 truncate mt-0.5">
+                      {s.slug}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      s.active
+                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                        : "bg-zinc-800/50 text-zinc-400 border border-zinc-700"
+                    }`}
+                  >
+                    {s.active ? "Active" : "Inactive"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-zinc-500 pt-2 border-t border-zinc-900/40">
+                  <span className="font-mono">Order: #{s.displayOrder}</span>
+                  <div className="flex items-center gap-1.5">
                     <a
                       href={`/cms/services/${s.id}/edit`}
-                      className="p-2 text-zinc-400 hover:text-emerald-400"
-                      title="Edit"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-zinc-700 bg-zinc-800/60 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors"
                     >
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z"
-                          aria-hidden="true"
-                        />
-                      </svg>
+                      <Pencil className="w-3 h-3 text-emerald-400" />
+                      <span>Edit</span>
                     </a>
-                    <form
-                      action={setServiceActiveAction}
-                      className="inline"
-                    >
+                    <form action={setServiceActiveAction} className="inline">
                       <input name="id" defaultValue={s.id} type="hidden" />
-                      <input name="active" defaultValue={String(!s.active)} type="hidden" />
+                      <input
+                        name="active"
+                        defaultValue={String(!s.active)}
+                        type="hidden"
+                      />
                       <button
                         type="submit"
-                        className="p-2 rounded-md text-zinc-400 hover:bg-zinc-800 transition-colors"
-                        title={s.active ? "Deactivate" : "Activate"}
+                        //onClick={(e) =>{ e.preventDefault()}}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md border text-xs font-medium transition-colors ${
+                          s.active
+                            ? "border-zinc-700 bg-zinc-800/40 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
+                            : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                        }`}
+                        title={
+                          s.active ? "Deactivate service" : "Activate service"
+                        }
                       >
-                        {s.active ? "↓" : "↑"}
+                        <Power className="w-3 h-3" />
+                        <span>{s.active ? "Pause" : "Activate"}</span>
                       </button>
                     </form>
                     <DeleteButton
                       action={deleteServiceAction}
                       id={s.id}
                       itemTitle={s.title}
+                      variant="icon"
                     />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
 
+          {/* Desktop Table Layout (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-zinc-900/50 bg-zinc-900/30">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">
+                    Service
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">
+                    Slug
+                  </th>
+                  <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-500">
+                    Active
+                  </th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">
+                    Order
+                  </th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-900/40">
+                {services.map((s) => (
+                  <tr
+                    key={s.id}
+                    className="hover:bg-zinc-900/30 transition-colors"
+                  >
+                    <td className="px-4 py-3 text-sm font-medium text-zinc-200">
+                      {s.title}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-400 truncate max-w-xs font-mono">
+                      {s.slug}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          s.active
+                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                            : "bg-zinc-800/50 text-zinc-400 border border-zinc-700"
+                        }`}
+                      >
+                        {s.active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right text-sm text-zinc-300 font-mono">
+                      {s.displayOrder}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="inline-flex items-center justify-end gap-1">
+                        <a
+                          href={`/cms/services/${s.id}/edit`}
+                          className="p-1.5 rounded-md text-zinc-400 hover:text-emerald-400 hover:bg-zinc-800/60 transition-colors"
+                          title="Edit Service"
+                          aria-label={`Edit ${s.title}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </a>
+                        <form
+                          action={setServiceActiveAction}
+                          className="inline"
+                        >
+                          <input name="id" defaultValue={s.id} type="hidden" />
+                          <input
+                            name="active"
+                            defaultValue={String(!s.active)}
+                            type="hidden"
+                          />
+                          <button
+                            type="submit"
+                            className={`p-1.5 rounded-md transition-colors ${
+                              s.active
+                                ? "text-zinc-400 hover:text-amber-400 hover:bg-zinc-800/60"
+                                : "text-zinc-500 hover:text-emerald-400 hover:bg-zinc-800/60"
+                            }`}
+                            title={
+                              s.active
+                                ? "Deactivate Service"
+                                : "Activate Service"
+                            }
+                            aria-label={
+                              s.active
+                                ? "Deactivate Service"
+                                : "Activate Service"
+                            }
+                          >
+                            <Power className="h-4 w-4" />
+                          </button>
+                        </form>
+                        <DeleteButton
+                          action={deleteServiceAction}
+                          id={s.id}
+                          itemTitle={s.title}
+                          variant="icon"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
           {totalPages > 1 && (
-            <div className="px-4 py-3 flex items-center justify-between text-xs text-zinc-500">
+            <div className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500 border-t border-zinc-900/50 bg-zinc-950/40">
               <p>
-                Page {page} of {totalPages}
+                Page {page} of {totalPages} &bull; {total} total
               </p>
-              <div className="flex gap-1">
+              <div className="flex gap-2">
                 {page > 1 && (
                   <a
                     href={`?search=${encodeURIComponent(search)}&active=${active}&page=${page - 1}`}
-                    className="px-3 py-1 rounded hover:bg-zinc-900/50 text-zinc-400 hover:text-zinc-200"
+                    className="px-3 py-1.5 rounded-md border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors"
                   >
                     Prev
                   </a>
@@ -190,7 +258,7 @@ export default async function ServicesPage({
                 {page < totalPages && (
                   <a
                     href={`?search=${encodeURIComponent(search)}&active=${active}&page=${page + 1}`}
-                    className="px-3 py-1 rounded hover:bg-zinc-900/50 text-zinc-400 hover:text-zinc-200"
+                    className="px-3 py-1.5 rounded-md border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white transition-colors"
                   >
                     Next
                   </a>

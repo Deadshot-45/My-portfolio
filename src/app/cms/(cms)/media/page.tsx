@@ -12,25 +12,26 @@ export default async function MediaPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-zinc-100">Media Library</h1>
-          <p className="text-zinc-400 text-sm">Upload and manage images used across the portfolio.</p>
+          <p className="text-zinc-400 text-sm">Upload and manage images and assets used across the portfolio.</p>
         </div>
         <form
-          action="/api/media/upload"
+          action="/api/media"
           method="POST"
           encType="multipart/form-data"
-          className="flex items-center gap-2"
+          className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
         >
           <input
             name="file"
             type="file"
-            accept="image/*"
-            className="block w-0 px-0 py-0 text-zinc-400 ring-offset-white focus:ring-0 focus-visible:ring-0 disabled:cursor-not-allowed pr-0"
+            accept="image/*,application/pdf"
+            required
+            className="text-xs text-zinc-400 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-zinc-800 file:text-zinc-200 hover:file:bg-zinc-700 cursor-pointer"
           />
           <button
             type="submit"
-            className="px-4 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-300 text-sm hover:bg-zinc-900/60 transition-colors disabled:opacity-60"
+            className="px-4 py-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold transition-colors shrink-0"
           >
-            Upload Image
+            Upload Media
           </button>
         </form>
       </div>

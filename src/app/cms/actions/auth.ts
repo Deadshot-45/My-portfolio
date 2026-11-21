@@ -25,40 +25,51 @@ function extractField(formData: FormData, name: string): string {
   return found;
 }
 
+
 export async function login(formData: FormData) {
-  'use server';
-  const email = extractField(formData, 'email').trim().toLowerCase();
-  const password = extractField(formData, 'password');
+  const email = extractField(formData, "email").trim().toLowerCase();
+  const password = extractField(formData, "password");
 
   if (!email || !password) {
-    return { error: 'Email and password are required.' };
+    return { error: "Email and password are required." };
   }
 
   const { allowed } = loginRateLimit(email);
+
   if (!allowed) {
-    return { error: 'Too many failed attempts. Please try again later.' };
+    return {
+      error: "Too many failed attempts. Please try again later.",
+    };
   }
 
-  // Look up the admin by email. A missing/inactive admin and a wrong password
-  // produce the same generic message to avoid email enumeration.
-  const admin = await findAdminByEmail(email);
+  try {
+    const admin = await findAdminByEmail(email);
 
-  if (!admin || !admin.isActive) {
-    recordLoginFailure(email);
-    return { error: 'Invalid email or password.' };
+    if (!admin || !admin.isActive) {
+      recordLoginFailure(email);
+      return { error: "Invalid email or password." };
+    }
+
+    const valid = await verifyPassword(password, admin.passwordHash);
+
+    if (!valid) {
+      recordLoginFailure(email);
+      return { error: "Invalid email or password." };
+    }
+
+    await createSession(admin.id);
+    clearLoginAttempts(email);
+  } catch (error) {
+    console.error("[CMS Login] Authentication failed:", error);
+
+    return {
+      error: "Unable to sign in right now. Please try again.",
+    };
   }
 
-  const valid = await verifyPassword(password, admin.passwordHash);
-
-  if (!valid) {
-    recordLoginFailure(email);
-    return { error: 'Invalid email or password.' };
-  }
-
-  clearLoginAttempts(email);
-  await createSession(admin.id);
-  redirect('/cms/dashboard');
+  redirect("/cms/dashboard");
 }
+
 
 export async function logout(): Promise<never> {
   await destroySession();

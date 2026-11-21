@@ -2,6 +2,8 @@ import { listExperience } from '@/lib/cms/experience';
 import { requireSession } from '@/lib/auth';
 import { createExperienceAction, deleteExperienceAction } from '@/app/cms/actions/experience';
 import { DeleteButton } from '@/components/cms/DeleteButton';
+import { CmsSelect } from '@/components/cms/CmsSelect';
+import { FilterBar } from '@/components/cms/FilterBar';
 
 export default async function ExperiencePage({
   searchParams,
@@ -70,16 +72,16 @@ export default async function ExperiencePage({
               <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
                 Employment Type
               </label>
-              <select
+              <CmsSelect
                 name="employmentType"
                 defaultValue="Full-time"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-              >
-                <option value="Full-time">Full-time</option>
-                <option value="Contract">Contract</option>
-                <option value="Freelance">Freelance</option>
-                <option value="Part-time">Part-time</option>
-              </select>
+                options={[
+                  { value: 'Full-time', label: 'Full-time' },
+                  { value: 'Contract', label: 'Contract' },
+                  { value: 'Freelance', label: 'Freelance' },
+                  { value: 'Part-time', label: 'Part-time' },
+                ]}
+              />
             </div>
           </div>
 
@@ -165,25 +167,10 @@ export default async function ExperiencePage({
       </details>
 
       {/* Filter Bar */}
-      <form
-        method="get"
-        className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 p-4 grid grid-cols-1 sm:grid-cols-4 gap-3"
-      >
-        <div className="col-span-3">
-          <input
-            name="search"
-            defaultValue={search}
-            placeholder="Search by title, company, or tech..."
-            className="w-full px-3.5 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-          />
-        </div>
-        <button
-          type="submit"
-          className="px-4 py-2 rounded-lg border border-zinc-700 bg-zinc-900/50 text-zinc-300 hover:bg-zinc-900/80 transition-colors text-sm font-medium"
-        >
-          Filter
-        </button>
-      </form>
+      <FilterBar
+        initialSearch={search}
+        placeholder="Search by title, company, or tech..."
+      />
 
       {/* Positions Table */}
       {experiences.length === 0 ? (
@@ -191,60 +178,111 @@ export default async function ExperiencePage({
           <p className="text-zinc-500 text-sm">No experience records found.</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-zinc-900/50 bg-zinc-900/30">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Position / Company</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Type</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Timeline</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Tech Stack</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Order</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-900/40">
-              {experiences.map((exp) => {
-                const startStr = exp.startDate ? new Date(exp.startDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : 'N/A';
-                const endStr = exp.current ? 'Present' : exp.endDate ? new Date(exp.endDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : 'N/A';
+        <div className="rounded-xl border border-zinc-900/50 bg-[#07070a]/80 overflow-hidden shadow-sm">
+          {/* Mobile Card Layout (< md) */}
+          <div className="block md:hidden divide-y divide-zinc-900/50">
+            {experiences.map((exp) => {
+              const startStr = exp.startDate ? new Date(exp.startDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : 'N/A';
+              const endStr = exp.current ? 'Present' : exp.endDate ? new Date(exp.endDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : 'N/A';
 
-                return (
-                  <tr key={exp.id} className="hover:bg-zinc-900/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-zinc-200">{exp.title}</div>
-                      <div className="text-xs text-zinc-400">{exp.company}</div>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-zinc-400">
-                      <span className="inline-block px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700/60">
-                        {exp.employmentType || 'Full-time'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-zinc-300">
+              return (
+                <div key={exp.id} className="p-4 space-y-3 hover:bg-zinc-900/20 transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-semibold text-zinc-200">{exp.title}</h3>
+                      <p className="text-xs text-zinc-400 mt-0.5">{exp.company}</p>
+                    </div>
+                    <span className="shrink-0 inline-block px-2 py-0.5 text-xs rounded bg-zinc-800 text-zinc-300 border border-zinc-700/60">
+                      {exp.employmentType || 'Full-time'}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
+                    <span className="text-zinc-300">
                       {startStr} — {endStr}
                       {exp.current && (
                         <span className="ml-1.5 inline-block text-[10px] text-emerald-400 font-semibold uppercase">
                           • Current
                         </span>
                       )}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-zinc-400 max-w-xs truncate">
-                      {exp.technologies || '—'}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono text-zinc-300 text-xs">
-                      {exp.displayOrder}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <DeleteButton
-                        action={deleteExperienceAction}
-                        id={exp.id}
-                        itemTitle={`${exp.title} at ${exp.company}`}
-                      />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </span>
+                    <span className="font-mono text-zinc-500">Order: #{exp.displayOrder}</span>
+                  </div>
+
+                  {exp.technologies && (
+                    <p className="text-xs text-zinc-400 bg-zinc-900/40 p-2 rounded border border-zinc-800/60 truncate">
+                      {exp.technologies}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-end pt-2 border-t border-zinc-900/40">
+                    <DeleteButton
+                      action={deleteExperienceAction}
+                      id={exp.id}
+                      itemTitle={`${exp.title} at ${exp.company}`}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop Table (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-zinc-900/50 bg-zinc-900/30">
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Position / Company</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Type</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Timeline</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500">Tech Stack</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Order</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-900/40">
+                {experiences.map((exp) => {
+                  const startStr = exp.startDate ? new Date(exp.startDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : 'N/A';
+                  const endStr = exp.current ? 'Present' : exp.endDate ? new Date(exp.endDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short' }) : 'N/A';
+
+                  return (
+                    <tr key={exp.id} className="hover:bg-zinc-900/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-zinc-200">{exp.title}</div>
+                        <div className="text-xs text-zinc-400">{exp.company}</div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-zinc-400">
+                        <span className="inline-block px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700/60">
+                          {exp.employmentType || 'Full-time'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-zinc-300">
+                        {startStr} — {endStr}
+                        {exp.current && (
+                          <span className="ml-1.5 inline-block text-[10px] text-emerald-400 font-semibold uppercase">
+                            • Current
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-zinc-400 max-w-xs truncate">
+                        {exp.technologies || '—'}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-zinc-300 text-xs">
+                        {exp.displayOrder}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <DeleteButton
+                          action={deleteExperienceAction}
+                          id={exp.id}
+                          itemTitle={`${exp.title} at ${exp.company}`}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

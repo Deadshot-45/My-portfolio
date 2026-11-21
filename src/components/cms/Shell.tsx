@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X, LogOut, UserCircle, Mail as MailIcon, ChevronRight } from "lucide-react";
+import { Menu, X, LogOut, UserCircle, Mail as MailIcon, ChevronRight, ArrowLeft } from "lucide-react";
 import { NAV_ITEMS } from "./NavItems";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import Link from "next/link";
@@ -62,6 +62,7 @@ export function Shell(this: any, { user, children }: ShellProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const activePath = usePathname();
   const breadcrumbItems = getBreadcrumbs(activePath);
+  const parentRoute = breadcrumbItems.length > 1 ? breadcrumbItems[breadcrumbItems.length - 2] : null;
   const isMobile = useMediaQuery("(max-width: 1023px)");
 
   const isSidebarOpen = isMobile ? mobileSidebarOpen : sidebarOpen;
@@ -78,7 +79,7 @@ export function Shell(this: any, { user, children }: ShellProps) {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#09090b] text-zinc-100">
+    <div className="flex min-h-[92dvh] bg-[#09090b] text-zinc-100">
       <aside
         className={`fixed left-0 top-0 bottom-0 w-64 border-r border-zinc-900/50 bg-[#07070a]/80 backdrop-blur z-40 transform transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -178,7 +179,7 @@ export function Shell(this: any, { user, children }: ShellProps) {
         </aside>
       )}
 
-      <div className="flex-1 flex flex-col lg:pl-2 relative">
+      <div className="flex-1 flex flex-col min-w-0 lg:pl-2 relative">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-4 px-4 py-2 border-b border-zinc-900/50 bg-[#09090b]/80 backdrop-blur-lg lg:px-8">
           <div className="flex items-center gap-3">
             <button
@@ -186,7 +187,7 @@ export function Shell(this: any, { user, children }: ShellProps) {
                 if (window.innerWidth < 1024) setMobileSidebarOpen(true);
                 else setSidebarOpen((prev) => !prev);
               }}
-              className="p-2 md:hidden text-zinc-400 hover:text-white"
+              className="p-2 lg:hidden text-zinc-400 hover:text-white"
               aria-label="Toggle navigation"
             >
               {isSidebarOpen ? (
@@ -195,6 +196,17 @@ export function Shell(this: any, { user, children }: ShellProps) {
                 <Menu className="h-5 w-5" />
               )}
             </button>
+            {parentRoute && (
+              <Link
+                href={parentRoute.href}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-zinc-800 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-medium transition-colors shrink-0"
+                title={`Back to ${parentRoute.label}`}
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Back to {parentRoute.label}</span>
+                <span className="sm:hidden">Back</span>
+              </Link>
+            )}
             <nav
               aria-label="Breadcrumbs"
               className="hidden sm:flex items-center gap-1.5 text-xs font-medium"

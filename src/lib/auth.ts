@@ -1,10 +1,10 @@
-import bcrypt from 'bcryptjs';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { randomBytes, createHash } from 'node:crypto';
-import { getCollection, generateId, serializeDoc } from '@/lib/mongodb';
+import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { randomBytes, createHash } from "node:crypto";
+import { getCollection, generateId, serializeDoc } from "@/lib/mongodb";
 
-const SESSION_COOKIE = 'portfolio_cms_session';
+const SESSION_COOKIE = "portfolio_cms_session";
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export interface AdminUserDoc {
@@ -34,7 +34,10 @@ const loginAttempts = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
-export function loginRateLimit(email: string): { allowed: boolean; remaining: number } {
+export function loginRateLimit(email: string): {
+  allowed: boolean;
+  remaining: number;
+} {
   const now = Date.now();
   const record = loginAttempts.get(email);
   if (!record || now > record.resetAt) {
@@ -50,7 +53,10 @@ export function loginRateLimit(email: string): { allowed: boolean; remaining: nu
 
 export function recordLoginFailure(email: string): void {
   const now = Date.now();
-  const record = loginAttempts.get(email) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+  const record = loginAttempts.get(email) || {
+    count: 0,
+    resetAt: now + RATE_LIMIT_WINDOW_MS,
+  };
   record.count += 1;
   loginAttempts.set(email, record);
 }
@@ -63,75 +69,83 @@ export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
 
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+export async function verifyPassword(
+  password: string,
+  hash: string,
+): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
 function generateToken(): string {
-  return randomBytes(32).toString('base64url');
+  return randomBytes(32).toString("base64url");
 }
 
 function hashToken(token: string): string {
-  return createHash('sha256').update(token).digest('hex');
+  return createHash("sha256").update(token).digest("hex");
 }
 
-function cookieOptions(): { httpOnly: boolean; secure: boolean; sameSite: 'lax' | 'strict' | 'none'; path: string } {
-  const isProduction = process.env.NODE_ENV === 'production';
+function cookieOptions(): {
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: "lax" | "strict" | "none";
+  path: string;
+} {
+  const isProduction = process.env.NODE_ENV === "production";
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax' as const,
-    path: '/',
+    sameSite: "lax" as const,
+    path: "/",
   };
 }
 
-export async function findAdminByEmail(email: string): Promise<AdminUserDoc | null> {
-  const adminCol = await getCollection<AdminUserDoc>('admin_users');
-  const admin = await adminCol.findOne({ email: email.toLowerCase() });
-  console.log('[Auth] Admin lookup:', admin ? admin.email : 'null');
-  return admin ? serializeDoc<AdminUserDoc>(admin) : null;
+export async function findAdminByEmail(
+  email: string,
+): Promise<AdminUserDoc | null> {
+  try {
+    const adminCol = await getCollection<AdminUserDoc>("admin_users");
+    const admin = await adminCol.findOne({ email: email.toLowerCase() });
+    console.log("[Auth] Admin lookup:", admin ? admin.email : "null");
+    return admin ? serializeDoc<AdminUserDoc>(admin) : null;
+  } catch (err) {
+    console.error(
+      "[Auth Error] Failed to find admin by email:",
+      err instanceof Error ? err.message : err,
+    );
+    return null;
+  }
 }
 
 /**
  * Create a session for the admin user and set the HTTP-only session cookie.
  * Call this from a Server Action after validating credentials.
  */
+
 export async function createSession(adminUserId: string): Promise<string> {
   const token = generateToken();
   const tokenHash = hashToken(token);
   const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
 
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, token, {
-    ...cookieOptions(),
-    expires: expiresAt,
-  });
+  const sessionCol = await getCollection<SessionDoc>("sessions");
 
-  // Best-effort: capture client IP/user-agent from headers when available.
-  let ipAddress: string | undefined;
-  let userAgent: string | undefined;
-  try {
-    const { headers } = await import('next/headers');
-    const h = await headers();
-    ipAddress = (h.get('x-forwarded-for') || h.get('x-real-ip') || undefined) ?? undefined;
-    userAgent = h.get('user-agent') || undefined;
-  } catch {
-    // ignore
-  }
-
-  const sessionCol = await getCollection<SessionDoc>('sessions');
   await sessionCol.insertOne({
     id: generateId(),
     tokenHash,
     adminUserId,
     expiresAt,
-    ipAddress,
-    userAgent,
     createdAt: new Date(),
+  });
+
+  const cookieStore = await cookies();
+
+  cookieStore.set(SESSION_COOKIE, token, {
+    ...cookieOptions(),
+    expires: expiresAt,
   });
 
   return token;
 }
+
 
 /** Clear the session cookie and revoke the current session. */
 export async function destroySession(): Promise<void> {
@@ -140,7 +154,7 @@ export async function destroySession(): Promise<void> {
   cookieStore.delete(SESSION_COOKIE);
   if (token) {
     try {
-      const sessionCol = await getCollection<SessionDoc>('sessions');
+      const sessionCol = await getCollection<SessionDoc>("sessions");
       await sessionCol.deleteMany({ tokenHash: hashToken(token) });
     } catch {
       // ignore
@@ -152,40 +166,74 @@ export async function destroySession(): Promise<void> {
  * Validate the current session and return the authenticated admin user.
  * Returns null when there is no valid session (no cookie, expired, or revoked).
  */
+
 export async function getSession(): Promise<{
-  user: { id: string; email: string; name: string; role: string } | null;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  } | null;
 }> {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(SESSION_COOKIE)?.value;
-    if (!token) return { user: null };
+
+    if (!token) {
+      return { user: null };
+    }
 
     const tokenHash = hashToken(token);
-    const sessionCol = await getCollection<SessionDoc>('sessions');
+    const sessionCol = await getCollection<SessionDoc>("sessions");
+
     const session = await sessionCol.findOne({
       tokenHash,
       expiresAt: { $gt: new Date() },
     });
 
-    if (!session) return { user: null };
+    if (!session) {
+      return { user: null };
+    }
 
-    const adminCol = await getCollection<AdminUserDoc>('admin_users');
-    const admin = await adminCol.findOne({
+    const adminCol = await getCollection<AdminUserDoc>("admin_users");
+
+    let admin = await adminCol.findOne({
       id: session.adminUserId,
       isActive: true,
     });
 
-    if (!admin) return { user: null };
+    if (!admin && session.adminUserId) {
+      // Support MongoDB documents where identifier is stored in default _id ObjectId
+      const { ObjectId } = await import("mongodb");
+      if (ObjectId.isValid(session.adminUserId)) {
+        admin = await adminCol.findOne({
+          _id: new ObjectId(session.adminUserId) as any,
+          isActive: true,
+        });
+      }
+    }
+
+    if (!admin) {
+      try {
+        cookieStore.delete(SESSION_COOKIE);
+      } catch {
+        // Safe: Server Components cannot mutate cookies
+      }
+      return { user: null };
+    }
+
+    const serialized = serializeDoc<AdminUserDoc>(admin);
 
     return {
       user: {
-        id: admin.id,
-        email: admin.email,
-        name: admin.name,
-        role: admin.role,
+        id: serialized.id,
+        email: serialized.email,
+        name: serialized.name,
+        role: serialized.role,
       },
     };
-  } catch {
+  } catch (error) {
+    console.error("[Auth] getSession failed:", error);
     return { user: null };
   }
 }
@@ -199,7 +247,7 @@ export async function requireSession(): Promise<{
 }> {
   const { user } = await getSession();
   if (!user) {
-    redirect('/cms/login');
+    redirect("/cms/login");
   }
   return { user };
 }

@@ -1,5 +1,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import { filterProjectsByCategory, calculateCaffeinePerk, formatInquiryMailto, getSkySceneConfig } from '../dist-test/utils/portfolioUtils.js';
 import { PROJECTS, SERVICES, CLIENT_REVIEWS, CLIENT_MARKS } from '../dist-test/data/portfolioData.js';
 
@@ -90,7 +92,7 @@ describe('Portfolio Reference & Integrity Tests', () => {
     function getLuminance({ r, g, b }) {
       const a = [r, g, b].map((v) => {
         const val = v / 255;
-        return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+        return val <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
       });
       return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
     }
@@ -127,5 +129,29 @@ describe('Portfolio Reference & Integrity Tests', () => {
     const footerCardOut = computeDifferenceColor('050505');
     assert.ok(footerCardOut.r >= 245 && footerCardOut.g >= 245 && footerCardOut.b >= 245);
     assert.ok(getContrast('050505') >= 18, 'Contrast on footer dark card must be >= 18:1');
+  });
+
+  test('Tailwind CSS v4 CSS-first configuration and tokens are valid', () => {
+    const cssPath = path.resolve('src/app/globals.css');
+    assert.ok(fs.existsSync(cssPath), 'globals.css must exist');
+    const css = fs.readFileSync(cssPath, 'utf8');
+
+    // Verify v4 import and custom variant
+    assert.ok(css.includes('@import "tailwindcss";'), 'globals.css must import tailwindcss v4');
+    assert.ok(css.includes('@custom-variant dark'), 'globals.css must define class-based custom dark variant');
+    assert.ok(css.includes('@theme {'), 'globals.css must define @theme directive');
+
+    // Verify key design tokens
+    assert.ok(css.includes('--color-dark-950: #060608;'), 'Must preserve dark-950 palette');
+    assert.ok(css.includes('--color-accent-emerald: #10b981;'), 'Must preserve emerald accent');
+    assert.ok(css.includes('--animate-marquee:'), 'Must preserve marquee animation token');
+    assert.ok(css.includes('--color-border: var(--border);'), 'Must map semantic border token');
+    assert.ok(css.includes('--color-background: var(--background);'), 'Must map semantic background token');
+
+    // Verify PostCSS config points to @tailwindcss/postcss
+    const postCssPath = path.resolve('postcss.config.mjs');
+    assert.ok(fs.existsSync(postCssPath), 'postcss.config.mjs must exist');
+    const postCss = fs.readFileSync(postCssPath, 'utf8');
+    assert.ok(postCss.includes('@tailwindcss/postcss'), 'PostCSS config must use @tailwindcss/postcss');
   });
 });

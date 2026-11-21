@@ -1,6 +1,8 @@
 import { requireSession } from '@/lib/auth';
 import { getSeoSettings } from '@/lib/cms/settings';
 import { updateSeoSettingsAction } from '@/app/cms/actions/settings';
+import { ImagePickerInput } from '@/components/cms/ImagePickerInput';
+import { CmsSelect } from '@/components/cms/CmsSelect';
 
 export default async function SeoPage() {
   await requireSession();
@@ -16,7 +18,7 @@ export default async function SeoPage() {
     'Creative full-stack developer and UI designer crafting high-converting web apps, 3D interactive experiences, online stores, and autonomous AI systems.';
   const keywords = map['seo:keywords'] || 'Full-Stack Developer, Next.js, React, TypeScript, 3D Web, WebGL, AI';
   const ogImage = map['seo:og_image'] || '/images/hero-sunset.jpg';
-  const canonicalUrl = map['seo:canonical_url'] || 'https://mayanksahu.dev';
+  const canonicalUrl = map['seo:canonical_url'] || 'https://mayank-sahu-dev.vercel.app';
   const twitterCard = map['seo:twitter_card'] || 'summary_large_image';
   const robots = map['seo:robots'] || 'index, follow';
 
@@ -85,23 +87,17 @@ export default async function SeoPage() {
               type="url"
               name="seo:canonical_url"
               defaultValue={canonicalUrl}
-              placeholder="https://mayanksahu.dev"
+              placeholder="https://mayank-sahu-dev.vercel.app"
               className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
-              Open Graph Image URL
-            </label>
-            <input
-              type="text"
-              name="seo:og_image"
-              defaultValue={ogImage}
-              placeholder="/images/hero-sunset.jpg"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm font-mono"
-            />
-          </div>
+          <ImagePickerInput
+            label="Open Graph Image"
+            name="seo:og_image"
+            defaultValue={ogImage}
+            placeholder="/images/hero-sunset.jpg or https://..."
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -109,29 +105,29 @@ export default async function SeoPage() {
             <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
               Twitter Card Format
             </label>
-            <select
+            <CmsSelect
               name="seo:twitter_card"
               defaultValue={twitterCard}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-            >
-              <option value="summary_large_image">summary_large_image (Recommended)</option>
-              <option value="summary">summary</option>
-            </select>
+              options={[
+                { value: 'summary_large_image', label: 'summary_large_image (Recommended)' },
+                { value: 'summary', label: 'summary' },
+              ]}
+            />
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
               Robots Tag
             </label>
-            <select
+            <CmsSelect
               name="seo:robots"
               defaultValue={robots}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
-            >
-              <option value="index, follow">index, follow (Allow Indexing)</option>
-              <option value="noindex, follow">noindex, follow</option>
-              <option value="noindex, nofollow">noindex, nofollow (Block Indexing)</option>
-            </select>
+              options={[
+                { value: 'index, follow', label: 'index, follow (Allow Indexing)' },
+                { value: 'noindex, follow', label: 'noindex, follow' },
+                { value: 'noindex, nofollow', label: 'noindex, nofollow (Block Indexing)' },
+              ]}
+            />
           </div>
         </div>
 

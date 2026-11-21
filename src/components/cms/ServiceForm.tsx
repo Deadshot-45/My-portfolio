@@ -61,13 +61,13 @@ export function ServiceForm({ mode, service }: ServiceFormProps) {
         </div>
         <div className="space-y-1.5"><label className="text-xs font-medium text-zinc-400">SEO title</label><input name="seoTitle" defaultValue={form.seoTitle} className="w-full px-3 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:ring-1 focus:ring-emerald-500" /></div>
         <div className="space-y-1.5"><label className="text-xs font-medium text-zinc-400">SEO description</label><textarea name="seoDescription" defaultValue={form.seoDescription} rows={3} className="w-full px-3 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:ring-1 focus:ring-emerald-500" /></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <div className="space-y-1.5"><label className="text-xs font-medium text-zinc-400">Display order</label><input name="displayOrder" type="number" defaultValue={String(form.displayOrder)} className="w-full px-3 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:ring-1 focus:ring-emerald-500" /></div>
-          <div className="flex items-center gap-2"><input name="active" type="checkbox" defaultChecked={form.active} className="rounded border-zinc-700 bg-[#09090b] text-emerald-500 focus:ring-emerald-500" /><label className="text-sm text-zinc-300">Active</label></div>
+          <div className="h-10 sm:h-11 flex items-center gap-2"><input id="service-active" name="active" type="checkbox" defaultChecked={form.active} className="rounded border-zinc-700 bg-[#09090b] text-emerald-500 focus:ring-emerald-500 h-4 w-4" /><label htmlFor="service-active" className="text-sm text-zinc-300 cursor-pointer">Active (Visible on Portfolio)</label></div>
         </div>
-        <div className="flex items-center gap-3 pt-4">
-          <button type="submit" disabled={pending} className="px-5 py-2.5 rounded-lg text-sm font-semibold text-black bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 transition-all">{pending ? 'Saving...' : mode === 'create' ? 'Create Service' : 'Save Changes'}</button>
-          <a href="/cms/services" className="px-5 py-2.5 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900/50 transition-colors">Cancel</a>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4">
+          <button type="submit" disabled={pending} className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold text-black bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 transition-all">{pending ? 'Saving...' : mode === 'create' ? 'Create Service' : 'Save Changes'}</button>
+          <a href="/cms/services" className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900/50 transition-colors">Cancel</a>
         </div>
       </form>
     </div>

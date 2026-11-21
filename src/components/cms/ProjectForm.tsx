@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { createProjectAction, updateProjectAction } from '@/app/cms/actions/projects';
 import { Loader2 } from 'lucide-react';
+import { ImagePickerInput } from '@/components/cms/ImagePickerInput';
+import { CmsSelect } from '@/components/cms/CmsSelect';
 
 export type ProjectFormMode = 'create' | 'edit';
 
@@ -139,8 +141,14 @@ export function ProjectForm({ mode, project }: ProjectFormProps) {
           <Field label="GitHub URL" name="githubUrl" type="url" value={form.githubUrl} onChange={handleChange('githubUrl')} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Cover image URL" name="coverImage" type="url" value={form.coverImage} onChange={handleChange('coverImage')} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+          <ImagePickerInput
+            label="Cover image"
+            name="coverImage"
+            value={form.coverImage}
+            onChange={(val) => setForm((prev) => ({ ...prev, coverImage: val }))}
+            placeholder="e.g. https://... or /images/..."
+          />
           <Field label="Technologies" name="technologies" type="text" value={form.technologies} onChange={handleChange('technologies')} hint="Comma-separated" />
         </div>
 
@@ -149,23 +157,33 @@ export function ProjectForm({ mode, project }: ProjectFormProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
           <Field label="Duration" name="duration" type="text" value={form.duration} onChange={handleChange('duration')} hint="e.g. 6 weeks" />
-          <div className="flex items-center gap-2">
-            <input id="featured" name="featured" type="checkbox" checked={form.featured} onChange={handleChange('featured')} className="rounded border-zinc-700 bg-[#09090b] text-emerald-500 focus:ring-emerald-500" />
-            <label htmlFor="featured" className="text-sm text-zinc-300">Featured project</label>
+          <div className="h-10 sm:h-11 flex items-center gap-2">
+            <input id="featured" name="featured" type="checkbox" checked={form.featured} onChange={handleChange('featured')} className="rounded border-zinc-700 bg-[#09090b] text-emerald-500 focus:ring-emerald-500 h-4 w-4" />
+            <label htmlFor="featured" className="text-sm text-zinc-300 cursor-pointer">Featured project</label>
           </div>
-          <Field label="Status" name="status" as="select" value={form.status} onChange={handleChange('status')}>
-            <option value="DRAFT">Draft</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="ARCHIVED">Archived</option>
-          </Field>
+          <div className="space-y-1.5">
+            <label className="flex items-center gap-1 text-xs font-medium text-zinc-400">
+              Status
+            </label>
+            <CmsSelect
+              name="status"
+              value={form.status}
+              onValueChange={(val) => setForm((prev) => ({ ...prev, status: val }))}
+              options={[
+                { value: 'DRAFT', label: 'Draft' },
+                { value: 'PUBLISHED', label: 'Published' },
+                { value: 'ARCHIVED', label: 'Archived' },
+              ]}
+            />
+          </div>
         </div>
 
-        <div className="flex items-center gap-3 pt-4">
-          <button type="submit" disabled={pending} className="px-5 py-2.5 rounded-lg text-sm font-semibold text-black bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 transition-all shadow-[0_0_20px_rgba(155,243,90,0.25)]">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4">
+          <button type="submit" disabled={pending} className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold text-black bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 transition-all shadow-[0_0_20px_rgba(155,243,90,0.25)]">
             {pending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
             {mode === 'create' ? 'Create Project' : 'Save Changes'}
           </button>
-          <a href="/cms/projects" className="px-5 py-2.5 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900/50 transition-colors">Cancel</a>
+          <a href="/cms/projects" className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900/50 transition-colors">Cancel</a>
         </div>
       </form>
     </div>
@@ -182,18 +200,16 @@ function Field({
   as,
   rows,
   hint,
-  children,
 }: {
   label: string;
   name: string;
   type?: string;
   required?: boolean;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  as?: 'textarea' | 'select';
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  as?: 'textarea';
   rows?: number;
   hint?: string;
-  children?: React.ReactNode;
 }) {
   return (
     <div className="space-y-1.5">
@@ -206,19 +222,19 @@ function Field({
         <textarea
           name={name}
           rows={rows ?? 3}
-          defaultValue={value}
+          value={value}
           onChange={onChange as (e: React.ChangeEvent<HTMLTextAreaElement>) => void}
-          className="w-full px-3 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm leading-relaxed"
         />
       ) : (
-        <select
+        <input
+          type={type}
           name={name}
-          defaultValue={value}
-          onChange={onChange as (e: React.ChangeEvent<HTMLSelectElement>) => void}
-          className="w-full pl-3 pr-3 py-2 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-        >
-          {children}
-        </select>
+          required={required}
+          value={value}
+          onChange={onChange as (e: React.ChangeEvent<HTMLInputElement>) => void}
+          className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+        />
       )}
     </div>
   );

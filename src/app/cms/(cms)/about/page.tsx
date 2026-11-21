@@ -1,6 +1,7 @@
 import { requireSession } from '@/lib/auth';
 import { getProfile } from '@/lib/cms/profile';
 import { updateProfileAction } from '@/app/cms/actions/about';
+import { ImagePickerInput } from '@/components/cms/ImagePickerInput';
 
 export default async function AboutPage() {
   await requireSession();
@@ -124,32 +125,25 @@ export default async function AboutPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
-              Profile Image URL
-            </label>
-            <input
-              type="text"
-              name="profileImage"
-              defaultValue={profile?.profileImage || ''}
-              placeholder="e.g. /images/hero-sunset.jpg"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm font-mono"
-            />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+          <ImagePickerInput
+            label="Profile Image"
+            name="profileImage"
+            defaultValue={profile?.profileImage || ''}
+            placeholder="e.g. /images/hero-sunset.jpg or https://..."
+            accept="image/*"
+            modalTitle="Select Profile Image from Storage"
+          />
 
-          <div>
-            <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">
-              Resume / CV URL
-            </label>
-            <input
-              type="text"
-              name="resumeUrl"
-              defaultValue={profile?.resumeUrl || ''}
-              placeholder="e.g. /resume.pdf"
-              className="w-full px-3.5 py-2.5 rounded-lg border border-zinc-700 bg-[#09090b] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-sm font-mono"
-            />
-          </div>
+          <ImagePickerInput
+            label="Resume / CV File or URL"
+            name="resumeUrl"
+            defaultValue={profile?.resumeUrl || ''}
+            placeholder="e.g. /resume.pdf or https://..."
+            accept="application/pdf,image/*"
+            hint="PDF or Document link"
+            modalTitle="Select Resume / Document from Storage"
+          />
         </div>
 
         <div className="border-t border-zinc-800/80 pt-5 space-y-4">
