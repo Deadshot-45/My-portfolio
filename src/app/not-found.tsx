@@ -23,7 +23,7 @@ export default function NotFound() {
         </h1>
 
         <p className="font-grotesk text-zinc-400 text-sm sm:text-base leading-relaxed">
-          The page or resource you are looking for doesn't exist, has been archived, or was moved to another location.
+          The page or resource you are looking for doesn&apos;t exist, has been archived, or was moved to another location.
         </p>
 
         {/* Action buttons */}
@@ -35,10 +35,10 @@ export default function NotFound() {
             Return to Home
           </Link>
           <Link
-            href="/cms/login"
+            href="/studio"
             className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-zinc-300 font-semibold text-sm hover:bg-white/10 hover:text-white transition-colors"
           >
-            CMS Portal
+            Studio
           </Link>
         </div>
       </div>

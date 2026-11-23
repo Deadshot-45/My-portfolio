@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import Image from 'next/image';
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -171,7 +172,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
                   {/* Screenshot Image Overlay */}
                   {getProjectPreviewUrl(project) && !modalImgError && (
-                    <img
+                    <Image
                       src={getProjectPreviewUrl(project)}
                       alt={`${project.title} Preview`}
                       className={`absolute inset-0 w-full h-full object-cover object-top transition-all duration-700 ${

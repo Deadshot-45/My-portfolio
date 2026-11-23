@@ -1,14 +1,19 @@
 'use client';
 
 import React from 'react';
+import { ServiceItem } from '../types/index';
+import { SERVICES } from '../data/portfolioData';
 
-export const ServicesIntro: React.FC = () => {
-  const capabilities = [
-    { title: 'Websites', desc: 'that bring you customers' },
-    { title: '3D & animated sites', desc: 'people remember' },
-    { title: 'Online stores', desc: 'built to sell' },
-    { title: 'AI assistants', desc: 'that work while you sleep' },
-  ];
+interface ServicesIntroProps {
+  services?: ServiceItem[];
+}
+
+export const ServicesIntro: React.FC<ServicesIntroProps> = ({ services = SERVICES }) => {
+  const list = services && services.length > 0 ? services : SERVICES;
+  const capabilities = list.map((s) => ({
+    title: s.title,
+    desc: s.subtitle || s.badge || s.description,
+  }));
 
   return (
     <section

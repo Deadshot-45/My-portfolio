@@ -250,7 +250,6 @@ describe('Portfolio Reference & Integrity Tests', () => {
     const layoutPath = path.resolve('src/app/layout.tsx');
     const skeletonPath = path.resolve('src/components/ui/skeleton.tsx');
     const loadingPath = path.resolve('src/app/loading.tsx');
-    const cmsLoadingPath = path.resolve('src/app/cms/loading.tsx');
     const dialogPath = path.resolve('src/components/ui/dialog.tsx');
     const inquiryPath = path.resolve('src/components/InquiryModal.tsx');
     const projectDetailPath = path.resolve('src/components/ProjectDetailModal.tsx');
@@ -258,7 +257,6 @@ describe('Portfolio Reference & Integrity Tests', () => {
     assert.ok(fs.existsSync(layoutPath), 'layout.tsx must exist');
     assert.ok(fs.existsSync(skeletonPath), 'skeleton.tsx must exist');
     assert.ok(fs.existsSync(loadingPath), 'app/loading.tsx must exist');
-    assert.ok(fs.existsSync(cmsLoadingPath), 'app/cms/loading.tsx must exist');
 
     const layoutSrc = fs.readFileSync(layoutPath, 'utf8');
     const dialogSrc = fs.readFileSync(dialogPath, 'utf8');

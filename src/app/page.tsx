@@ -12,9 +12,11 @@ import {
   ClientReview,
   UserProfile,
   ExperienceItem,
+  ServiceItem,
 } from '../types/index';
 import {
   PROJECTS,
+  SERVICES,
   CLIENT_MARKS,
   CLIENT_REVIEWS,
   USER_PROFILE,
@@ -75,6 +77,7 @@ const ProjectDetailModal = dynamic(
 
 interface PortfolioApiPayload {
   projects: Project[];
+  services: ServiceItem[];
   clients: ClientMark[];
   testimonials: ClientReview[];
   profile: UserProfile;
@@ -90,6 +93,7 @@ export default function Home() {
   // Live state initialized with authoritative static defaults for zero layout shift
   const [portfolioData, setPortfolioData] = useState<PortfolioApiPayload>({
     projects: PROJECTS,
+    services: SERVICES,
     clients: CLIENT_MARKS,
     testimonials: CLIENT_REVIEWS,
     profile: USER_PROFILE,
@@ -100,7 +104,7 @@ export default function Home() {
     document.documentElement.setAttribute('data-sky', skyMode);
   }, [skyMode]);
 
-  // Fetch live API data from MongoDB via /api/portfolio
+  // Fetch live CMS data (Sanity / MongoDB) via /api/portfolio
   useEffect(() => {
     let isMounted = true;
     fetch('/api/portfolio')
@@ -112,6 +116,7 @@ export default function Home() {
         if (isMounted && json?.success && json?.data) {
           setPortfolioData({
             projects: json.data.projects?.length ? json.data.projects : PROJECTS,
+            services: json.data.services?.length ? json.data.services : SERVICES,
             clients: json.data.clients?.length ? json.data.clients : CLIENT_MARKS,
             testimonials: json.data.testimonials?.length ? json.data.testimonials : CLIENT_REVIEWS,
             profile: json.data.profile || USER_PROFILE,
@@ -155,17 +160,17 @@ export default function Home() {
           profile={portfolioData.profile}
         />
 
-        {/* 3. Services Overview - Rendered on demand when nearing viewport */}
+        {/* 3. Services Overview - Rendered on demand using CMS services */}
         <InViewSection id="services-intro" minHeight="360px">
-          <ServicesIntro />
+          <ServicesIntro services={portfolioData.services} />
         </InViewSection>
 
-        {/* 4. Why Custom: Editorial Value & Live Testimonials */}
+        {/* 4. Why Custom: Editorial Value & Live Testimonials from CMS */}
         <InViewSection id="why" minHeight="520px">
           <WhyCustom testimonials={portfolioData.testimonials} />
         </InViewSection>
 
-        {/* 5. Selected Work: Live Projects from MongoDB / CMS */}
+        {/* 5. Selected Work: Live Projects from CMS */}
         <InViewSection id="work" minHeight="720px">
           <SelectedWork
             onSelectProject={setSelectedProject}
@@ -173,11 +178,12 @@ export default function Home() {
           />
         </InViewSection>
 
-        {/* 6. Clients & Offerings: Client Ticker & Capability Matrix */}
+        {/* 6. Clients & Offerings: Client Ticker & Capability Matrix from CMS */}
         <InViewSection id="clients" minHeight="480px">
           <ClientsSection
             onSelectService={(serviceName) => handleOpenInquiry(serviceName)}
             clients={portfolioData.clients}
+            services={portfolioData.services}
           />
         </InViewSection>
 
@@ -186,7 +192,7 @@ export default function Home() {
           <ProcessSection />
         </InViewSection>
 
-        {/* 8. Work Experience & Engineering Track Record */}
+        {/* 8. Work Experience & Engineering Track Record from CMS */}
         <InViewSection id="experience" minHeight="560px">
           <ExperienceSection
             theme="dark"

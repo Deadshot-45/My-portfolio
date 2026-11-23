@@ -7,12 +7,24 @@ export interface SanityImageAsset {
   url?: string;
 }
 
+export interface SanityMetric {
+  label: string;
+  value: string;
+}
+
+export interface SanityDeliverable {
+  title: string;
+  description?: string;
+}
+
 export interface SanityProject {
   _id: string;
   _createdAt?: string;
   title: string;
   slug?: { current: string } | string;
   clientName?: string;
+  location?: string;
+  year?: string;
   category?: 'websites' | 'ecommerce' | 'threejs' | 'ai' | string;
   categoryLabel?: string;
   shortDescription?: string;
@@ -21,8 +33,14 @@ export interface SanityProject {
   duration?: string;
   liveUrl?: string;
   githubUrl?: string;
+  accentColor?: string;
   featured?: boolean;
   coverImage?: SanityImageAsset | string;
+  coverImageUrl?: string;
+  headline?: string;
+  badge?: string;
+  metrics?: SanityMetric[];
+  deliverables?: string[] | SanityDeliverable[];
   displayOrder?: number;
 }
 
@@ -47,10 +65,14 @@ export interface SanityProfile {
 
 export interface SanityService {
   _id: string;
+  number?: string;
   title: string;
   subtitle?: string;
+  badge?: string;
   description?: string;
-  deliverables?: string[];
+  tags?: string[];
+  deliverables?: Array<string | { title: string; description?: string }>;
+  techStack?: string[];
   icon?: string;
   displayOrder?: number;
 }
@@ -69,6 +91,9 @@ export interface SanityTestimonial {
 export interface SanityClient {
   _id: string;
   name: string;
+  city?: string;
+  country?: string;
+  category?: string;
   description?: string;
   websiteUrl?: string;
   logo?: SanityImageAsset | string;
@@ -81,6 +106,7 @@ export interface SanityExperience {
   company: string;
   employmentType?: string;
   location?: string;
+  period?: string;
   startDate?: string;
   endDate?: string;
   current?: boolean;
@@ -88,4 +114,38 @@ export interface SanityExperience {
   highlights?: string[];
   technologies?: string[] | string;
   displayOrder?: number;
+}
+
+export interface SanitySkill {
+  _id: string;
+  category: string;
+  skills: string[];
+  displayOrder?: number;
+}
+
+export interface SanitySeoSettings {
+  _id: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords?: string[];
+  canonicalUrl?: string;
+  ogImage?: SanityImageAsset | string;
+  ogImageUrl?: string;
+  twitterHandle?: string;
+  robotsIndex?: boolean;
+}
+
+export interface SanitySiteSettings {
+  _id: string;
+  siteName?: string;
+  tagline?: string;
+  primaryEmail?: string;
+  phone?: string;
+  location?: string;
+  availableForWork?: boolean;
+  availabilityText?: string;
+  defaultSkyMode?: string;
+  githubUrl?: string;
+  linkedinUrl?: string;
+  resumeUrl?: string;
 }

@@ -2,45 +2,54 @@
 
 import React from 'react';
 import { CLIENT_MARKS } from '../data/portfolioData';
-import { ClientMark } from '../types/index';
+import { ClientMark, ServiceItem } from '../types/index';
 import { ArrowUpRight } from 'lucide-react';
 
 interface ClientsSectionProps {
   onSelectService?: (serviceName: string) => void;
   clients?: ClientMark[];
+  services?: ServiceItem[];
 }
 
 export const ClientsSection: React.FC<ClientsSectionProps> = ({
   onSelectService,
   clients = CLIENT_MARKS,
+  services,
 }) => {
   const marksList = clients && clients.length > 0 ? clients : CLIENT_MARKS;
-  const serviceOfferings = [
-    {
-      id: 'websites',
-      title: 'Websites',
-      tools: 'Business sites, booking, payments',
-      desc: 'High-conversion Next.js applications tuned for speed and SEO authority.',
-    },
-    {
-      id: 'threejs',
-      title: '3D & animated sites',
-      tools: 'Interactive 3D, scroll animation',
-      desc: 'Memorable brand narratives built with Three.js WebGL and GSAP.',
-    },
-    {
-      id: 'ecommerce',
-      title: 'Online stores',
-      tools: 'Shopify stores, product pages, checkout',
-      desc: 'Friction-free purchasing, mobile slideout carts, and Stripe integration.',
-    },
-    {
-      id: 'ai',
-      title: 'AI assistants',
-      tools: 'Chatbots, auto-replies, follow-ups',
-      desc: 'Autonomous 24/7 lead qualification bots and intelligent customer care.',
-    },
-  ];
+  const serviceOfferings = services && services.length > 0
+    ? services.map((s) => ({
+        id: s.id,
+        title: s.title,
+        tools: s.badge || s.subtitle || (s.tags ? s.tags.slice(0, 3).join(', ') : ''),
+        desc: s.description || '',
+      }))
+    : [
+        {
+          id: 'websites',
+          title: 'Websites',
+          tools: 'Business sites, booking, payments',
+          desc: 'High-conversion Next.js applications tuned for speed and SEO authority.',
+        },
+        {
+          id: 'threejs',
+          title: '3D & animated sites',
+          tools: 'Interactive 3D, scroll animation',
+          desc: 'Memorable brand narratives built with Three.js WebGL and GSAP.',
+        },
+        {
+          id: 'ecommerce',
+          title: 'Online stores',
+          tools: 'Shopify stores, product pages, checkout',
+          desc: 'Friction-free purchasing, mobile slideout carts, and Stripe integration.',
+        },
+        {
+          id: 'ai',
+          title: 'AI assistants',
+          tools: 'Chatbots, auto-replies, follow-ups',
+          desc: 'Autonomous 24/7 lead qualification bots and intelligent customer care.',
+        },
+      ];
 
   return (
     <section

@@ -8,6 +8,7 @@ import {
   cleanDisplayUrl,
   getProjectPreviewUrl,
 } from "../utils/portfolioUtils";
+import Image from "next/image";
 
 interface SelectedWorkProps {
   onSelectProject: (project: Project) => void;
@@ -116,7 +117,7 @@ const ProjectVisualStage: React.FC<{ project: Project }> = ({ project }) => {
 
         {/* Live Website Preview Screenshot (smoothly overlays mockup once loaded) */}
         {previewUrl && !imageError && (
-          <img
+          <Image
             src={previewUrl}
             alt={`${project.title} live preview`}
             loading="lazy"

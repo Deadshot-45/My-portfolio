@@ -5,6 +5,9 @@ import type {
   SanityTestimonial,
   SanityClient,
   SanityExperience,
+  SanitySkill,
+  SanitySeoSettings,
+  SanitySiteSettings,
 } from './types';
 import { urlForSanityImage } from './client';
 import type {
@@ -15,8 +18,9 @@ import type {
   ExperienceItem,
   UserProfile,
   ServiceItem,
-} from '@/types/index';
-import { USER_PROFILE } from '@/data/portfolioData';
+  TechnicalSkillGroup,
+} from '../../types/index';
+import { USER_PROFILE } from '../../data/portfolioData';
 
 const categoryLabels: Record<ProjectCategory, string> = {
   all: 'All Work',
@@ -40,32 +44,40 @@ export function mapSanityProjectToFrontend(doc: SanityProject): Project {
     tags = doc.technologies.split(',').map((t) => t.trim()).filter(Boolean);
   }
 
-  const coverUrl = urlForSanityImage(doc.coverImage);
+  const coverUrl = doc.coverImageUrl || urlForSanityImage(doc.coverImage);
+
+  const deliverables = doc.deliverables && doc.deliverables.length > 0
+    ? doc.deliverables.map((d) => (typeof d === 'string' ? d : d.title || String(d)))
+    : ['Full-Stack Architecture', 'Responsive UI & Polish'];
+
+  const metrics = doc.metrics && doc.metrics.length > 0
+    ? doc.metrics.map((m) => ({ label: m.label || '', value: m.value || '' }))
+    : [
+        { label: 'Timeline', value: doc.duration || 'Sprint' },
+        { label: 'Category', value: categoryLabels[category] },
+      ];
 
   return {
     id: slug,
     title: doc.title,
     client: doc.clientName || 'Client Project',
-    location: 'Indore, India',
-    year: doc._createdAt ? new Date(doc._createdAt).getFullYear().toString() : '2026',
+    location: doc.location || 'Indore, India',
+    year: doc.year || (doc._createdAt ? new Date(doc._createdAt).getFullYear().toString() : '2026'),
     category,
     categoryLabel: doc.categoryLabel || categoryLabels[category] || 'Web Application',
     description: doc.shortDescription || doc.description || '',
     longDescription: doc.description || doc.shortDescription || '',
     tags: tags.length > 0 ? tags : ['Full-Stack', 'Next.js', 'TypeScript'],
-    metrics: [
-      { label: 'Timeline', value: doc.duration || 'Sprint' },
-      { label: 'Category', value: categoryLabels[category] },
-    ],
-    deliverables: ['Full-Stack Architecture', 'Responsive UI & Polish'],
+    metrics,
+    deliverables,
     liveUrl: doc.liveUrl,
     githubUrl: doc.githubUrl,
-    accentColor: '#9bf35a',
+    accentColor: doc.accentColor || '#9bf35a',
     featured: Boolean(doc.featured),
     coverImage: coverUrl,
     imagePlaceholder: {
-      badge: `${categoryLabels[category]} • Live`,
-      headline: doc.title,
+      badge: doc.badge || `${categoryLabels[category]} • Live`,
+      headline: doc.headline || doc.title,
       gradientFrom: '#151719',
       gradientTo: '#0b0c0e',
     },
@@ -90,29 +102,26 @@ export function mapSanityProfileToFrontend(doc: SanityProfile): UserProfile {
 
 export function mapSanityServiceToFrontend(doc: SanityService, index: number = 0): ServiceItem {
   return {
-    id: doc._id,
-    number: `0${index + 1}`,
+    id: doc._id.replace(/^service-/, ''),
+    number: doc.number || `0${index + 1}`,
     title: doc.title,
     subtitle: doc.subtitle || '',
     description: doc.description || '',
-    tags: ['Full-Stack', 'Production'],
+    tags: Array.isArray(doc.tags) && doc.tags.length > 0 ? doc.tags : ['Full-Stack', 'Production'],
     deliverables: doc.deliverables && doc.deliverables.length > 0
-      ? doc.deliverables.map((d) => ({
-          title: d,
-          description: '',
-        }))
+      ? doc.deliverables.map((d) => (typeof d === 'string' ? { title: d, description: '' } : { title: d.title || '', description: d.description || '' }))
       : [],
-    techStack: ['Next.js', 'TypeScript', 'Tailwind CSS'],
-    badge: 'Production Grade',
+    techStack: Array.isArray(doc.techStack) && doc.techStack.length > 0 ? doc.techStack : ['Next.js', 'TypeScript', 'Tailwind CSS'],
+    badge: doc.badge || 'Production Grade',
   };
 }
 
 export function mapSanityClientToFrontend(doc: SanityClient): ClientMark {
   return {
     name: doc.name,
-    city: 'Global',
-    country: 'International',
-    category: doc.description || 'Client Partner',
+    city: doc.city || 'Global',
+    country: doc.country || 'International',
+    category: doc.category || doc.description || 'Client Partner',
   };
 }
 
@@ -140,7 +149,7 @@ export function mapSanityExperienceToFrontend(doc: SanityExperience): Experience
 
   return {
     id: doc._id,
-    period: `${startYear} – ${endYear}`,
+    period: doc.period || `${startYear} – ${endYear}`,
     role: doc.title,
     company: doc.company,
     location: doc.location || 'Indore, MP, India',
@@ -152,3 +161,11 @@ export function mapSanityExperienceToFrontend(doc: SanityExperience): Experience
     technologies: technologies.length > 0 ? technologies : ['Full-Stack', 'TypeScript'],
   };
 }
+
+export function mapSanitySkillToFrontend(doc: SanitySkill): TechnicalSkillGroup {
+  return {
+    category: doc.category,
+    skills: Array.isArray(doc.skills) ? doc.skills : [],
+  };
+}
+

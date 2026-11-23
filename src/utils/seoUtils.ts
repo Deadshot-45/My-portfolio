@@ -97,7 +97,7 @@ export function getRobotsConfig(baseUrl: string = DEFAULT_SITE_URL) {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/cms', '/cms/*', '/api/cms', '/api/cms/*'],
+        disallow: ['/cms', '/cms/*', '/api/cms', '/api/cms/*', '/studio', '/studio/*'],
       },
     ],
     sitemap: `${cleanBaseUrl}/sitemap.xml`,
