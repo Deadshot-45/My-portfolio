@@ -2,6 +2,137 @@ import { MongoClient } from "mongodb";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
+//import { PROJECTS } from "../src/data/portfolioData"
+
+const PROJECTS = [
+  {
+    id: "imessage-web",
+    title: "iMessage Web",
+    client: "Personal Project",
+    location: "Indore, India",
+    year: "2026",
+    category: "websites",
+    categoryLabel: "Real-Time / Sockets",
+    description:
+      "Production-ready macOS-inspired real-time chat with Socket.io, optimistic UI updates, three-tier delivery state machine, and Redis caching.",
+    longDescription:
+      "Built a production-ready, macOS-inspired real-time chat app with Socket.io, optimistic UI updates, a three-tier message delivery state machine, JWT auth, and Redis caching, containerized with Docker and GitHub Actions CI/CD.",
+    tags: [
+      "React 19",
+      "TypeScript",
+      "Zustand",
+      "Socket.io",
+      "Node.js",
+      "Redis",
+      "Docker",
+    ],
+    metrics: [
+      { label: "Message Delivery", value: "3-Tier State" },
+      { label: "Event Engine", value: "Socket.io + Redis" },
+      { label: "Deployment", value: "Docker & Render" },
+    ],
+    deliverables: [
+      "Socket.io WebSocket Layer",
+      "Optimistic UI Engine",
+      "Docker Pipeline",
+    ],
+    liveUrl: "https://imessage-hydf.onrender.com",
+    githubUrl: "https://github.com/Deadshot-45/iMessage",
+    accentColor: "#0284c7",
+    featured: true,
+    coverImage: "/images/projects/imessage-web.jpg",
+    imagePlaceholder: {
+      badge: "macOS • WebSockets",
+      headline: "iMessage Web Realtime Engine",
+      gradientFrom: "#0a1622",
+      gradientTo: "#050c14",
+    },
+  },
+  {
+    id: "crm-platform",
+    title: "CRM Management Platform",
+    client: "Enterprise Client",
+    location: "Indore, India",
+    year: "2026",
+    category: "websites",
+    categoryLabel: "Enterprise CRM / RBAC",
+    description:
+      "Role-based sales CRM where Team Leaders assign leads to Sales Executives, tracking follow-ups with PostgreSQL and Prisma ORM on Neon DB.",
+    longDescription:
+      "Built a role-based CRM where Team Leaders assign leads to Sales Executives, who log and track follow-ups, with PostgreSQL schema design via Prisma ORM and refresh/access token authentication.",
+    tags: [
+      "Next.js",
+      "Express.js",
+      "PostgreSQL",
+      "Prisma ORM",
+      "Neon DB",
+      "RBAC",
+    ],
+    metrics: [
+      { label: "Access Control", value: "Multi-Role RBAC" },
+      { label: "Database", value: "PostgreSQL / Neon" },
+      { label: "ORM Architecture", value: "Prisma Client" },
+    ],
+    deliverables: [
+      "Role Pipelines",
+      "Relational PostgreSQL Schemas",
+      "Token Rotation",
+    ],
+    liveUrl: "https://crm-management-zrog.vercel.app/",
+    githubUrl: "https://github.com/Deadshot-45/crm-management",
+    accentColor: "#059669",
+    featured: true,
+    coverImage: "/images/projects/crm-platform.jpg",
+    imagePlaceholder: {
+      badge: "Enterprise • Next.js",
+      headline: "CRM Lead Assignment Pipeline",
+      gradientFrom: "#081c15",
+      gradientTo: "#040d0a",
+    },
+  },
+  {
+    id: "vault-vogue",
+    title: "Vault-Vogue",
+    client: "Vault-Vogue Inc",
+    location: "Indore, India",
+    year: "2026",
+    category: "ecommerce",
+    categoryLabel: "MERN E-Commerce",
+    description:
+      "Independent full-stack digital storefront with responsive product catalog, cart persistence, RESTful APIs, and MongoDB schema.",
+    longDescription:
+      "Independently built the full stack — product UI, REST APIs, MongoDB schema — deployed on Vercel.",
+    tags: [
+      "React",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Redux Toolkit",
+      "Tailwind CSS",
+    ],
+    metrics: [
+      { label: "State Layer", value: "Redux Toolkit" },
+      { label: "Backend API", value: "Express REST" },
+      { label: "Deployment", value: "Vercel" },
+    ],
+    deliverables: [
+      "Responsive Storefront",
+      "RESTful API Services",
+      "MongoDB Schema",
+    ],
+    liveUrl: "https://vault-vogue-lite.vercel.app/",
+    githubUrl: "https://github.com/Deadshot-45/vault-vogue",
+    accentColor: "#d97706",
+    featured: true,
+    coverImage: "/images/projects/vault-vogue.jpg",
+    imagePlaceholder: {
+      badge: "E-Commerce • MERN",
+      headline: "Vault-Vogue Digital Storefront",
+      gradientFrom: "#1c1408",
+      gradientTo: "#0d0a04",
+    },
+  },
+];
 
 // Load environment variables natively in Node.js from .env.local and .env
 for (const envFile of [".env.local", ".env"]) {
@@ -42,9 +173,7 @@ const uri =
   process.env.DATABASE_URL ||
   "mongodb://127.0.0.1:27017/mayank_portfolio";
 
-const sanitizedUri = uri
-  ? uri.replace(/\/\/[^@]+@/, "//***:***@")
-  : "unknown";
+const sanitizedUri = uri ? uri.replace(/\/\/[^@]+@/, "//***:***@") : "unknown";
 
 async function main() {
   console.log(`[MongoDB] Connecting to ${sanitizedUri}...`);
@@ -109,110 +238,89 @@ async function main() {
     }
 
     // 3. Projects Seeding
-    const initialProjects = [
-      {
-        id: randomUUID(),
-        title: "iMessage Web Realtime Engine",
-        slug: "imessage-web-realtime-engine",
-        shortDescription:
-          "Production macOS-inspired chat app with Socket.io, optimistic UI, and Redis.",
-        description:
-          "Built a production-ready, macOS-inspired real-time chat app with Socket.io, optimistic UI updates, a three-tier message delivery state machine, JWT auth, and Redis caching, containerized with Docker.",
-        coverImage: "/images/hero-sunset.jpg",
-        category: "websites",
-        technologies:
-          "React 19, TypeScript, Zustand, Socket.io, Node.js, Redis, Docker",
-        liveUrl: "https://imessage-hydf.onrender.com",
-        githubUrl: "https://github.com/Deadshot-45",
-        clientName: "Mayank Sahu",
-        duration: "4 weeks",
-        featured: true,
-        displayOrder: 1,
-        seoTitle: "iMessage Web Realtime Engine — Mayank Sahu",
-        seoDescription:
-          "High-throughput real-time web messaging engine with Socket.io and Redis.",
-        status: "PUBLISHED",
-        images: [],
-        createdAt: now,
-        updatedAt: now,
-      },
-      {
-        id: randomUUID(),
-        title: "Enterprise CRM Management Platform",
-        slug: "crm-management-platform",
-        shortDescription:
-          "Role-based sales CRM with lead assignment pipelines and multi-role RBAC.",
-        description:
-          "Built a role-based sales CRM where Team Leaders assign leads to Sales Executives, tracking follow-ups with PostgreSQL schema design, token rotation, and activity logs.",
-        coverImage: "/images/hero-sunset.jpg",
-        category: "websites",
-        technologies:
-          "Next.js, Express.js, PostgreSQL, Prisma ORM, Neon DB, RBAC",
-        liveUrl: "https://crm-management-zrog.vercel.app/",
-        githubUrl: "https://github.com/Deadshot-45",
-        clientName: "Enterprise Client",
-        duration: "6 weeks",
-        featured: true,
-        displayOrder: 2,
-        seoTitle: "Enterprise CRM Platform — Mayank Sahu",
-        seoDescription:
-          "Scalable CRM architecture with role-based access control and lead workflows.",
-        status: "PUBLISHED",
-        images: [],
-        createdAt: now,
-        updatedAt: now,
-      },
-      {
-        id: randomUUID(),
-        title: "Vault-Vogue Digital Storefront",
-        slug: "vault-vogue",
-        shortDescription:
-          "Full-stack MERN e-commerce storefront with cart persistence and REST APIs.",
-        description:
-          "Independently built the full stack — responsive storefront UI, REST APIs, MongoDB schema, and cart state — deployed on Vercel.",
-        coverImage: "/images/hero-sunset.jpg",
-        category: "ecommerce",
-        technologies:
-          "React, Node.js, Express, MongoDB, Redux Toolkit, Tailwind CSS",
-        liveUrl: "https://vault-vogue-lite.vercel.app/",
-        githubUrl: "https://github.com/Deadshot-45",
-        clientName: "Vault-Vogue Inc",
-        duration: "3 weeks",
-        featured: true,
-        displayOrder: 3,
-        seoTitle: "Vault-Vogue Storefront — Mayank Sahu",
-        seoDescription:
-          "Responsive modern e-commerce storefront built with MERN stack.",
-        status: "PUBLISHED",
-        images: [],
-        createdAt: now,
-        updatedAt: now,
-      },
-      {
-        id: randomUUID(),
-        title: "Stratedgy AI & FinTech Portal",
-        slug: "stratedgy",
-        shortDescription:
-          "B2B growth consultancy platform with autonomous AI financial strategy assistant.",
-        description:
-          "Corporate web application for New York-based financial advisory firm Stratedgy. Integrated a fine-tuned RAG assistant that answers high-level M&A queries in real-time.",
-        coverImage: "/images/hero-sunset.jpg",
-        category: "ai",
-        technologies:
-          "Next.js, OpenAI API, LangChain, Tailwind, Interactive Charts",
-        clientName: "Stratedgy Inc",
-        duration: "5 weeks",
-        featured: true,
-        displayOrder: 4,
-        seoTitle: "Stratedgy FinTech AI Portal — Mayank Sahu",
-        seoDescription:
-          "Autonomous AI strategy assistant and corporate platform for financial advisors.",
-        status: "PUBLISHED",
-        images: [],
-        createdAt: now,
-        updatedAt: now,
-      },
-    ];
+    const initialProjects = PROJECTS;
+    //[
+    //  {
+    //    id: randomUUID(),
+    //    title: "iMessage Web Realtime Engine",
+    //    slug: "imessage-web-realtime-engine",
+    //    shortDescription:
+    //      "Production macOS-inspired chat app with Socket.io, optimistic UI, and Redis.",
+    //    description:
+    //      "Built a production-ready, macOS-inspired real-time chat app with Socket.io, optimistic UI updates, a three-tier message delivery state machine, JWT auth, and Redis caching, containerized with Docker.",
+    //    coverImage: "/images/projects/imessage-web.jpg",
+    //    category: "websites",
+    //    technologies:
+    //      "React 19, TypeScript, Zustand, Socket.io, Node.js, Redis, Docker",
+    //    liveUrl: "https://imessage-hydf.onrender.com",
+    //    githubUrl: "https://github.com/Deadshot-45",
+    //    clientName: "Mayank Sahu",
+    //    duration: "4 weeks",
+    //    featured: true,
+    //    displayOrder: 1,
+    //    seoTitle: "iMessage Web Realtime Engine — Mayank Sahu",
+    //    seoDescription:
+    //      "High-throughput real-time web messaging engine with Socket.io and Redis.",
+    //    status: "PUBLISHED",
+    //    images: [],
+    //    createdAt: now,
+    //    updatedAt: now,
+    //  },
+    //  {
+    //    id: randomUUID(),
+    //    title: "Enterprise CRM Management Platform",
+    //    slug: "crm-management-platform",
+    //    shortDescription:
+    //      "Role-based sales CRM with lead assignment pipelines and multi-role RBAC.",
+    //    description:
+    //      "Built a role-based sales CRM where Team Leaders assign leads to Sales Executives, tracking follow-ups with PostgreSQL schema design, token rotation, and activity logs.",
+    //    coverImage: "/images/projects/crm-platform.jpg",
+    //    category: "websites",
+    //    technologies:
+    //      "Next.js, Express.js, PostgreSQL, Prisma ORM, Neon DB, RBAC",
+    //    liveUrl: "https://crm-management-zrog.vercel.app/",
+    //    githubUrl: "https://github.com/Deadshot-45",
+    //    clientName: "Enterprise Client",
+    //    duration: "6 weeks",
+    //    featured: true,
+    //    displayOrder: 2,
+    //    seoTitle: "Enterprise CRM Platform — Mayank Sahu",
+    //    seoDescription:
+    //      "Scalable CRM architecture with role-based access control and lead workflows.",
+    //    status: "PUBLISHED",
+    //    images: [],
+    //    createdAt: now,
+    //    updatedAt: now,
+    //  },
+    //  {
+    //    id: randomUUID(),
+    //    title: "Vault-Vogue Digital Storefront",
+    //    slug: "vault-vogue",
+    //    shortDescription:
+    //      "Full-stack MERN e-commerce storefront with cart persistence and REST APIs.",
+    //    description:
+    //      "Independently built the full stack — responsive storefront UI, REST APIs, MongoDB schema, and cart state — deployed on Vercel.",
+    //    coverImage: "/images/projects/vault-vogue.jpg",
+    //    category: "ecommerce",
+    //    technologies:
+    //      "React, Node.js, Express, MongoDB, Redux Toolkit, Tailwind CSS",
+    //    liveUrl: "https://vault-vogue-lite.vercel.app/",
+    //    githubUrl: "https://github.com/Deadshot-45",
+    //    clientName: "Vault-Vogue Inc",
+    //    duration: "3 weeks",
+    //    featured: true,
+    //    displayOrder: 3,
+    //    seoTitle: "Vault-Vogue Storefront — Mayank Sahu",
+    //    seoDescription:
+    //      "Responsive modern e-commerce storefront built with MERN stack.",
+    //    status: "PUBLISHED",
+    //    images: [],
+    //    createdAt: now,
+    //    updatedAt: now,
+    //  },
+    //];
+
+    console.log(initialProjects)
 
     for (const project of initialProjects) {
       await db

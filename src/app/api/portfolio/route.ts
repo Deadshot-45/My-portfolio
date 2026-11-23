@@ -6,6 +6,31 @@ import { getPublishedTestimonials, CmsTestimonial } from '@/lib/cms/testimonials
 import { getProfile, CmsProfile } from '@/lib/cms/profile';
 import { listExperience, CmsExperience } from '@/lib/cms/experience';
 import { listSiteSettings, CmsSiteSetting } from '@/lib/cms/settings';
+import { isSanityConfigured, sanityFetch } from '@/lib/sanity/client';
+import {
+  SANITY_PROJECTS_QUERY,
+  SANITY_PROFILE_QUERY,
+  SANITY_SERVICES_QUERY,
+  SANITY_TESTIMONIALS_QUERY,
+  SANITY_CLIENTS_QUERY,
+  SANITY_EXPERIENCE_QUERY,
+} from '@/lib/sanity/queries';
+import {
+  SanityProject,
+  SanityProfile,
+  SanityService,
+  SanityTestimonial,
+  SanityClient,
+  SanityExperience,
+} from '@/lib/sanity/types';
+import {
+  mapSanityProjectToFrontend,
+  mapSanityProfileToFrontend,
+  mapSanityServiceToFrontend,
+  mapSanityTestimonialToFrontend,
+  mapSanityClientToFrontend,
+  mapSanityExperienceToFrontend,
+} from '@/lib/sanity/mappers';
 import {
   PROJECTS,
   SERVICES,
@@ -110,6 +135,34 @@ function mapCmsExperienceToFrontend(exp: CmsExperience): ExperienceItem {
 
 export async function GET() {
   try {
+    // 1. Sanity CMS Fetch (when NEXT_PUBLIC_SANITY_PROJECT_ID is provided)
+    let sanityProjects: Project[] | null = null;
+    let sanityProfile: UserProfile | null = null;
+    let sanityClients: ClientMark[] | null = null;
+    let sanityTestimonials: ClientReview[] | null = null;
+    let sanityExperiences: ExperienceItem[] | null = null;
+
+    if (isSanityConfigured()) {
+      try {
+        const [sProj, sProf, sClients, sTestim, sExp] = await Promise.all([
+          sanityFetch<SanityProject[]>(SANITY_PROJECTS_QUERY),
+          sanityFetch<SanityProfile>(SANITY_PROFILE_QUERY),
+          sanityFetch<SanityClient[]>(SANITY_CLIENTS_QUERY),
+          sanityFetch<SanityTestimonial[]>(SANITY_TESTIMONIALS_QUERY),
+          sanityFetch<SanityExperience[]>(SANITY_EXPERIENCE_QUERY),
+        ]);
+
+        if (sProj && sProj.length > 0) sanityProjects = sProj.map(mapSanityProjectToFrontend);
+        if (sProf) sanityProfile = mapSanityProfileToFrontend(sProf);
+        if (sClients && sClients.length > 0) sanityClients = sClients.map(mapSanityClientToFrontend);
+        if (sTestim && sTestim.length > 0) sanityTestimonials = sTestim.map(mapSanityTestimonialToFrontend);
+        if (sExp && sExp.length > 0) sanityExperiences = sExp.map(mapSanityExperienceToFrontend);
+      } catch (sanityErr: unknown) {
+        console.warn('[API/portfolio] Sanity fetch error, falling back to database/static:', sanityErr);
+      }
+    }
+
+    // 2. MongoDB & Local CMS Fetch (runs as local CMS or fallback)
     const [rawProjects, rawServices, rawClients, rawTestimonials, rawProfile, rawExperiences, rawSettings] =
       await Promise.all([
         getPublishedProjects().catch((err: unknown) => {
@@ -142,41 +195,47 @@ export async function GET() {
         }),
       ]);
 
-    // Map DB projects or fallback to static PROJECTS
+    // Priority: Sanity -> MongoDB -> Static Data
     const projects: Project[] =
-      rawProjects.length > 0
+      sanityProjects && sanityProjects.length > 0
+        ? sanityProjects
+        : rawProjects.length > 0
         ? rawProjects.map(mapCmsProjectToFrontendProject)
         : PROJECTS;
 
-    // Map DB clients or fallback to static CLIENT_MARKS
     const clients: ClientMark[] =
-      rawClients.length > 0
+      sanityClients && sanityClients.length > 0
+        ? sanityClients
+        : rawClients.length > 0
         ? rawClients.map(mapCmsClientToClientMark)
         : CLIENT_MARKS;
 
-    // Map DB testimonials or fallback to static CLIENT_REVIEWS
     const testimonials: ClientReview[] =
-      rawTestimonials.length > 0
+      sanityTestimonials && sanityTestimonials.length > 0
+        ? sanityTestimonials
+        : rawTestimonials.length > 0
         ? rawTestimonials.map(mapCmsTestimonialToClientReview)
         : CLIENT_REVIEWS;
 
-    // Map DB profile or fallback to static USER_PROFILE
-    const profile: UserProfile = rawProfile
-      ? {
-          name: rawProfile.name || USER_PROFILE.name,
-          role: rawProfile.headline || USER_PROFILE.role,
-          location: rawProfile.location || USER_PROFILE.location,
-          email: rawProfile.email || USER_PROFILE.email,
-          phone: USER_PROFILE.phone,
-          github: USER_PROFILE.github,
-          linkedin: USER_PROFILE.linkedin,
-          summary: rawProfile.introduction || rawProfile.biography || USER_PROFILE.summary,
-        }
-      : USER_PROFILE;
+    const profile: UserProfile =
+      sanityProfile ||
+      (rawProfile
+        ? {
+            name: rawProfile.name || USER_PROFILE.name,
+            role: rawProfile.headline || USER_PROFILE.role,
+            location: rawProfile.location || USER_PROFILE.location,
+            email: rawProfile.email || USER_PROFILE.email,
+            phone: USER_PROFILE.phone,
+            github: USER_PROFILE.github,
+            linkedin: USER_PROFILE.linkedin,
+            summary: rawProfile.introduction || rawProfile.biography || USER_PROFILE.summary,
+          }
+        : USER_PROFILE);
 
-    // Map DB experiences or fallback to static WORK_EXPERIENCE
     const experiences: ExperienceItem[] =
-      rawExperiences.length > 0
+      sanityExperiences && sanityExperiences.length > 0
+        ? sanityExperiences
+        : rawExperiences.length > 0
         ? rawExperiences.map(mapCmsExperienceToFrontend)
         : WORK_EXPERIENCE;
 

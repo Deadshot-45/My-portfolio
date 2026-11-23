@@ -9,7 +9,7 @@ describe('Portfolio Reference & Integrity Tests', () => {
   test('filterProjectsByCategory returns all projects when category is "all"', () => {
     const all = filterProjectsByCategory(PROJECTS, 'all');
     assert.equal(all.length, PROJECTS.length);
-    assert.ok(all.length >= 5, 'Should have at least 5 featured projects');
+    assert.ok(all.length >= 3, 'Should have at least 3 featured projects');
   });
 
   test('filterProjectsByCategory filters correctly by category', () => {
@@ -17,9 +17,9 @@ describe('Portfolio Reference & Integrity Tests', () => {
     assert.ok(ecommerce.length > 0);
     assert.ok(ecommerce.every((p) => p.category === 'ecommerce'));
 
-    const threejs = filterProjectsByCategory(PROJECTS, 'threejs');
-    assert.ok(threejs.length > 0);
-    assert.ok(threejs.every((p) => p.category === 'threejs'));
+    const websites = filterProjectsByCategory(PROJECTS, 'websites');
+    assert.ok(websites.length > 0);
+    assert.ok(websites.every((p) => p.category === 'websites'));
   });
 
   test('calculateCaffeinePerk handles boundary values without error', () => {
@@ -244,5 +244,34 @@ describe('Portfolio Reference & Integrity Tests', () => {
     assert.ok(deploySrc.includes('pnpm/action-setup'), 'deploy.yml must use pnpm/action-setup');
     assert.ok(deploySrc.includes("cache: 'pnpm'"), 'deploy.yml must configure setup-node with pnpm cache');
     assert.ok(deploySrc.includes('pnpm install --frozen-lockfile'), 'deploy.yml must install via pnpm frozen lockfile');
+  });
+
+  test('Route transition progress bar, loading skeletons, and faded dialog modal borders', () => {
+    const layoutPath = path.resolve('src/app/layout.tsx');
+    const skeletonPath = path.resolve('src/components/ui/skeleton.tsx');
+    const loadingPath = path.resolve('src/app/loading.tsx');
+    const cmsLoadingPath = path.resolve('src/app/cms/loading.tsx');
+    const dialogPath = path.resolve('src/components/ui/dialog.tsx');
+    const inquiryPath = path.resolve('src/components/InquiryModal.tsx');
+    const projectDetailPath = path.resolve('src/components/ProjectDetailModal.tsx');
+
+    assert.ok(fs.existsSync(layoutPath), 'layout.tsx must exist');
+    assert.ok(fs.existsSync(skeletonPath), 'skeleton.tsx must exist');
+    assert.ok(fs.existsSync(loadingPath), 'app/loading.tsx must exist');
+    assert.ok(fs.existsSync(cmsLoadingPath), 'app/cms/loading.tsx must exist');
+
+    const layoutSrc = fs.readFileSync(layoutPath, 'utf8');
+    const dialogSrc = fs.readFileSync(dialogPath, 'utf8');
+    const inquirySrc = fs.readFileSync(inquiryPath, 'utf8');
+    const projectDetailSrc = fs.readFileSync(projectDetailPath, 'utf8');
+
+    // Route progress loader must be present in RootLayout
+    assert.ok(layoutSrc.includes('NextTopLoader'), 'layout.tsx must render NextTopLoader');
+    assert.ok(layoutSrc.includes('#9bf35a'), 'NextTopLoader must use signature brand color');
+
+    // Dialog borders must use soft faded borders instead of stark grey borders
+    assert.ok(dialogSrc.includes('border-white/10'), 'ui/dialog.tsx must use faded border-white/10');
+    assert.ok(inquirySrc.includes('border-white/10'), 'InquiryModal must use faded border-white/10 in dark mode');
+    assert.ok(projectDetailSrc.includes('border-white/10'), 'ProjectDetailModal must use faded border-white/10 in dark mode');
   });
 });

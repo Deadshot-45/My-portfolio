@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { generatePersonProfileJsonLd, DEFAULT_SITE_URL } from "@/utils/seoUtils";
 
@@ -89,6 +90,17 @@ export default function RootLayout({
         />
       </head>
       <body className="dark antialiased selection:bg-emerald-500/20 selection:text-emerald-300">
+        <NextTopLoader
+          color="#9bf35a"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #9bf35a,0 0 5px #9bf35a"
+        />
         {children}
       </body>
     </html>

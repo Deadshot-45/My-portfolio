@@ -26,20 +26,30 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   theme = 'dark',
 }) => {
   const isDark = theme === 'dark';
+  const [modalImgLoaded, setModalImgLoaded] = useState(false);
+  const [modalImgError, setModalImgError] = useState(false);
 
   return (
-    <Dialog open={Boolean(project)} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={Boolean(project)}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
       {project && (
         <DialogContent
           showCloseButton={false}
-          className={`w-[calc(100%-1.5rem)] sm:max-w-3xl p-0 overflow-hidden rounded-3xl border shadow-2xl max-h-[calc(100dvh-2.5rem)] flex flex-col min-h-0 gap-0 ${
-            isDark ? 'bg-zinc-900 border-zinc-750 text-white' : 'bg-white border-zinc-200 text-zinc-950'
+          className={`w-[calc(100%-1.5rem)] sm:max-w-3xl p-0 overflow-hidden rounded-3xl border shadow-2xl max-h-[min(90dvh,calc(100dvh-3.5rem))] flex flex-col min-h-0 gap-0 ${
+            isDark
+              ? "bg-zinc-950/95 border-white/10 text-white backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.7)]"
+              : "bg-white/95 border-zinc-200/80 text-zinc-950 backdrop-blur-xl shadow-2xl"
           }`}
         >
           {/* Top Header Graphic Banner */}
           <DialogHeader
             className={`p-5 sm:p-8 border-b space-y-0 text-left shrink-0 ${
-              isDark ? 'border-zinc-800 bg-zinc-950/70' : 'border-zinc-200 bg-zinc-100/70'
+              isDark
+                ? "border-white/10 bg-zinc-950/70"
+                : "border-zinc-200/80 bg-zinc-100/70"
             }`}
           >
             <div className="flex items-center justify-between mb-4">
@@ -52,8 +62,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 onClick={onClose}
                 className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                   isDark
-                    ? 'border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800'
-                    : 'border-zinc-300 text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200'
+                    ? "border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    : "border-zinc-300 text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200"
                 }`}
                 aria-label="Close Case Study"
               >
@@ -63,13 +73,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
             <DialogTitle
               className={`text-2xl sm:text-4xl font-extrabold tracking-tight ${
-                isDark ? 'text-white' : 'text-zinc-950'
+                isDark ? "text-white" : "text-zinc-950"
               }`}
             >
               {project.title}
             </DialogTitle>
             <DialogDescription
-              className={`text-sm font-mono mt-1 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}
+              className={`text-sm font-mono mt-1 ${isDark ? "text-zinc-400" : "text-zinc-600"}`}
             >
               {project.subtitle || project.categoryLabel || project.client}
             </DialogDescription>
@@ -103,13 +113,76 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                     </a>
                   )}
                 </div>
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-black/40">
-                  <img
-                    src={getProjectPreviewUrl(project)}
-                    alt={`${project.title} Preview`}
-                    className="w-full h-full object-cover object-top"
-                    loading="lazy"
-                  />
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-zinc-950 flex flex-col justify-between">
+                  {/* High-Fidelity Mockup Background */}
+                  <div
+                    className="absolute inset-0 w-full h-full p-4 sm:p-6 flex flex-col justify-between select-none overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${project.imagePlaceholder?.gradientFrom || "#09090b"}, ${project.imagePlaceholder?.gradientTo || "#18181b"})`,
+                    }}
+                  >
+                    <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-2">
+                        <span className="w-4 h-4 rounded-md bg-[#9bf35a]/20 border border-[#9bf35a]/40 flex items-center justify-center text-[8px] font-mono font-bold text-[#9bf35a]">
+                          ▲
+                        </span>
+                        <span className="text-xs font-mono font-semibold text-white/90">
+                          {project.title}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-zinc-400 px-2 py-0.5 rounded bg-white/5">
+                        Production Live
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3 my-auto py-2">
+                      {(project.metrics && project.metrics.length > 0
+                        ? project.metrics.slice(0, 3)
+                        : [
+                            { label: "Uptime", value: "99.9%" },
+                            { label: "Latency", value: "<80ms" },
+                            { label: "Status", value: "Production" },
+                          ]
+                      ).map((m, i) => (
+                        <div
+                          key={i}
+                          className="p-2 sm:p-3 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-xs flex flex-col justify-between"
+                        >
+                          <span className="text-[9px] font-mono uppercase tracking-wider text-zinc-400 truncate">
+                            {m.label}
+                          </span>
+                          <span className="text-xs sm:text-base font-grotesk font-bold text-white mt-1 truncate">
+                            {m.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="rounded-lg bg-black/40 border border-white/5 p-2 flex items-center justify-between text-xs font-mono">
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                        <span className="text-zinc-300 truncate">
+                          {project.imagePlaceholder?.headline ||
+                            project.description}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Screenshot Image Overlay */}
+                  {getProjectPreviewUrl(project) && !modalImgError && (
+                    <img
+                      src={getProjectPreviewUrl(project)}
+                      alt={`${project.title} Preview`}
+                      className={`absolute inset-0 w-full h-full object-cover object-top transition-all duration-700 ${
+                        modalImgLoaded ? "opacity-100" : "opacity-0"
+                      }`}
+                      loading="lazy"
+                      onLoad={() => setModalImgLoaded(true)}
+                      onError={() => setModalImgError(true)}
+                    />
+                  )}
+
                 </div>
               </div>
             )}
@@ -118,7 +191,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <div>
               <h4
                 className={`text-xs font-mono uppercase tracking-wider mb-3 ${
-                  isDark ? 'text-zinc-400' : 'text-zinc-600'
+                  isDark ? "text-zinc-400" : "text-zinc-600"
                 }`}
               >
                 Verified Architecture Outcomes
@@ -128,17 +201,21 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                   <div
                     key={idx}
                     className={`p-4 rounded-2xl border ${
-                      isDark ? 'bg-zinc-950/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
+                      isDark
+                        ? "bg-zinc-950/50 border-zinc-800"
+                        : "bg-zinc-50 border-zinc-200"
                     }`}
                   >
                     <span
                       className={`text-xl font-extrabold font-mono ${
-                        isDark ? 'text-white' : 'text-zinc-950'
+                        isDark ? "text-white" : "text-zinc-950"
                       }`}
                     >
                       {m.value}
                     </span>
-                    <span className={`text-xs block mt-1 ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                    <span
+                      className={`text-xs block mt-1 ${isDark ? "text-zinc-400" : "text-zinc-600"}`}
+                    >
                       {m.label}
                     </span>
                   </div>
@@ -150,14 +227,14 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <div>
               <h4
                 className={`text-xs font-mono uppercase tracking-wider mb-2 ${
-                  isDark ? 'text-zinc-400' : 'text-zinc-600'
+                  isDark ? "text-zinc-400" : "text-zinc-600"
                 }`}
               >
                 Technical Architecture & Implementation
               </h4>
               <p
                 className={`text-sm sm:text-base leading-relaxed ${
-                  isDark ? 'text-zinc-300' : 'text-zinc-700'
+                  isDark ? "text-zinc-300" : "text-zinc-700"
                 }`}
               >
                 {project.longDescription}
@@ -168,7 +245,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <div>
               <h4
                 className={`text-xs font-mono uppercase tracking-wider mb-3 ${
-                  isDark ? 'text-zinc-400' : 'text-zinc-600'
+                  isDark ? "text-zinc-400" : "text-zinc-600"
                 }`}
               >
                 Key Deliverables Shipped
@@ -178,7 +255,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                   <div
                     key={idx}
                     className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs ${
-                      isDark ? 'bg-zinc-950/40 border-zinc-800 text-zinc-300' : 'bg-zinc-50 border-zinc-200 text-zinc-700'
+                      isDark
+                        ? "bg-zinc-950/40 border-zinc-800 text-zinc-300"
+                        : "bg-zinc-50 border-zinc-200 text-zinc-700"
                     }`}
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -192,7 +271,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <div>
               <h4
                 className={`text-xs font-mono uppercase tracking-wider mb-2.5 ${
-                  isDark ? 'text-zinc-400' : 'text-zinc-600'
+                  isDark ? "text-zinc-400" : "text-zinc-600"
                 }`}
               >
                 Technologies & Infrastructure
@@ -202,7 +281,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                   <span
                     key={tag}
                     className={`px-3 py-1 rounded-lg text-xs font-mono border ${
-                      isDark ? 'bg-zinc-800/60 border-zinc-700 text-zinc-300' : 'bg-zinc-100 border-zinc-300 text-zinc-800'
+                      isDark
+                        ? "bg-zinc-800/60 border-zinc-700 text-zinc-300"
+                        : "bg-zinc-100 border-zinc-300 text-zinc-800"
                     }`}
                   >
                     {tag}
@@ -212,7 +293,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             </div>
 
             {/* Modal Action Links */}
-            <div className="pt-6 border-t border-zinc-800/60 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 pb-8 sm:pb-4">
+            <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3.5 pb-6">
               <div className="flex flex-wrap items-center gap-2.5">
                 {project.liveUrl && (
                   <a
@@ -221,11 +302,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                     rel="noopener noreferrer"
                     className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex-1 sm:flex-initial text-center ${
                       isDark
-                        ? 'bg-emerald-500 hover:bg-emerald-400 text-black'
-                        : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                        ? "bg-emerald-500 hover:bg-emerald-400 text-black"
+                        : "bg-emerald-600 hover:bg-emerald-500 text-white"
                     }`}
                   >
-                    <span className="whitespace-nowrap">Open Live Application</span>
+                    <span className="whitespace-nowrap">
+                      Open Live Application
+                    </span>
                     <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                   </a>
                 )}
@@ -237,8 +320,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                     rel="noopener noreferrer"
                     className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-mono border transition-all flex-1 sm:flex-initial text-center ${
                       isDark
-                        ? 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300'
-                        : 'bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-800'
+                        ? "bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300"
+                        : "bg-zinc-100 hover:bg-zinc-200 border-zinc-300 text-zinc-800"
                     }`}
                   >
                     <Github className="w-3.5 h-3.5 shrink-0" />
@@ -254,13 +337,20 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                   onStartSimilar(project.title);
                 }}
                 className={`inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-xl font-bold text-xs transition-all active:scale-95 cursor-pointer w-full sm:w-auto shrink-0 whitespace-nowrap ${
-                  isDark ? 'bg-white hover:bg-zinc-200 text-black' : 'bg-zinc-950 hover:bg-zinc-800 text-white'
+                  isDark
+                    ? "bg-white hover:bg-zinc-200 text-black"
+                    : "bg-zinc-950 hover:bg-zinc-800 text-white"
                 }`}
               >
-                <span className="whitespace-nowrap">Discuss Similar Project</span>
+                <span className="whitespace-nowrap">
+                  Discuss Similar Project
+                </span>
                 <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             </div>
+
+            {/* Bottom scroll clearance buffer for mobile viewports */}
+            <div className="h-6 sm:h-2" aria-hidden="true" />
           </div>
         </DialogContent>
       )}

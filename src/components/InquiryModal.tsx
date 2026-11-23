@@ -81,8 +81,8 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
       <DialogContent
         className={`w-[calc(100%-1.5rem)] sm:max-w-2xl p-5 sm:p-8 rounded-3xl border shadow-2xl max-h-[calc(100dvh-2.5rem)] min-h-0 overflow-y-auto overscroll-contain no-scrollbar ${
           isDark
-            ? 'bg-zinc-900 border-zinc-750 text-white'
-            : 'bg-white border-zinc-200 text-zinc-950'
+            ? 'bg-zinc-950/95 border-white/10 text-white backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.7)]'
+            : 'bg-white/95 border-zinc-200/80 text-zinc-950 backdrop-blur-xl shadow-2xl'
         }`}
       >
         {!submitted ? (
@@ -243,16 +243,20 @@ export const InquiryModal: React.FC<InquiryModalProps> = ({
                 <button
                   type="button"
                   onClick={handleCopyEmail}
-                  className={`text-xs font-mono flex items-center justify-center sm:justify-start gap-1.5 transition-colors cursor-pointer py-1.5 px-1 ${
-                    isDark ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-zinc-950'
+                  className={`text-xs font-mono flex items-center justify-center sm:justify-start gap-2 transition-colors cursor-pointer py-2 px-2.5 rounded-lg border ${
+                    isDark
+                      ? 'border-zinc-800/80 bg-zinc-900/60 text-zinc-300 hover:text-white hover:border-zinc-700'
+                      : 'border-zinc-200 bg-zinc-50 text-zinc-700 hover:text-zinc-950 hover:border-zinc-300'
                   }`}
                 >
                   {copied ? (
                     <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                   ) : (
-                    <Copy className="w-3.5 h-3.5 shrink-0" />
+                    <Copy className="w-3.5 h-3.5 shrink-0 text-zinc-400" />
                   )}
-                  <span className="truncate">{copied ? 'Email copied!' : 'Or copy mayanksahu8179@gmail.com'}</span>
+                  <span className="whitespace-nowrap">
+                    {copied ? 'Email copied!' : `Copy: ${USER_PROFILE.email}`}
+                  </span>
                 </button>
 
                 <button

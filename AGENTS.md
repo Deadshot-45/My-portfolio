@@ -186,7 +186,7 @@ Theme support
 Use motion only when it improves comprehension, feedback, or visual
 storytelling.
 
-Before implementing an animation:
+Before implementing an animation: use gsap skills for animation.
 1. Check whether a CSS transition or keyframe is sufficient.
 2. Check existing animation utilities and installed packages.
 3. Use GSAP or Framer Motion only when their capabilities are genuinely

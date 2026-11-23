@@ -1,9 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Project, ProjectCategory, ThemeMode } from '../types/index';
-import { ExternalLink, Github, ArrowUpRight } from 'lucide-react';
-import { filterProjectsByCategory, cleanDisplayUrl, getProjectPreviewUrl } from '../utils/portfolioUtils';
+import React, { useState } from "react";
+import { Project, ProjectCategory, ThemeMode } from "../types/index";
+import { ExternalLink, Github, ArrowUpRight } from "lucide-react";
+import {
+  filterProjectsByCategory,
+  cleanDisplayUrl,
+  getProjectPreviewUrl,
+} from "../utils/portfolioUtils";
 
 interface SelectedWorkProps {
   onSelectProject: (project: Project) => void;
@@ -12,13 +16,15 @@ interface SelectedWorkProps {
 }
 
 const ProjectVisualStage: React.FC<{ project: Project }> = ({ project }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const previewUrl = getProjectPreviewUrl(project);
   const displayHost = cleanDisplayUrl(project.liveUrl);
-  const showLivePreview = Boolean(previewUrl && !imageError);
+
+  console.log("display host :", project);
 
   return (
-    <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-6 flex flex-col bg-zinc-900 border border-white/10 group-hover:border-white/25 transition-all duration-500 shadow-xl">
+    <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-6 flex flex-col bg-zinc-950 border border-white/10 group-hover:border-white/25 transition-all duration-500 shadow-xl">
       {/* Browser Window Header Bar */}
       <div className="w-full h-8 px-3.5 bg-zinc-950/90 border-b border-white/10 flex items-center justify-between z-20 shrink-0 backdrop-blur-sm">
         <div className="flex items-center gap-1.5">
@@ -45,62 +51,102 @@ const ProjectVisualStage: React.FC<{ project: Project }> = ({ project }) => {
 
       {/* Screen Preview Container */}
       <div className="relative flex-1 w-full overflow-hidden bg-zinc-950 flex flex-col justify-between">
-        {showLivePreview ? (
-          <>
-            {/* Live Website Preview Screenshot */}
-            <img
-              src={previewUrl}
-              alt={`${project.title} live preview`}
-              loading="lazy"
-              decoding="async"
-              onError={() => setImageError(true)}
-              className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-            />
-            {/* Subtle dark gradient overlay to anchor text and keep badge legible */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none opacity-60 group-hover:opacity-40 transition-opacity" />
-
-            <div className="relative z-10 p-5 mt-auto flex items-end justify-between">
-              <div>
-                <span className="font-mono text-[11px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white/90 border border-white/15">
-                  {project.imagePlaceholder.badge}
-                </span>
-                <h4 className="font-grotesk text-xl md:text-2xl font-bold text-white tracking-tight drop-shadow-md mt-2">
-                  {project.title}
-                </h4>
-              </div>
-
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#9bf35a] text-black text-xs font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg shrink-0">
-                <span>View</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
+        {/* Architectural App Mockup Canvas (always visible as high-fidelity background/fallback) */}
+        <div
+          className="absolute inset-0 w-full h-full p-4 sm:p-5 flex flex-col justify-between select-none overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg, ${project.imagePlaceholder.gradientFrom || "#09090b"}, ${project.imagePlaceholder.gradientTo || "#18181b"})`,
+          }}
+        >
+          {/* Mockup Top Navigation Bar */}
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <span className="w-4 h-4 rounded-md bg-[#9bf35a]/20 border border-[#9bf35a]/40 flex items-center justify-center text-[8px] font-mono font-bold text-[#9bf35a]">
+                ▲
+              </span>
+              <span className="text-[11px] font-mono font-semibold text-white/90 truncate max-w-[130px]">
+                {project.title}
               </span>
             </div>
-          </>
-        ) : (
-          /* Branded Canvas Fallback */
-          <div
-            className="w-full h-full p-6 flex flex-col justify-between"
-            style={{
-              background: `linear-gradient(135deg, ${project.imagePlaceholder.gradientFrom}, ${project.imagePlaceholder.gradientTo})`,
-            }}
-          >
-            <div className="flex items-center justify-between z-10">
-              <span className="font-mono text-xs uppercase px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/15">
-                {project.imagePlaceholder.badge}
+            <div className="hidden sm:flex items-center gap-2 text-[9px] font-mono text-zinc-400">
+              <span className="px-1.5 py-0.5 rounded bg-white/5 text-zinc-300">
+                Live Production
               </span>
-              <span className="font-mono text-xs text-white/70">
-                {project.year}
-              </span>
+              <span>v2.4</span>
             </div>
-
-            <div className="z-10">
-              <h4 className="font-grotesk text-2xl md:text-3xl font-bold text-white tracking-tight drop-shadow-md">
-                {project.imagePlaceholder.headline}
-              </h4>
-            </div>
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
           </div>
+
+          {/* Mockup Metrics Cards */}
+          <div className="grid grid-cols-3 gap-2 my-auto py-2">
+            {(project.metrics && project.metrics.length > 0
+              ? project.metrics.slice(0, 3)
+              : [
+                  { label: "Uptime", value: "99.9%" },
+                  { label: "Response", value: "<80ms" },
+                  { label: "Architecture", value: "Verified" },
+                ]
+            ).map((metric, i) => (
+              <div
+                key={i}
+                className="p-2 sm:p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-xs flex flex-col justify-between"
+              >
+                <span className="text-[8px] sm:text-[9px] font-mono uppercase tracking-wider text-zinc-400 truncate">
+                  {metric.label}
+                </span>
+                <span className="text-xs sm:text-sm font-grotesk font-bold text-white mt-1 truncate">
+                  {metric.value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Mockup Status Strip */}
+          <div className="rounded-lg bg-black/40 border border-white/5 p-2 flex items-center justify-between text-[10px] font-mono">
+            <div className="flex items-center gap-1.5 truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+              <span className="text-zinc-300 truncate">
+                {project.imagePlaceholder.headline}
+              </span>
+            </div>
+            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-zinc-300 uppercase shrink-0">
+              {project.categoryLabel}
+            </span>
+          </div>
+        </div>
+
+        {/* Live Website Preview Screenshot (smoothly overlays mockup once loaded) */}
+        {previewUrl && !imageError && (
+          <img
+            src={previewUrl}
+            alt={`${project.title} live preview`}
+            loading="lazy"
+            decoding="async"
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+            className={`absolute inset-0 w-full h-full object-cover object-top transition-all duration-700 ease-out group-hover:scale-105 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          />
         )}
+
+        {/* Subtle dark gradient overlay to keep badge and headline legible */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none opacity-60 group-hover:opacity-40 transition-opacity" />
+
+        <div className="relative z-10 p-4 sm:p-5 mt-auto flex items-end justify-between">
+          <div className="max-w-[80%]">
+            <span className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white/90 border border-white/15">
+              {project.imagePlaceholder.badge}
+            </span>
+            <p className="font-grotesk text-sm sm:text-base font-bold text-white tracking-tight drop-shadow-md mt-1.5 line-clamp-1">
+              {project.imagePlaceholder.headline}
+            </p>
+          </div>
+
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#9bf35a] text-black text-xs font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-lg shrink-0">
+            <span>View</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -110,16 +156,16 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({
   onSelectProject,
   projects = [],
 }) => {
-  const [activeCategory, setActiveCategory] = useState<ProjectCategory>('all');
+  const [activeCategory, setActiveCategory] = useState<ProjectCategory>("all");
 
   const filteredProjects = filterProjectsByCategory(projects, activeCategory);
 
   const categories: { label: string; value: ProjectCategory }[] = [
-    { label: 'All Work', value: 'all' },
-    { label: 'Websites', value: 'websites' },
-    { label: 'Online Stores', value: 'ecommerce' },
-    { label: '3D & Interactive', value: 'threejs' },
-    { label: 'AI Assistants', value: 'ai' },
+    { label: "All Work", value: "all" },
+    { label: "Websites", value: "websites" },
+    { label: "Online Stores", value: "ecommerce" },
+    { label: "3D & Interactive", value: "threejs" },
+    { label: "AI Assistants", value: "ai" },
   ];
 
   return (
@@ -143,7 +189,8 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({
             />
           </h2>
           <p className="font-grotesk text-[clamp(1rem,1.3vw,1.25rem)] text-zinc-400 mt-4 max-w-2xl leading-relaxed">
-            Real websites for real businesses, live today. I built each one myself, start to finish.
+            Real websites for real businesses, live today. I built each one
+            myself, start to finish.
           </p>
         </div>
 
@@ -156,8 +203,8 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({
               onClick={() => setActiveCategory(cat.value)}
               className={`px-4 py-2 rounded-full text-xs font-mono transition-all duration-300 ${
                 activeCategory === cat.value
-                  ? 'bg-white text-black font-bold shadow-md'
-                  : 'text-zinc-400 hover:text-white'
+                  ? "bg-white text-black font-bold shadow-md"
+                  : "text-zinc-400 hover:text-white"
               }`}
             >
               {cat.label}
@@ -247,7 +294,8 @@ export const SelectedWork: React.FC<SelectedWorkProps> = ({
       {/* 3. Bottom Note */}
       <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 font-mono text-xs text-zinc-400">
         <p className="font-grotesk text-sm text-zinc-400 max-w-2xl m-0">
-          They open fast on any phone, don’t break when lots of people visit, and feel smooth to use. I stay on after launch to keep them that way.
+          They open fast on any phone, don’t break when lots of people visit,
+          and feel smooth to use. I stay on after launch to keep them that way.
         </p>
         <span className="text-zinc-500">All live builds verified</span>
       </div>

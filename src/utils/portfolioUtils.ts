@@ -89,6 +89,7 @@ export function cleanDisplayUrl(url?: string): string {
 }
 
 export function getProjectPreviewUrl(project: { coverImage?: string; liveUrl?: string }): string | undefined {
+  console.log(project.coverImage)
   if (project.coverImage) {
     return project.coverImage;
   }
