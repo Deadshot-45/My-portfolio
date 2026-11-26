@@ -6,6 +6,7 @@ import {
 import { DeleteButton } from "@/components/cms/DeleteButton";
 import { FilterBar } from "@/components/cms/FilterBar";
 import { Pencil, Plus, Power } from "lucide-react";
+import Link from "next/link";
 
 const items = [
   { value: "all", label: "All" },
@@ -95,13 +96,13 @@ export default async function ServicesPage({
                 <div className="flex items-center justify-between text-xs text-zinc-500 pt-2 border-t border-zinc-900/40">
                   <span className="font-mono">Order: #{s.displayOrder}</span>
                   <div className="flex items-center gap-1.5">
-                    <a
+                    <Link
                       href={`/cms/services/${s.id}/edit`}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-zinc-700 bg-zinc-800/60 hover:bg-zinc-700 text-zinc-200 text-xs font-medium transition-colors"
                     >
                       <Pencil className="w-3 h-3 text-emerald-400" />
                       <span>Edit</span>
-                    </a>
+                    </Link>
                     <form action={setServiceActiveAction} className="inline">
                       <input name="id" defaultValue={s.id} type="hidden" />
                       <input

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { Hero3DCanvas } from './Hero3DCanvas';
 import { SkyDial } from './SkyDial';
 import { SkyMode } from '../types/index';
@@ -98,42 +99,73 @@ export const Hero: React.FC<HeroProps> = ({
         className={`absolute inset-x-0 top-[14svh] md:top-[9svh] z-10 flex flex-col items-center px-[4vw] md:px-[6vw] text-center pointer-events-none transition-colors duration-700 ${inkClass}`}
       >
         <h1 className="font-grotesk font-normal text-[clamp(2.2rem,5.4vw,4.9rem)] leading-[1.03] tracking-[-0.03em] capitalize max-w-[16em] m-0">
-          Websites That Sell.
-          <br />
-          AI That Never Sleeps.
+          <span className="block overflow-hidden pb-1">
+            <motion.span
+              className="block"
+              initial={{ y: '110%', skewY: 3, opacity: 0 }}
+              animate={{ y: 0, skewY: 0, opacity: 1 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+            >
+              Websites That Sell.
+            </motion.span>
+          </span>
+          <span className="block overflow-hidden pb-1">
+            <motion.span
+              className="block"
+              initial={{ y: '110%', skewY: 3, opacity: 0 }}
+              animate={{ y: 0, skewY: 0, opacity: 1 }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.28 }}
+            >
+              AI That Never Sleeps.
+            </motion.span>
+          </span>
         </h1>
       </div>
 
       {/* 5. Curved SVG Arrow Annotation ("That's me, on my third coffee.") */}
-      <div
+      <motion.div
         className={`pointer-events-none absolute left-[44%] top-[78%] sm:left-[45%] sm:top-[71%] md:left-[44.5%] md:top-[69%] z-10 flex items-center gap-2 transition-colors duration-700 ${inkClass}`}
         aria-hidden="true"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
       >
         <svg
           viewBox="0 0 46 38"
           fill="none"
           className="w-8 h-7 md:w-11 md:h-9 shrink-0 -mt-5 opacity-90"
         >
-          <path
+          <motion.path
             d="M42 32C24 31 12 22 9 5"
             stroke="currentColor"
             strokeWidth="1.25"
             strokeLinecap="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 1, delay: 0.7, ease: "easeInOut" }}
           />
-          <path
+          <motion.path
             d="M4 11L9 4.5L15 9.5"
             stroke="currentColor"
             strokeWidth="1.25"
             strokeLinecap="round"
             strokeLinejoin="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 1.5, ease: "easeOut" }}
           />
         </svg>
-        <p className="font-grotesk text-[12px] md:text-[14px] font-normal leading-[1.28] tracking-[-0.01em] whitespace-nowrap m-0">
+        <motion.p
+          className="font-grotesk text-[12px] md:text-[14px] font-normal leading-[1.28] tracking-[-0.01em] whitespace-nowrap m-0"
+          initial={{ opacity: 0, x: -6 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 1.4 }}
+        >
           That’s me,
           <br />
           on my third coffee.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
       {/* 6. Bottom-Center Interactive SkyDial (Day / Sunset / Night) */}
       <div className="pointer-events-auto absolute bottom-6 left-1/2 -translate-x-1/2 md:bottom-8 z-30">
@@ -141,13 +173,16 @@ export const Hero: React.FC<HeroProps> = ({
       </div>
 
       {/* 7. Bottom-Right Intro Paragraph (Desktop / Tablet Landscape) */}
-      <div
+      <motion.div
         className={`pointer-events-none absolute bottom-8 right-[4vw] z-10 hidden max-w-[23.5em] text-right md:block transition-colors duration-700 ${inkClass}`}
+        initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.9, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="font-grotesk text-[14px] md:text-[15px] font-medium leading-[1.38] tracking-[-0.01em] text-pretty m-0">
           I’m {firstName}, a web developer. I design and build your website, your online store, and the AI tools that do the busywork for you, so more people find you, trust you and buy from you.
         </p>
-      </div>
+      </motion.div>
     </section>
   );
 };

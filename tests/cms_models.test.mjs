@@ -171,4 +171,19 @@ describe('CMS Models and Data Formatting Logic', () => {
     assert.ok(globalsCss.includes('color: #ffffff !important'), 'Must enforce bright white text on hover');
     assert.ok(globalsCss.includes('background-color: #27272a !important'), 'Must enforce dark gray hover background');
   });
+
+  test('SignOutConfirmDialog is wired into Shell with accessible confirmation and cancel paths', async () => {
+    const fs = await import('node:fs/promises');
+    const dialogSource = await fs.readFile('src/components/cms/SignOutConfirmDialog.tsx', 'utf-8');
+    const shellSource = await fs.readFile('src/components/cms/Shell.tsx', 'utf-8');
+
+    assert.ok(dialogSource.includes('export function SignOutConfirmDialog'), 'Exports SignOutConfirmDialog component');
+    assert.ok(dialogSource.includes('Confirm Sign Out'), 'Has clear confirmation title');
+    assert.ok(dialogSource.includes('Yes, Sign Out'), 'Has confirmation action button');
+    assert.ok(dialogSource.includes('Cancel'), 'Has cancel action button');
+    assert.ok(dialogSource.includes('/api/cms/logout'), 'Invokes logout API endpoint on confirm');
+
+    assert.ok(shellSource.includes('SignOutConfirmDialog'), 'Shell imports SignOutConfirmDialog');
+    assert.ok(shellSource.includes('setShowSignOutConfirm(true)'), 'Shell opens dialog on Sign out click');
+  });
 });

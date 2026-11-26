@@ -1,17 +1,35 @@
-import { MongoClient, Db, Collection } from 'mongodb';
+import { MongoClient, type MongoClientOptions, Db, Collection } from 'mongodb';
 import { randomUUID } from 'node:crypto';
 
 const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/mayank_portfolio';
-const options = {};
+
+export function getMongoPoolOptions(): MongoClientOptions {
+  return {
+    maxPoolSize: process.env.MONGODB_MAX_POOL_SIZE
+      ? parseInt(process.env.MONGODB_MAX_POOL_SIZE, 10)
+      : 10,
+    minPoolSize: process.env.MONGODB_MIN_POOL_SIZE
+      ? parseInt(process.env.MONGODB_MIN_POOL_SIZE, 10)
+      : 1,
+    maxIdleTimeMS: process.env.MONGODB_MAX_IDLE_TIME_MS
+      ? parseInt(process.env.MONGODB_MAX_IDLE_TIME_MS, 10)
+      : 60000,
+    waitQueueTimeoutMS: process.env.MONGODB_WAIT_QUEUE_TIMEOUT_MS
+      ? parseInt(process.env.MONGODB_WAIT_QUEUE_TIMEOUT_MS, 10)
+      : 10000,
+    serverSelectionTimeoutMS: 5000,
+    connectTimeoutMS: 10000,
+  };
+}
 
 declare global {
-  // eslint-disable-next-line no-var
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
 let cachedPromise: Promise<MongoClient> | null = null;
 
 async function initClient(): Promise<MongoClient> {
+  const options = getMongoPoolOptions();
   const client = new MongoClient(uri, options);
   try {
     const connectedClient = await client.connect();

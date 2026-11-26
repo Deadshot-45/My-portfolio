@@ -23,7 +23,7 @@ export default function NotFound() {
         </h1>
 
         <p className="font-grotesk text-zinc-400 text-sm sm:text-base leading-relaxed">
-          The page or resource you are looking for doesn't exist, has been archived, or was moved to another location.
+          The page or resource you are looking for doesn&apos;t exist, has been archived, or was moved to another location.
         </p>
 
         {/* Action buttons */}

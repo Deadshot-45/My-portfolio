@@ -5,7 +5,7 @@ import { randomBytes, createHash } from "node:crypto";
 import { getCollection, generateId, serializeDoc } from "@/lib/mongodb";
 
 const SESSION_COOKIE = "portfolio_cms_session";
-const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+const SESSION_DURATION_MS =  1 * 60 * 60 * 1000; // 24 Hours
 
 export interface AdminUserDoc {
   id: string;
@@ -89,12 +89,14 @@ function cookieOptions(): {
   secure: boolean;
   sameSite: "lax" | "strict" | "none";
   path: string;
+  maxAge: number;
 } {
   const isProduction = process.env.NODE_ENV === "production";
   return {
     httpOnly: true,
     secure: isProduction,
     sameSite: "lax" as const,
+    maxAge: SESSION_DURATION_MS,
     path: "/",
   };
 }

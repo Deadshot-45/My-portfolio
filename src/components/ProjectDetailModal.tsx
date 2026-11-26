@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import Image from 'next/image';
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -28,6 +29,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   const isDark = theme === 'dark';
   const [modalImgLoaded, setModalImgLoaded] = useState(false);
   const [modalImgError, setModalImgError] = useState(false);
+  const previewUrl = project ? getProjectPreviewUrl(project) : undefined;
 
   return (
     <Dialog open={Boolean(project)}
@@ -97,7 +99,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                     <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]/80" />
                   </div>
                   {project.liveUrl && (
-                    <span className="text-zinc-400 text-[11px] truncate max-w-[200px] sm:max-w-xs">
+                    <span className="text-zinc-400 text-[11px] truncate max-w-50 sm:max-w-xs">
                       {cleanDisplayUrl(project.liveUrl)}
                     </span>
                   )}
@@ -113,7 +115,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                     </a>
                   )}
                 </div>
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-zinc-950 flex flex-col justify-between">
+                <div className="relative aspect-video w-full overflow-hidden bg-zinc-950 flex flex-col justify-between">
                   {/* High-Fidelity Mockup Background */}
                   <div
                     className="absolute inset-0 w-full h-full p-4 sm:p-6 flex flex-col justify-between select-none overflow-hidden"
@@ -146,7 +148,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                       ).map((m, i) => (
                         <div
                           key={i}
-                          className="p-2 sm:p-3 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-xs flex flex-col justify-between"
+                          className="p-2 sm:p-3 rounded-xl bg-white/4 border border-white/10 backdrop-blur-xs flex flex-col justify-between"
                         >
                           <span className="text-[9px] font-mono uppercase tracking-wider text-zinc-400 truncate">
                             {m.label}
@@ -170,11 +172,13 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                   </div>
 
                   {/* Screenshot Image Overlay */}
-                  {getProjectPreviewUrl(project) && !modalImgError && (
-                    <img
-                      src={getProjectPreviewUrl(project)}
+                  {previewUrl && !modalImgError && (
+                    <Image
+                      src={previewUrl}
                       alt={`${project.title} Preview`}
-                      className={`absolute inset-0 w-full h-full object-cover object-top transition-all duration-700 ${
+                      fill
+                      unoptimized
+                      className={`object-cover object-top transition-all duration-700 ${
                         modalImgLoaded ? "opacity-100" : "opacity-0"
                       }`}
                       loading="lazy"

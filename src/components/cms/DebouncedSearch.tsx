@@ -20,13 +20,15 @@ export function DebouncedSearch({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const initialQuery = searchParams.get(paramKey) || '';
-  const [query, setQuery] = useState(initialQuery);
+  const currentParam = searchParams.get(paramKey) || '';
+  const [prevParam, setPrevParam] = useState(currentParam);
+  const [query, setQuery] = useState(currentParam);
 
-  // Synchronize state if URL changes externally (e.g., reset or back/forward)
-  useEffect(() => {
-    setQuery(searchParams.get(paramKey) || '');
-  }, [searchParams, paramKey]);
+  // Synchronize state if URL changes externally (during render per React docs)
+  if (prevParam !== currentParam) {
+    setPrevParam(currentParam);
+    setQuery(currentParam);
+  }
 
   useEffect(() => {
     // Only trigger if query actually differs from what is currently in URL

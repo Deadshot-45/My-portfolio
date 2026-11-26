@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CLIENT_REVIEWS } from '../data/portfolioData';
 import { ClientReview } from '../types/index';
 
@@ -72,9 +73,9 @@ export const WhyCustom: React.FC<WhyCustomProps> = ({ testimonials = CLIENT_REVI
           <span className="block h-[1px] w-full bg-[#0f0f0f]/15 relative overflow-hidden" aria-hidden="true">
             <span
               key={currentIndex}
-              className="absolute inset-0 bg-[#0f0f0f] origin-left animate-[review-fill_6500ms_linear_infinite]"
+              className="absolute inset-0 bg-[#0f0f0f] origin-left animate-[reviewFill_6500ms_linear_infinite]"
               style={{
-                animation: 'review-fill 6500ms linear forwards',
+                animation: 'reviewFill 6500ms linear forwards',
               }}
             />
           </span>
@@ -103,18 +104,29 @@ export const WhyCustom: React.FC<WhyCustomProps> = ({ testimonials = CLIENT_REVI
           </div>
 
           {/* Review Body */}
-          <figure className="mt-5 min-h-[9.5rem] flex flex-col justify-between">
-            <blockquote className="font-grotesk text-[clamp(1rem,1.4vw,1.25rem)] leading-[1.38] text-[#0f0f0f] font-normal italic">
-              “{currentReview.quote}”
-            </blockquote>
+          <div className="mt-5 min-h-[9.5rem]">
+            <AnimatePresence mode="wait">
+              <motion.figure
+                key={currentIndex}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col justify-between h-full"
+              >
+                <blockquote className="font-grotesk text-[clamp(1rem,1.4vw,1.25rem)] leading-[1.38] text-[#0f0f0f] font-normal italic">
+                  “{currentReview.quote}”
+                </blockquote>
 
-            <figcaption className="mt-4 flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-[#0f0f0f]">{currentReview.company}</span>
-              <span className="text-[#0f0f0f]/60">
-                <span className="text-[#0f0f0f] font-semibold">★ {currentReview.rating.toFixed(1)}</span> · {currentReview.serviceTag}
-              </span>
-            </figcaption>
-          </figure>
+                <figcaption className="mt-4 flex items-center justify-between text-xs font-mono">
+                  <span className="font-bold text-[#0f0f0f]">{currentReview.company}</span>
+                  <span className="text-[#0f0f0f]/60">
+                    <span className="text-[#0f0f0f] font-semibold">★ {currentReview.rating.toFixed(1)}</span> · {currentReview.serviceTag}
+                  </span>
+                </figcaption>
+              </motion.figure>
+            </AnimatePresence>
+          </div>
         </div>
 
       </div>

@@ -39,15 +39,16 @@ export function FilterBar({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const [search, setSearch] = useState(
-    searchParams.get("search") || initialSearch,
-  );
+  const currentSearchParam = searchParams.get("search") || "";
+  const [prevSearchParam, setPrevSearchParam] = useState(currentSearchParam);
+  const [search, setSearch] = useState(currentSearchParam || initialSearch);
   const active = searchParams.get(filterKey) || initialActive;
 
-  // Synchronize state if URL search param changes externally (e.g. back/forward navigation)
-  useEffect(() => {
-    setSearch(searchParams.get("search") || "");
-  }, [searchParams]);
+  // Synchronize state if URL search param changes externally (during render per React docs)
+  if (prevSearchParam !== currentSearchParam) {
+    setPrevSearchParam(currentSearchParam);
+    setSearch(currentSearchParam);
+  }
 
   // Debounced search effect (300ms)
   useEffect(() => {

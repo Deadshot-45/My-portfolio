@@ -23,19 +23,20 @@ export const InViewSection: React.FC<InViewSectionProps> = ({
   children,
   fallback,
 }) => {
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+      return true;
+    }
+    if (id && typeof window !== 'undefined' && window.location.hash === `#${id}`) {
+      return true;
+    }
+    return false;
+  });
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Fallback immediately if IntersectionObserver is not supported
+    if (isInView) return;
     if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      setIsInView(true);
-      return;
-    }
-
-    // Direct hash deep-link landing check
-    if (id && window.location.hash === `#${id}`) {
-      setIsInView(true);
       return;
     }
 

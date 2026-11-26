@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { SkyMode } from "../types/index";
 import { USER_PROFILE } from "../data/portfolioData";
 import { ArrowUpRight } from "lucide-react";
@@ -153,21 +154,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenInquiry }) => {
             menuOpen ? "opacity-0 pointer-events-none" : "opacity-100"
           }`}
         >
-          <svg
-            viewBox="0 0 64 64"
-            fill="currentColor"
-            className="w-7 h-7 md:w-[34px] md:h-[34px]"
-            role="img"
-            aria-label="Mayank Monogram"
+          <motion.div
+            initial={{ opacity: 0, scale: 0.25, rotate: -35 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            {/* Geometric sculpted 4-part 'M' mark */}
-            <path d="M8 52V14C8 10 12 8 15 11L30 28V52C22 52 14 52 8 52Z" />
-            <path
-              d="M56 14V52C50 52 42 52 34 52V28L49 11C52 8 56 10 56 14Z"
-              opacity="0.92"
-            />
-            <circle cx="32" cy="14" r="5.5" />
-          </svg>
+            <svg
+              viewBox="0 0 64 64"
+              fill="currentColor"
+              className="w-7 h-7 md:w-[34px] md:h-[34px]"
+              role="img"
+              aria-label="Mayank Monogram"
+            >
+              {/* Geometric sculpted 4-part 'M' mark */}
+              <path d="M8 52V14C8 10 12 8 15 11L30 28V52C22 52 14 52 8 52Z" />
+              <path
+                d="M56 14V52C50 52 42 52 34 52V28L49 11C52 8 56 10 56 14Z"
+                opacity="0.92"
+              />
+              <circle cx="32" cy="14" r="5.5" />
+            </svg>
+          </motion.div>
         </a>
 
         {/* Center: Clean Editorial Wordmark - Automatically inverts over white sections & dark laptop stage */}

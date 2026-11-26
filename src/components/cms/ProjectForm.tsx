@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createProjectAction, updateProjectAction } from '@/app/cms/actions/projects';
 import { Loader2 } from 'lucide-react';
 import { ImagePickerInput } from '@/components/cms/ImagePickerInput';
 import { CmsSelect } from '@/components/cms/CmsSelect';
+import Link from 'next/link';
 
 export type ProjectFormMode = 'create' | 'edit';
 
@@ -60,15 +61,10 @@ export function ProjectForm({ mode, project }: ProjectFormProps) {
     status: initial.status,
   });
 
-  useEffect(() => {
-    if (mode === 'create' && !form.slug) {
-      setForm((prev) => ({ ...prev, slug: slugify(prev.title) }));
-    }
-  }, [mode, form.title]);
-
   function slugify(text: string): string {
     return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setServerError(null);
@@ -111,6 +107,14 @@ export function ProjectForm({ mode, project }: ProjectFormProps) {
     setForm((prev) => {
       if (key === 'featured') return { ...prev, featured: checked ?? prev.featured };
       if (key === 'displayOrder') return { ...prev, displayOrder: parseInt(value, 10) || 0 };
+      if (key === 'title' && mode === 'create') {
+        const isAutoSlug = !prev.slug || prev.slug === slugify(prev.title);
+        return {
+          ...prev,
+          title: value,
+          slug: isAutoSlug ? slugify(value) : prev.slug,
+        };
+      }
       return { ...prev, [key]: value };
     });
   };
@@ -183,7 +187,7 @@ export function ProjectForm({ mode, project }: ProjectFormProps) {
             {pending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
             {mode === 'create' ? 'Create Project' : 'Save Changes'}
           </button>
-          <a href="/cms/projects" className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900/50 transition-colors">Cancel</a>
+          <Link href="/cms/projects" className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900/50 transition-colors">Cancel</Link>
         </div>
       </form>
     </div>

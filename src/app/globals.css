@@ -96,6 +96,23 @@
       transform: translateX(100%);
     }
   }
+  @keyframes reviewFill {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes scrollHintDrop {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(6px);
+    }
+  }
 }
 
 :root {

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { USER_PROFILE } from '../data/portfolioData';
 import { UserProfile } from '../types/index';
 import { ArrowUp, Github, Linkedin, Mail } from 'lucide-react';
+import Link from 'next/link';
 
 interface FooterProps {
   onOpenInquiry?: () => void;
@@ -103,9 +104,9 @@ export const Footer: React.FC<FooterProps> = ({ onOpenInquiry, profile = USER_PR
                   </a>
                 </li>
                 <li>
-                  <a href="#why" className="hover:text-white transition-colors">
+                  <Link href="#why" className="hover:text-white transition-colors">
                     Why Custom
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a

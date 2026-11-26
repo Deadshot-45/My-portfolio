@@ -1,4 +1,5 @@
 import { getCollection, generateId, serializeDoc, serializeDocs } from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
 
 export type ProjectStatusValue = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 
@@ -119,7 +120,7 @@ export async function listProjects(params: ListProjectsParams = {}): Promise<Lis
 
 export async function getProjectById(id: string): Promise<CmsProject | null> {
   const projectCol = await getCollection('projects');
-  const project = await projectCol.findOne({ id });
+  const project = await projectCol.findOne({ _id: new ObjectId(id) });
   return project ? formatProjectDoc(project) : null;
 }
 

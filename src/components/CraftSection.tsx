@@ -2,6 +2,28 @@
 
 import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
+import { motion } from 'framer-motion';
+
+const titleVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.035,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const charVariants = {
+  hidden: { opacity: 0, y: 22, skewY: 4 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    skewY: 0,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+  },
+};
 
 export const CraftSection: React.FC = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -89,13 +111,39 @@ export const CraftSection: React.FC = () => {
 
         {/* Right: Signature Editorial Typography */}
         <div className="lg:col-span-6 flex flex-col max-w-xl order-1 lg:order-2">
-          <h2
+          <motion.h2
             id="craft-title"
             className="font-grotesk text-[clamp(2.5rem,6.5vw,5.5rem)] font-light leading-[1] tracking-[-0.035em] text-[#0f0f0f] m-0"
+            variants={titleVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
           >
-            <span className="block">Where Code</span>
-            <span className="block font-normal">Meets Art.</span>
-          </h2>
+            <span className="block overflow-hidden">
+              {"Where Code".split("").map((char, i) => (
+                <motion.span
+                  key={i}
+                  variants={charVariants}
+                  className="inline-block"
+                  style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </span>
+            <span className="block overflow-hidden font-normal">
+              {"Meets Art.".split("").map((char, i) => (
+                <motion.span
+                  key={i}
+                  variants={charVariants}
+                  className="inline-block"
+                  style={{ whiteSpace: char === " " ? "pre" : "normal" }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </span>
+          </motion.h2>
 
           <div className="mt-8 pt-6 border-t border-[#0f0f0f]/15">
             <p className="font-grotesk text-[clamp(1.05rem,1.4vw,1.35rem)] leading-[1.45] text-[#0f0f0f]/80 m-0">

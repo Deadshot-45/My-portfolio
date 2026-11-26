@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createServiceAction, updateServiceAction } from '@/app/cms/actions/services';
+import Link from 'next/link';
 
 interface ServiceFormProps {
   mode: 'create' | 'edit';
@@ -67,7 +68,7 @@ export function ServiceForm({ mode, service }: ServiceFormProps) {
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4">
           <button type="submit" disabled={pending} className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg text-sm font-semibold text-black bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 transition-all">{pending ? 'Saving...' : mode === 'create' ? 'Create Service' : 'Save Changes'}</button>
-          <a href="/cms/services" className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900/50 transition-colors">Cancel</a>
+          <Link href="/cms/services" className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900/50 transition-colors">Cancel</Link>
         </div>
       </form>
     </div>

@@ -1,7 +1,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import bcrypt from 'bcryptjs';
-import { serializeDoc, serializeDocs, generateId } from '../src/lib/mongodb.ts';
+import { serializeDoc, serializeDocs, generateId, getMongoPoolOptions } from '../src/lib/mongodb.ts';
 
 describe('MongoDB Utility & Serialization Tests', () => {
   test('generateId returns valid UUID string', () => {
@@ -77,5 +77,38 @@ describe('MongoDB Utility & Serialization Tests', () => {
     const isWrongMatch = await bcrypt.compare('WrongPassword123!', passwordHash);
     assert.equal(isMatch, true);
     assert.equal(isWrongMatch, false);
+  });
+
+  test('getMongoPoolOptions provides production defaults and honors environment overrides', () => {
+    // Default pooling config
+    delete process.env.MONGODB_MAX_POOL_SIZE;
+    delete process.env.MONGODB_MIN_POOL_SIZE;
+    delete process.env.MONGODB_MAX_IDLE_TIME_MS;
+    delete process.env.MONGODB_WAIT_QUEUE_TIMEOUT_MS;
+
+    const defaultOptions = getMongoPoolOptions();
+    assert.equal(defaultOptions.maxPoolSize, 10);
+    assert.equal(defaultOptions.minPoolSize, 1);
+    assert.equal(defaultOptions.maxIdleTimeMS, 60000);
+    assert.equal(defaultOptions.waitQueueTimeoutMS, 10000);
+    assert.equal(defaultOptions.serverSelectionTimeoutMS, 5000);
+
+    // Environment overrides
+    process.env.MONGODB_MAX_POOL_SIZE = '25';
+    process.env.MONGODB_MIN_POOL_SIZE = '5';
+    process.env.MONGODB_MAX_IDLE_TIME_MS = '30000';
+    process.env.MONGODB_WAIT_QUEUE_TIMEOUT_MS = '5000';
+
+    const customOptions = getMongoPoolOptions();
+    assert.equal(customOptions.maxPoolSize, 25);
+    assert.equal(customOptions.minPoolSize, 5);
+    assert.equal(customOptions.maxIdleTimeMS, 30000);
+    assert.equal(customOptions.waitQueueTimeoutMS, 5000);
+
+    // Cleanup
+    delete process.env.MONGODB_MAX_POOL_SIZE;
+    delete process.env.MONGODB_MIN_POOL_SIZE;
+    delete process.env.MONGODB_MAX_IDLE_TIME_MS;
+    delete process.env.MONGODB_WAIT_QUEUE_TIMEOUT_MS;
   });
 });
