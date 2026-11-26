@@ -10,7 +10,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsc src/utils/portfolioUtils.ts src/utils/seoUtils.ts src/data/portfolioData.ts --outDir dist-test --target es2022 --module esnext --moduleResolution bundler --skipLibCheck && node --test tests/portfolio.test.mjs tests/mongodb.test.mjs tests/cms_models.test.mjs tests/seo.test.mjs tests/sanity.test.mjs && node -e \"require('fs').rmSync('dist-test', { recursive: true, force: true })\""
+    "test": "tsc src/utils/portfolioUtils.ts src/utils/seoUtils.ts src/data/portfolioData.ts src/lib/seo.ts --outDir dist-test --target es2022 --module esnext --moduleResolution bundler --skipLibCheck && node --test tests/portfolio.test.mjs tests/mongodb.test.mjs tests/cms_models.test.mjs tests/seo.test.mjs tests/sanity.test.mjs && node -e \"require('fs').rmSync('dist-test', { recursive: true, force: true })\""
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

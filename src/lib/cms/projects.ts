@@ -235,6 +235,13 @@ export async function getPublishedProjects(): Promise<CmsProject[]> {
 
 export async function getPublishedProjectBySlug(slug: string): Promise<CmsProject | null> {
   const projectCol = await getCollection('projects');
-  const project = await projectCol.findOne({ slug, status: 'PUBLISHED' });
+  const orConditions: any[] = [{ slug }, { id: slug }];
+  if (ObjectId.isValid(slug)) {
+    orConditions.push({ _id: new ObjectId(slug) });
+  }
+  const project = await projectCol.findOne({
+    status: 'PUBLISHED',
+    $or: orConditions,
+  });
   return project ? formatProjectDoc(project) : null;
 }

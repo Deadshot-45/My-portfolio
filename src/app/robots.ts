@@ -1,7 +1,39 @@
 import type { MetadataRoute } from 'next';
-import { getRobotsConfig, DEFAULT_SITE_URL } from '@/utils/seoUtils';
+import { getSiteUrl, isProductionEnvironment } from '@/lib/seo';
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL;
-  return getRobotsConfig(siteUrl);
+  const siteUrl = getSiteUrl();
+  const isProduction = isProductionEnvironment();
+
+  // On Vercel preview environments, completely block indexing to prevent duplicate content
+  if (!isProduction) {
+    return {
+      rules: [
+        {
+          userAgent: '*',
+          disallow: '/',
+        },
+      ],
+      sitemap: `${siteUrl}/sitemap.xml`,
+    };
+  }
+
+  // Production crawler directives: allow public portfolio pages, shield CMS & API endpoints
+  return {
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/cms',
+          '/cms/*',
+          '/api',
+          '/api/*',
+          '/api/cms',
+          '/api/cms/*',
+        ],
+      },
+    ],
+    sitemap: `${siteUrl}/sitemap.xml`,
+  };
 }

@@ -14,6 +14,14 @@ const SESSION_COOKIE = 'portfolio_cms_session';
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Search engine indexing shield for all API endpoints
+  if (pathname.startsWith('/api')) {
+    const response = NextResponse.next();
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return response;
+  }
+
   const isCms = pathname.startsWith('/cms');
   const isLogin = pathname === '/cms/login';
   const hasSession = request.cookies.has(SESSION_COOKIE);
@@ -34,5 +42,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/cms/:path*'],
+  matcher: ['/cms/:path*', '/api/:path*'],
 };
