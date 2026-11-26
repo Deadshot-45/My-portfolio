@@ -79,6 +79,8 @@ describe('SEO & Structured Data Verification Tests', () => {
     assert.equal(seoConfig.location.city, 'Indore');
     assert.equal(seoConfig.socials.github, 'https://github.com/Deadshot-45');
     assert.equal(seoConfig.socials.linkedin, 'https://linkedin.com/in/mayank-sahu-ou');
+    assert.equal(seoConfig.socials.twitter, 'https://x.com/Deadshot_45');
+    assert.equal(seoConfig.ogImage.url, '/images/hero-sunset.jpg');
     assert.ok(seoConfig.skills.length >= 8);
     assert.ok(seoConfig.skills.includes('React 19'));
     assert.ok(seoConfig.skills.includes('Next.js (App Router)') || seoConfig.skills.includes('Next.js'));

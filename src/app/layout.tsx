@@ -108,7 +108,11 @@ export default function RootLayout({
     image: `${siteUrl}/images/hero-sunset.jpg`,
     email: `mailto:${seoConfig.email}`,
     telephone: seoConfig.phone,
-    sameAs: [seoConfig.socials.github, seoConfig.socials.linkedin].filter(Boolean),
+    sameAs: [
+      seoConfig.socials.github,
+      seoConfig.socials.linkedin,
+      seoConfig.socials.twitter,
+    ].filter(Boolean),
     address: {
       "@type": "PostalAddress",
       addressLocality: seoConfig.location.city,

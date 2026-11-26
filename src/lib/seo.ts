@@ -33,6 +33,7 @@ export interface SeoConfig {
     github: string;
     linkedin: string;
     twitter?: string;
+    x?: string;
   };
   keywords: string[];
   skills: string[];
@@ -63,6 +64,8 @@ export const seoConfig: SeoConfig = {
   socials: {
     github: 'https://github.com/Deadshot-45',
     linkedin: 'https://linkedin.com/in/mayank-sahu-ou',
+    twitter: 'https://x.com/Deadshot_45',
+    x: 'https://x.com/Deadshot_45',
   },
   keywords: [
     'Mayank Sahu',
@@ -104,7 +107,7 @@ export const seoConfig: SeoConfig = {
     'TanStack Query',
   ],
   ogImage: {
-    url: '/opengraph-image',
+    url: '/images/hero-sunset.jpg',
     width: 1200,
     height: 630,
     alt: 'Mayank Sahu — Creative Full-Stack Developer & Designer',
