@@ -93,11 +93,11 @@ export function Shell(this: any, { user, children }: ShellProps) {
   };
 
   return (
-    <div className="flex min-h-[92dvh] bg-[#09090b] text-zinc-100">
+    <div className="relative flex min-h-[92dvh] bg-[#09090b] text-zinc-100">
       <aside
-        className={`fixed left-0 top-0 bottom-0 w-64 border-r border-zinc-900/50 bg-[#07070a]/80 backdrop-blur z-40 transform transition-transform duration-300 ${
+        className={`fixed h-screen left-0 top-0 bottom-0 w-64 border-r border-zinc-900/50 bg-[#07070a]/80 backdrop-blur z-40 transform transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:relative lg:translate-x-0 lg:w-64`}
+        } lg:sticky lg:translate-x-0 lg:w-64`}
         aria-label="Main navigation"
       >
         <div className="flex h-full flex-col">
@@ -145,7 +145,7 @@ export function Shell(this: any, { user, children }: ShellProps) {
         />
       )}
       {mobileSidebarOpen && (
-        <aside className="fixed left-0 top-0 bottom-0 w-64 border-r border-zinc-900/50 bg-[#07070a] z-50 lg:hidden">
+        <aside className="fixed h-[92dvh] left-0 top-0 bottom-0 w-64 border-r border-zinc-900/50 bg-[#07070a] z-50 lg:hidden">
           <div className="flex h-full flex-col">
             <div className="h-12 flex items-center justify-between px-4">
               <span className="font-bold text-xl tracking-tighter text-emerald-400">
@@ -182,8 +182,8 @@ export function Shell(this: any, { user, children }: ShellProps) {
             </nav>
             <div className="p-3 border-t border-zinc-900/50">
               <button
-                onClick={handleLogout}
-                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-colors"
+                onClick={() => setShowSignOutConfirm(true)}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
               >
                 <LogOut className="h-5 w-5" aria-hidden="true" />
                 Sign out
